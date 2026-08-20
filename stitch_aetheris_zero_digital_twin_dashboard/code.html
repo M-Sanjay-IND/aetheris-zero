@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AETHERIS-Zero - Mission Control</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@600;700&amp;family=Inter:wght@400;500&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "inverse-on-surface": "#cfd4e5",
+                "on-tertiary-fixed-variant": "#44474e",
+                "on-tertiary-container": "#e2e2e9",
+                "on-secondary-fixed-variant": "#44474e",
+                "surface-overlay": "rgba(14, 19, 35, 0.7)",
+                "error": "#b51a2b",
+                "dusk-violet": "#0e1323",
+                "on-error-container": "#ffdad6",
+                "surface-container": "#161b2b",
+                "outline-variant": "#44474e",
+                "on-surface-variant": "#c4c6d0",
+                "tertiary": "#ffa586",
+                "on-primary-container": "#ffdad6",
+                "surface": "#0e1323",
+                "on-surface": "#e2e2e9",
+                "tertiary-fixed-dim": "#ffa586",
+                "surface-bright": "#34394a",
+                "surface-container-low": "#161b2b",
+                "on-secondary": "#ffffff",
+                "tertiary-container": "#b51a2b",
+                "off-white": "#f8f9ff",
+                "secondary": "#ffa586",
+                "background": "#0e1323",
+                "on-secondary-container": "#ffdad6",
+                "error-container": "#541a2b",
+                "on-primary": "#ffffff",
+                "grid-line": "#384358",
+                "on-background": "#e2e2e9",
+                "on-secondary-fixed": "#1a1b21",
+                "on-tertiary-fixed": "#1a1b21",
+                "inverse-primary": "#ffa586",
+                "surface-container-lowest": "#080d1d",
+                "primary-fixed-dim": "#ffa586",
+                "surface-dim": "#0e1323",
+                "surface-container-high": "#242f49",
+                "soft-peach": "#ffa586",
+                "inverse-surface": "#e2e2e9",
+                "on-primary-fixed": "#1a1b21",
+                "on-tertiary": "#ffffff",
+                "primary-fixed": "#ffa586",
+                "on-primary-fixed-variant": "#44474e",
+                "secondary-container": "#541a2b",
+                "secondary-fixed-dim": "#ffa586",
+                "muted-rose": "#b51a2b",
+                "outline": "#8e9099",
+                "surface-container-highest": "#34394a",
+                "surface-variant": "#242f49",
+                "secondary-fixed": "#ffa586",
+                "tertiary-fixed": "#ffa586",
+                "surface-tint": "#ffa586",
+                "primary-container": "#541a2b",
+                "on-error": "#ffffff",
+                "primary": "#ffa586"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.125rem",
+                "lg": "0.25rem",
+                "xl": "0.5rem",
+                "full": "0.75rem"
+        },
+        "spacing": {
+                "unit": "4px",
+                "grid-column-gap": "16px",
+                "margin-edge": "24px",
+                "panel-padding": "20px",
+                "gutter": "16px"
+        },
+        "fontFamily": {
+                "headline-md": [
+                        "Hanken Grotesk"
+                ],
+                "display-lg": [
+                        "Hanken Grotesk"
+                ],
+                "label-caps": [
+                        "JetBrains Mono"
+                ],
+                "body-base": [
+                        "Inter"
+                ],
+                "display-lg-mobile": [
+                        "Hanken Grotesk"
+                ],
+                "data-telemetry": [
+                        "JetBrains Mono"
+                ]
+        },
+        "fontSize": {
+                "headline-md": [
+                        "24px",
+                        {
+                                "lineHeight": "32px",
+                                "fontWeight": "600"
+                        }
+                ],
+                "display-lg": [
+                        "48px",
+                        {
+                                "lineHeight": "56px",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "label-caps": [
+                        "11px",
+                        {
+                                "lineHeight": "16px",
+                                "letterSpacing": "0.1em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "body-base": [
+                        "16px",
+                        {
+                                "lineHeight": "24px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "display-lg-mobile": [
+                        "32px",
+                        {
+                                "lineHeight": "40px",
+                                "letterSpacing": "-0.01em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "data-telemetry": [
+                        "14px",
+                        {
+                                "lineHeight": "20px",
+                                "letterSpacing": "0.02em",
+                                "fontWeight": "500"
+                        }
+                ]
+        }
+},
+    },
+  }
+</script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .fill-icon {
+            font-variation-settings: 'FILL' 1;
+        }
+        
+        /* Ambient Glows */
+        .inner-glow {
+            box-shadow: inset 0 0 10px rgba(255, 165, 134, 0.1);
+        }
+        .safety-glow {
+            box-shadow: inset 0 0 20px rgba(181, 26, 43, 0.15), 0 0 15px rgba(181, 26, 43, 0.3);
+        }
+        .pulse-danger {
+            animation: pulse-border 2s infinite;
+        }
+        @keyframes pulse-border {
+            0% { border-color: rgba(181, 26, 43, 0.4); box-shadow: 0 0 0 rgba(181, 26, 43, 0); }
+            50% { border-color: rgba(181, 26, 43, 1); box-shadow: 0 0 10px rgba(181, 26, 43, 0.3); }
+            100% { border-color: rgba(181, 26, 43, 0.4); box-shadow: 0 0 0 rgba(181, 26, 43, 0); }
+        }
+
+        /* Graph Tooltips */
+        .graph-tooltip {
+            position: absolute;
+            background: rgba(14, 19, 35, 0.9);
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            z-index: 100;
+            border: 1px solid rgba(255, 165, 134, 0.2);
+            transform: translate(-50%, -100%);
+            margin-top: -8px;
+        }
+    </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body class="bg-background text-on-background font-body-base overflow-hidden selection:bg-primary-container selection:text-on-primary-container">
+<!-- Global Background Shader -->
+<div class="fixed inset-0 w-full h-full z-0 pointer-events-none opacity-60">
+<canvas class="w-full h-full" id="bg-shader"></canvas>
+</div>
+<!-- TopNavBar (Shared Component) -->
+<nav class="fixed top-0 w-full z-50 flex justify-between items-center px-margin-edge h-16 bg-surface-container/80 backdrop-blur-xl border-b border-grid-line">
+<!-- Brand -->
+<div class="flex items-center gap-4">
+<span class="font-display-lg text-[24px] font-bold tracking-tighter text-primary">AETHERIS-Zero</span>
+</div>
+<!-- Navigation Links -->
+<div class="hidden md:flex gap-8 items-center h-full">
+<a class="h-full flex items-center text-primary-fixed border-b-2 border-primary-fixed pb-1 font-label-caps text-label-caps uppercase transition-colors scale-95 duration-100" href="#">
+                Dashboard
+            </a>
+<a class="h-full flex items-center text-on-surface-variant font-label-caps text-label-caps uppercase hover:text-primary-fixed transition-colors pt-1" href="#">
+                Analytics
+            </a>
+<a class="h-full flex items-center text-on-surface-variant font-label-caps text-label-caps uppercase hover:text-primary-fixed transition-colors pt-1" href="#">
+                Assets
+            </a>
+<a class="h-full flex items-center text-on-surface-variant font-label-caps text-label-caps uppercase hover:text-primary-fixed transition-colors pt-1" href="#">
+                Optimization
+            </a>
+</div>
+<!-- Trailing Actions -->
+<div class="flex items-center gap-4 text-primary">
+<button class="hover:text-primary-fixed transition-colors flex items-center justify-center p-2 rounded-full hover:bg-surface-variant/30">
+<span class="material-symbols-outlined" data-icon="sensors_krone">drive_file_stream</span>
+</button>
+<button class="hover:text-primary-fixed transition-colors flex items-center justify-center p-2 rounded-full hover:bg-surface-variant/30 relative">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="hover:text-primary-fixed transition-colors flex items-center justify-center p-2 rounded-full hover:bg-surface-variant/30">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</nav>
+<!-- Main Dashboard Layout -->
+<main class="relative z-10 pt-16 h-screen flex flex-col">
+<!-- Split View Container -->
+<div class="flex-grow flex flex-col md:flex-row gap-gutter p-gutter pb-0 overflow-hidden">
+<!-- Left Column: 3D Digital Twin Stage (60%) -->
+<section class="w-full md:w-[60%] relative bg-surface-container-low/60 backdrop-blur-md border border-grid-line rounded-lg overflow-hidden inner-glow flex flex-col">
+<!-- Header / Telemetry Tag -->
+<div class="absolute top-4 left-4 z-20 flex items-center gap-3">
+<div class="px-3 py-1 bg-surface-variant/80 backdrop-blur-sm border-l-2 border-primary-fixed font-data-telemetry text-data-telemetry text-primary-fixed">
+                        SYS.TWIN.01
+                    </div>
+<div class="flex items-center gap-2 px-3 py-1 bg-error-container/20 backdrop-blur-sm border border-error/50 rounded-sm safety-glow">
+<span class="material-symbols-outlined text-error text-sm">warning</span>
+<span class="font-label-caps text-label-caps text-error uppercase tracking-widest">Safety Barrier: Active</span>
+</div>
+</div>
+<!-- 3D Scene Wrapper - Updated styling -->
+<div class="relative flex-grow w-full h-full" id="threejs-container-ANIMATION_15">
+</div>
+<!-- Overlay Grids/Crosshairs for Technical Aesthetic -->
+<div class="absolute inset-0 pointer-events-none border border-grid-line/30 m-8 opacity-20">
+<div class="absolute top-0 left-0 w-4 h-4 border-t border-l border-primary-fixed"></div>
+<div class="absolute top-0 right-0 w-4 h-4 border-t border-r border-primary-fixed"></div>
+<div class="absolute bottom-0 left-0 w-4 h-4 border-b border-l border-primary-fixed"></div>
+<div class="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-primary-fixed"></div>
+</div>
+</section>
+<!-- Right Column: Analytics Rail (40%) -->
+<section class="w-full md:w-[40%] flex flex-col gap-gutter overflow-y-auto pr-1 pb-gutter custom-scrollbar">
+<!-- Chart 1: Baseline vs AETHERIS Load -->
+<article class="bg-surface-container-high/70 backdrop-blur-xl border border-grid-line rounded-lg p-panel-padding flex flex-col gap-4 relative">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Load Analysis</h3>
+<p class="font-label-caps text-label-caps text-on-surface-variant uppercase mt-1">Baseline vs. AETHERIS Load</p>
+</div>
+<span class="material-symbols-outlined text-primary-fixed">monitoring</span>
+</div>
+<!-- Interactive Chart Area -->
+<div class="h-40 w-full relative mt-2 border-b border-l border-grid-line/50" id="load-chart-container">
+<div class="graph-tooltip" id="load-tooltip"></div>
+<!-- Y-Axis Labels -->
+<div class="absolute -left-6 bottom-0 font-data-telemetry text-[10px] text-on-surface-variant">0</div>
+<div class="absolute -left-8 top-0 font-data-telemetry text-[10px] text-on-surface-variant">MW</div>
+<!-- Grid lines -->
+<div class="absolute w-full h-[1px] bg-grid-line/50 top-1/2"></div>
+<div class="absolute w-full h-[1px] bg-grid-line/50 top-1/4"></div>
+<div class="absolute w-full h-[1px] bg-grid-line/50 top-3/4"></div>
+<!-- SVG Line Chart with Interactivity -->
+<svg class="absolute inset-0 w-full h-full overflow-visible" id="load-chart" preserveaspectratio="none" viewbox="0 0 100 100">
+<!-- Baseline (Dashed, Slate) -->
+<path class="text-grid-line" d="M0 60 Q 20 55, 40 70 T 80 50 T 100 30" fill="none" stroke="currentColor" stroke-dasharray="4 4" stroke-width="2"></path>
+<!-- Actual Load (Solid, Primary) -->
+<path class="text-primary-fixed" d="M0 65 Q 15 65, 30 50 T 70 80 T 100 40" fill="none" stroke="currentColor" stroke-width="2.5"></path>
+</svg>
+</div>
+<!-- Legend -->
+<div class="flex gap-6 mt-2">
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 bg-grid-line rounded-sm"></div>
+<span class="font-data-telemetry text-data-telemetry text-on-surface-variant">Baseline</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 bg-primary-fixed rounded-sm shadow-[0_0_8px_rgba(255,165,134,0.4)]"></div>
+<span class="font-data-telemetry text-data-telemetry text-primary-fixed">AETHERIS</span>
+</div>
+</div>
+</article>
+<!-- Chart 2: CAISO LMP Price -->
+<article class="bg-surface-container-high/70 backdrop-blur-xl border border-grid-line rounded-lg p-panel-padding flex flex-col gap-4 relative">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">CAISO LMP Price</h3>
+<p class="font-label-caps text-label-caps text-on-surface-variant uppercase mt-1">Live Price Curve (₹/MWh)</p>
+</div>
+<div class="px-2 py-1 bg-error-container/20 border border-error/50 rounded text-error font-data-telemetry text-xs animate-pulse">
+                            SPIKE DETECTED
+                        </div>
+</div>
+<!-- Interactive Chart Area -->
+<div class="h-32 w-full relative mt-2 border-b border-l border-grid-line/50" id="price-chart-container">
+<div class="graph-tooltip" id="price-tooltip"></div>
+<svg class="absolute inset-0 w-full h-full overflow-visible" id="price-chart" preserveaspectratio="none" viewbox="0 0 100 100">
+<!-- Gradient Fill under curve -->
+<defs>
+<lineargradient id="priceGrad" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#b51a2b" stop-opacity="0.3"></stop>
+<stop offset="100%" stop-color="#b51a2b" stop-opacity="0.0"></stop>
+</lineargradient>
+</defs>
+<path d="M0 80 L 20 75 L 40 85 L 60 20 L 80 40 L 100 10 L 100 100 L 0 100 Z" fill="url(#priceGrad)"></path>
+<path class="text-error" d="M0 80 L 20 75 L 40 85 L 60 20 L 80 40 L 100 10" fill="none" stroke="currentColor" stroke-width="2"></path>
+<!-- Current Price Point -->
+<circle class="fill-error" cx="100" cy="10" r="3">
+<animate attributename="r" dur="2s" repeatcount="indefinite" values="3;6;3"></animate>
+</circle>
+</svg>
+</div>
+<div class="text-right">
+<span class="font-data-telemetry text-[24px] font-bold text-error">₹11,827.50</span>
+</div>
+</article>
+<!-- Metric Card: Accumulated Savings -->
+<article class="bg-surface-container-highest/80 backdrop-blur-xl border border-secondary/20 rounded-lg p-panel-padding flex items-center justify-between relative overflow-hidden group">
+<div class="absolute inset-0 bg-gradient-to-r from-secondary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div>
+<p class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-2">Accumulated Savings</p>
+<div class="font-display-lg text-[32px] text-secondary">
+                            ₹4,060,360<span class="text-[20px] text-secondary/70">.45</span>
+</div>
+</div>
+<div class="w-12 h-12 rounded-full bg-secondary-container/20 border border-secondary/30 flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary fill-icon">payments</span>
+</div>
+</article>
+</section>
+</div>
+<!-- Bottom Panel: Control Deck -->
+<section class="mt-auto w-full p-gutter px-margin-edge bg-surface-container-low/90 backdrop-blur-2xl border-t border-grid-line flex flex-col md:flex-row justify-between items-center gap-4 z-20">
+<div class="flex items-center gap-4">
+<div class="w-2 h-2 bg-primary-fixed rounded-full animate-pulse shadow-[0_0_8px_rgba(255,165,134,0.8)]"></div>
+<span class="font-data-telemetry text-data-telemetry text-on-surface-variant uppercase tracking-wider text-sm">System Armed &amp; Ready</span>
+</div>
+<div class="flex flex-wrap items-center gap-4">
+<!-- Subtle Button -->
+<button class="px-6 py-2 rounded border border-transparent text-on-surface-variant font-label-caps text-label-caps uppercase hover:bg-surface-variant/50 transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">visibility_off</span>
+                    Toggle Shadow Mode
+                </button>
+<!-- Danger Button -->
+<button class="px-6 py-2 rounded border border-error text-error font-label-caps text-label-caps uppercase hover:bg-error/10 transition-colors flex items-center gap-2 pulse-danger">
+<span class="material-symbols-outlined text-[18px]">bug_report</span>
+                    Simulate Setpoint Override
+                </button>
+<!-- Primary Action Button -->
+<button class="px-8 py-3 rounded bg-primary-fixed text-on-primary font-label-caps text-label-caps uppercase font-bold hover:bg-primary-fixed/90 transition-colors flex items-center gap-2 shadow-[0_0_15px_rgba(255,165,134,0.3)] hover:shadow-[0_0_25px_rgba(255,165,134,0.5)]">
+<span class="material-symbols-outlined text-[18px] fill-icon">bolt</span>
+                    Trigger OpenADR DR Event
+                </button>
+</div>
+</section>
+</main>
+<style>
+        /* Custom scrollbar for analytics rail */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(196, 198, 208, 0.1); 
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 165, 134, 0.3); 
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 165, 134, 0.6); 
+        }
+    </style>
+<script>
+        // Background Shader Logic
+        const canvas = document.getElementById('bg-shader');
+        const gl = canvas.getContext('webgl');
+        
+        if (gl) {
+            const vertexShaderSource = `
+                attribute vec2 position;
+                varying vec2 v_texCoord;
+                void main() {
+                    v_texCoord = position * 0.5 + 0.5;
+                    gl_Position = vec4(position, 0.0, 1.0);
+                }
+            `;
+            
+            const fragmentShaderSource = `
+                precision highp float;
+                varying vec2 v_texCoord;
+                uniform float u_time;
+                uniform vec2 u_resolution;
+
+                void main() {
+                    vec2 uv = v_texCoord;
+                    
+                    // Create a subtle tech grid
+                    float grid = 0.0;
+                    vec2 g_uv = uv * 40.0;
+                    vec2 r_uv = fract(g_uv - 0.5) - 0.5;
+                    float dist = length(r_uv);
+                    grid = smoothstep(0.48, 0.5, 1.0 - dist);
+                    
+                    // Scanning line effect
+                    float scan = sin(uv.y * 20.0 - u_time * 2.0) * 0.1 + 0.1;
+                    
+                    // Data stream glow
+                    float stream = pow(abs(sin(uv.x * 5.0 + u_time * 0.5)), 10.0) * 0.1;
+                    
+                    // SUNSET PALETTE COLORS:
+                    // Deep Navy: #0e1323 (0.05, 0.07, 0.14)
+                    // Coral/Peach: #ffa586 (1.0, 0.65, 0.53)
+                    // Ruby: #b51a2b (0.71, 0.10, 0.17)
+                    
+                    vec3 color = vec3(0.05, 0.07, 0.14); // Deep navy background
+                    color += vec3(1.0, 0.65, 0.53) * grid * 0.05; // Coral grid
+                    color += vec3(0.71, 0.10, 0.17) * scan * 0.2; // Ruby scanline
+                    color += vec3(1.0, 0.65, 0.53) * stream * 0.4; // Pulsing peach data
+                    
+                    gl_FragColor = vec4(color, 1.0);
+                }
+            `;
+
+            function createShader(gl, type, source) {
+                const shader = gl.createShader(type);
+                gl.shaderSource(shader, source);
+                gl.compileShader(shader);
+                if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+                    console.error(gl.getShaderInfoLog(shader));
+                    gl.deleteShader(shader);
+                    return null;
+                }
+                return shader;
+            }
+
+            const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
+            const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
+
+            const program = gl.createProgram();
+            gl.attachShader(program, vertexShader);
+            gl.attachShader(program, fragmentShader);
+            gl.linkProgram(program);
+
+            const positionAttributeLocation = gl.getAttribLocation(program, "position");
+            const positionBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+            const positions = [
+                -1.0, -1.0,
+                 1.0, -1.0,
+                -1.0,  1.0,
+                -1.0,  1.0,
+                 1.0, -1.0,
+                 1.0,  1.0,
+            ];
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+
+            const timeLocation = gl.getUniformLocation(program, "u_time");
+            const resolutionLocation = gl.getUniformLocation(program, "u_resolution");
+
+            function resizeCanvasToDisplaySize(canvas) {
+                const displayWidth  = canvas.clientWidth;
+                const displayHeight = canvas.clientHeight;
+                if (canvas.width !== displayWidth || canvas.height !== displayHeight) {
+                    canvas.width  = displayWidth;
+                    canvas.height = displayHeight;
+                }
+            }
+
+            let startTime = Date.now();
+            function render() {
+                resizeCanvasToDisplaySize(gl.canvas);
+                gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+
+                gl.useProgram(program);
+                gl.enableVertexAttribArray(positionAttributeLocation);
+                gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+                gl.vertexAttribPointer(positionAttributeLocation, 2, gl.FLOAT, false, 0, 0);
+
+                gl.uniform1f(timeLocation, (Date.now() - startTime) / 1000.0);
+                gl.uniform2f(resolutionLocation, gl.canvas.width, gl.canvas.height);
+
+                gl.drawArrays(gl.TRIANGLES, 0, 6);
+                requestAnimationFrame(render);
+            }
+            requestAnimationFrame(render);
+        }
+
+        // Interactive Graph Logic
+        function setupInteractiveGraph(containerId, svgId, tooltipId, dataPoints, formatValue) {
+            const container = document.getElementById(containerId);
+            const svg = document.getElementById(svgId);
+            const tooltip = document.getElementById(tooltipId);
+            
+            if(!container || !svg || !tooltip) return;
+
+            let activePoint = null;
+
+            svg.addEventListener('mousemove', (e) => {
+                const rect = svg.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const percentX = (x / rect.width) * 100;
+                
+                // Find nearest data point based on X percentage
+                // Simplified for this demo - assumes evenly spaced points or a mathematical curve
+                let value = dataPoints(percentX);
+                
+                tooltip.style.opacity = '1';
+                tooltip.style.left = `${x}px`;
+                tooltip.style.top = `${e.clientY - rect.top}px`;
+                tooltip.textContent = formatValue(value);
+            });
+
+            svg.addEventListener('mouseleave', () => {
+                tooltip.style.opacity = '0';
+            });
+        }
+
+        // Mock data functions for demonstration
+        const getLoadValue = (percentX) => {
+            // Roughly matches the SVG curve path shape
+            return Math.abs(Math.sin(percentX / 15) * 20 + 60).toFixed(1);
+        };
+        
+        const getPriceValue = (percentX) => {
+             // Roughly matches the price curve
+             let val = 80;
+             if(percentX > 60) val = 120 + (percentX-60);
+             else if (percentX > 40) val = 100;
+             return (val * 83).toFixed(0); // Rough USD to INR conversion for visual
+        };
+
+        // Initialize graphs when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            setupInteractiveGraph('load-chart-container', 'load-chart', 'load-tooltip', getLoadValue, (v) => `${v} MW`);
+            setupInteractiveGraph('price-chart-container', 'price-chart', 'price-tooltip', getPriceValue, (v) => `₹${Number(v).toLocaleString()}`);
+        });
+    </script>
+<script>
+(function() {
+  const container = document.getElementById('threejs-container-ANIMATION_15');
+  const devicePixelRatio = window.devicePixelRatio || 1;
+  
+  const width = container.clientWidth || window.innerWidth;
+  const height = container.clientHeight || window.innerHeight;
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setSize(width, height);
+  renderer.setPixelRatio(window.devicePixelRatio);
+  container.appendChild(renderer.domElement);
+
+  // Lighting - Sunset Accents
+  // Palette: Navy #0e1323, Charcoal #242f49, Slate #384358, Peach #ffa586, Ruby #b51a2b, Plum #541a2b
+  const ambientLight = new THREE.AmbientLight(0x384358, 1.5); 
+  scene.add(ambientLight);
+  const directionalLight = new THREE.DirectionalLight(0xffa586, 1.2);
+  directionalLight.position.set(5, 10, 7);
+  scene.add(directionalLight);
+
+  // Building Group
+  const building = new THREE.Group();
+  scene.add(building);
+
+  // Materials
+  const wireframeMaterial = new THREE.MeshBasicMaterial({ color: 0xb51a2b, wireframe: true, transparent: true, opacity: 0.4 });
+  const glassMaterial = new THREE.MeshPhongMaterial({ color: 0x0e1323, transparent: true, opacity: 0.15, shininess: 80 });
+
+  // Main structure
+  const baseGeom = new THREE.BoxGeometry(4, 8, 4);
+  const base = new THREE.Mesh(baseGeom, glassMaterial);
+  building.add(base);
+
+  const wireframeBase = new THREE.Mesh(baseGeom, wireframeMaterial);
+  building.add(wireframeBase);
+
+  // Floor divisions (Thermal Zones)
+  const zones = [];
+  const palette = [0xb51a2b, 0xffa586, 0x541a2b, 0x384358, 0x242f49];
+  for(let i = 0; i < 5; i++) {
+    const zoneGeom = new THREE.BoxGeometry(4.1, 1.5, 4.1);
+    const zoneMat = new THREE.MeshPhongMaterial({ 
+        color: palette[i % palette.length], 
+        transparent: true, 
+        opacity: 0.3,
+        emissive: palette[i % palette.length],
+        emissiveIntensity: 0.2
+    });
+    const zone = new THREE.Mesh(zoneGeom, zoneMat);
+    zone.position.y = -3.2 + (i * 1.6);
+    building.add(zone);
+    zones.push(zone);
+  }
+
+  // Particle system for "Airflow" - Peach accents
+  const particleCount = 120;
+  const particles = new THREE.BufferGeometry();
+  const pPositions = new Float32Array(particleCount * 3);
+  for (let i = 0; i < particleCount; i++) {
+    pPositions[i * 3] = (Math.random() - 0.5) * 4;
+    pPositions[i * 3 + 1] = (Math.random() - 0.5) * 8;
+    pPositions[i * 3 + 2] = (Math.random() - 0.5) * 4;
+  }
+  particles.setAttribute('position', new THREE.BufferAttribute(pPositions, 3));
+  const pMaterial = new THREE.PointsMaterial({ color: 0xffa586, size: 0.06, transparent: true, opacity: 0.6 });
+  const flowParticles = new THREE.Points(particles, pMaterial);
+  building.add(flowParticles);
+
+  camera.position.z = 10;
+  camera.position.y = 1;
+
+  // Animation
+  let time = 0;
+  function animate() {
+    requestAnimationFrame(animate);
+    time += 0.01;
+    
+    building.rotation.y += 0.003;
+    
+    // Pulsing zones
+    zones.forEach((z, i) => {
+        const pulse = Math.sin(time + i) * 0.15 + 0.25;
+        z.material.opacity = pulse;
+        if(Math.sin(time * 0.7 + i) > 0.4) {
+            z.material.color.setHex(0xffa586); // Peach
+            z.material.emissive.setHex(0xffa586);
+        } else {
+            z.material.color.setHex(0xb51a2b); // Ruby
+            z.material.emissive.setHex(0xb51a2b);
+        }
+    });
+
+    // Animate airflow particles
+    const positions = flowParticles.geometry.attributes.position.array;
+    for (let i = 0; i < particleCount; i++) {
+        positions[i * 3 + 1] += 0.015;
+        if (positions[i * 3 + 1] > 4) positions[i * 3 + 1] = -4;
+    }
+    flowParticles.geometry.attributes.position.needsUpdate = true;
+
+    renderer.render(scene, camera);
+  }
+
+  window.addEventListener('resize', () => {
+    const w = container.clientWidth || window.innerWidth;
+    const h = container.clientHeight || window.innerHeight;
+    renderer.setSize(w, h);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+  });
+
+  animate();
+
+})();
+</script>
+</body></html>

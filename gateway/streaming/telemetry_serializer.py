@@ -51,15 +51,18 @@ class ZoneTelemetryModel(BaseModel):
     occupancy: int
     cooling_load_kw: float
     thermal_color: str
+    hex_color: Optional[str] = None
     heat_intensity: float
 
 
 class PowerTelemetryModel(BaseModel):
     chiller_kw: float
     fans_kw: float
+    supply_fan_kw: Optional[float] = None
     total_hvac_kw: float
     baseline_hvac_kw: float
     demand_shaved_kw: float
+
 
 
 class SafetyTelemetryModel(BaseModel):
@@ -134,12 +137,14 @@ class TelemetrySerializer:
                 "occupancy": int(zval.get("occupancy", 0)),
                 "cooling_load_kw": round(float(zval.get("cooling_load_kw", 0.0)), 2),
                 "thermal_color": color_hex,
+                "hex_color": color_hex,
                 "heat_intensity": round(intensity, 3),
             }
 
         power_data = raw_state.get("power", {})
         safety_data = raw_state.get("safety", {})
         metrics_data = raw_state.get("metrics", {})
+        fans_kw_val = round(float(power_data.get("fans_kw", 0.0)), 2)
 
         frame = TelemetryFrame(
             step=int(raw_state.get("step", 0)),
@@ -154,11 +159,13 @@ class TelemetrySerializer:
             zones={k: ZoneTelemetryModel(**v) for k, v in zones_enriched.items()},
             power=PowerTelemetryModel(
                 chiller_kw=round(float(power_data.get("chiller_kw", 0.0)), 2),
-                fans_kw=round(float(power_data.get("fans_kw", 0.0)), 2),
+                fans_kw=fans_kw_val,
+                supply_fan_kw=fans_kw_val,
                 total_hvac_kw=round(float(power_data.get("total_hvac_kw", 0.0)), 2),
                 baseline_hvac_kw=round(float(power_data.get("baseline_hvac_kw", 0.0)), 2),
                 demand_shaved_kw=round(float(power_data.get("demand_shaved_kw", 0.0)), 2),
             ),
+
             safety=SafetyTelemetryModel(
                 intervention_active=bool(safety_data.get("intervention_active", False)),
                 shield_status=str(safety_data.get("shield_status", "OPTIMAL")),
