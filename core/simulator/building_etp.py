@@ -365,7 +365,8 @@ class BuildingSimulator:
             zid = z["zone_id"]
             tz = self.t_zones[zid]
             pmv = calculate_pmv(tz, humidity=50.0)
-            if not is_ashrae55_compliant(pmv):
+            occ = self.get_occupancy(self.current_hour, z)
+            if occ > 0 and not is_ashrae55_compliant(pmv):
                 discomfort_penalty += (abs(pmv) - 0.5) ** 2
 
         reward = - (step_cost_actual + 2.0 * discomfort_penalty)
@@ -406,7 +407,7 @@ class BuildingSimulator:
                 "setpoint_c": 22.0,
                 "pmv": pmv,
                 "ppd": ppd,
-                "comfort_compliant": is_ashrae55_compliant(pmv),
+                "comfort_compliant": is_ashrae55_compliant(pmv) if occ > 0 else True,
                 "occupancy": occ,
                 "cooling_load_kw": 0.0
             }
