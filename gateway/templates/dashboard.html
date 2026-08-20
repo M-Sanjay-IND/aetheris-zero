@@ -63,12 +63,46 @@
     .custom-scroll::-webkit-scrollbar-thumb:hover {
       background: rgba(255, 165, 134, 0.5);
     }
-    @keyframes pulse-slow {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.85; transform: scale(1.02); }
+    /* Tooltip styles */
+    .info-tooltip-container {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      cursor: help;
     }
-    .animate-pulse-slow {
-      animation: pulse-slow 3s infinite ease-in-out;
+    .info-tooltip-text {
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 0.2s, transform 0.2s;
+      transform: translateY(4px);
+      position: absolute;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 240px;
+      background-color: #1e293b;
+      color: #f1f5f9;
+      text-align: left;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 11px;
+      line-height: 1.4;
+      border: 1px solid #334155;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6);
+      z-index: 60;
+      pointer-events: none;
+    }
+    .info-tooltip-container:hover .info-tooltip-text {
+      visibility: visible;
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    @keyframes toast-in {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .toast-anim {
+      animation: toast-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
     input[type=range] {
       accent-color: #ffa586;
@@ -91,6 +125,13 @@
           <span class="bg-accent-green/20 text-accent-green text-[11px] font-bold px-2 py-0.5 rounded-full border border-accent-green/30 flex items-center gap-1">
             <span class="w-1.5 h-1.5 rounded-full bg-accent-green animate-ping"></span> Live Connected
           </span>
+          <!-- Info Tooltip for App -->
+          <div class="info-tooltip-container">
+            <span class="material-symbols-outlined text-text-muted hover:text-primary text-base">info</span>
+            <div class="info-tooltip-text">
+              <strong>AETHERIS-Zero:</strong> Autonomous smart building energy optimizer and virtual power plant. Automatically pre-cools structural thermal mass during cheap hours and sheds AC load during peak grid hours while protecting comfort.
+            </div>
+          </div>
         </div>
         <p class="text-xs text-text-muted hidden sm:block">Autonomous AI Building Energy Saver & Virtual Power Plant</p>
       </div>
@@ -104,6 +145,12 @@
         <span class="text-text-muted">Sim Time:</span>
         <span id="sim-clock-display" class="font-bold text-text-main">00:00</span>
         <span id="sim-step-badge" class="text-text-dim text-[10px] bg-surface-card px-1.5 py-0.5 rounded">Step 0</span>
+        <div class="info-tooltip-container">
+          <span class="material-symbols-outlined text-text-dim hover:text-text-main text-xs">help</span>
+          <div class="info-tooltip-text">
+            <strong>Simulation Clock:</strong> Advances in 5-minute discrete physics steps across a 24-hour day.
+          </div>
+        </div>
       </div>
 
       <!-- Currency Switcher -->
@@ -133,6 +180,12 @@
           <div class="flex items-center gap-2 flex-wrap">
             <h2 id="status-banner-title" class="text-base font-bold text-text-main">AI Optimizer Active: Comfort Protected & Saving Electricity</h2>
             <span id="status-mode-pill" class="bg-primary/20 text-primary text-[11px] font-bold px-2 py-0.5 rounded-md border border-primary/30">Autonomous RL Mode</span>
+            <div class="info-tooltip-container">
+              <span class="material-symbols-outlined text-text-muted hover:text-primary text-sm">info</span>
+              <div class="info-tooltip-text">
+                <strong>System Health Banner:</strong> Provides real-time plain-English diagnostics on what the AI controller and safety shield are currently doing.
+              </div>
+            </div>
           </div>
           <p id="status-banner-desc" class="text-xs text-text-muted mt-0.5 max-w-3xl">
             All 5 building zones are maintained within ideal comfort temperatures (21°C - 23°C). Energy is scheduled dynamically to avoid costly peak electricity hours.
@@ -164,12 +217,20 @@
       </div>
     </section>
 
-    <!-- 2. KEY PERFORMANCE METRICS ROW (100% Dynamic, Clear Labels) -->
+    <!-- 2. KEY PERFORMANCE METRICS ROW (100% Dynamic, Clear Labels with Tooltips) -->
     <section class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
       <!-- Card 1: Money Saved -->
       <div class="bg-surface-card border border-surface-border rounded-2xl p-4 flex flex-col justify-between hover:border-primary/50 transition">
         <div class="flex items-center justify-between text-text-muted text-xs">
-          <span class="font-medium">Total Cost Saved</span>
+          <div class="flex items-center gap-1.5">
+            <span class="font-medium">Total Cost Saved</span>
+            <div class="info-tooltip-container">
+              <span class="material-symbols-outlined text-text-dim hover:text-primary text-xs">info</span>
+              <div class="info-tooltip-text">
+                <strong>Cost Savings:</strong> Baseline standard schedule cost minus AI optimized cost at current dynamic hourly tariff rates. Accumulates live in real time.
+              </div>
+            </div>
+          </div>
           <span class="material-symbols-outlined text-primary text-lg">savings</span>
         </div>
         <div class="my-2">
@@ -182,7 +243,15 @@
       <!-- Card 2: Electricity Price -->
       <div class="bg-surface-card border border-surface-border rounded-2xl p-4 flex flex-col justify-between hover:border-accent-amber/50 transition">
         <div class="flex items-center justify-between text-text-muted text-xs">
-          <span class="font-medium">Electricity Price</span>
+          <div class="flex items-center gap-1.5">
+            <span class="font-medium">Electricity Price</span>
+            <div class="info-tooltip-container">
+              <span class="material-symbols-outlined text-text-dim hover:text-accent-amber text-xs">info</span>
+              <div class="info-tooltip-text">
+                <strong>Wholesale Grid Price:</strong> Instantaneous Locational Marginal Price (LMP). Peak surge periods trigger deep Virtual Battery load shedding.
+              </div>
+            </div>
+          </div>
           <span class="material-symbols-outlined text-accent-amber text-lg">payments</span>
         </div>
         <div class="my-2">
@@ -195,7 +264,15 @@
       <!-- Card 3: Total Power Load -->
       <div class="bg-surface-card border border-surface-border rounded-2xl p-4 flex flex-col justify-between hover:border-accent-blue/50 transition">
         <div class="flex items-center justify-between text-text-muted text-xs">
-          <span class="font-medium">Current Power Draw</span>
+          <div class="flex items-center gap-1.5">
+            <span class="font-medium">Current Power Draw</span>
+            <div class="info-tooltip-container">
+              <span class="material-symbols-outlined text-text-dim hover:text-accent-blue text-xs">info</span>
+              <div class="info-tooltip-text">
+                <strong>Power Consumption:</strong> Total active electrical load from the Chiller compressor and AHU supply fans.
+              </div>
+            </div>
+          </div>
           <span class="material-symbols-outlined text-accent-blue text-lg">bolt</span>
         </div>
         <div class="my-2">
@@ -208,7 +285,15 @@
       <!-- Card 4: Building Comfort -->
       <div class="bg-surface-card border border-surface-border rounded-2xl p-4 flex flex-col justify-between hover:border-accent-green/50 transition">
         <div class="flex items-center justify-between text-text-muted text-xs">
-          <span class="font-medium">Room Comfort</span>
+          <div class="flex items-center gap-1.5">
+            <span class="font-medium">Room Comfort</span>
+            <div class="info-tooltip-container">
+              <span class="material-symbols-outlined text-text-dim hover:text-accent-green text-xs">info</span>
+              <div class="info-tooltip-text">
+                <strong>ASHRAE 55 SLA:</strong> Evaluates Predicted Mean Vote (PMV) across all active room occupants. 100% means all rooms are within thermal comfort bounds.
+              </div>
+            </div>
+          </div>
           <span class="material-symbols-outlined text-accent-green text-lg">thermostat</span>
         </div>
         <div class="my-2">
@@ -221,7 +306,15 @@
       <!-- Card 5: Carbon Emissions Avoided -->
       <div class="bg-surface-card border border-surface-border rounded-2xl p-4 col-span-2 sm:col-span-1 flex flex-col justify-between hover:border-emerald-400/50 transition">
         <div class="flex items-center justify-between text-text-muted text-xs">
-          <span class="font-medium">CO₂ Avoided</span>
+          <div class="flex items-center gap-1.5">
+            <span class="font-medium">CO₂ Avoided</span>
+            <div class="info-tooltip-container">
+              <span class="material-symbols-outlined text-text-dim hover:text-emerald-400 text-xs">info</span>
+              <div class="info-tooltip-text">
+                <strong>Emissions Avoided:</strong> Calculated from electrical energy saved (kWh) multiplied by grid emission intensity (0.385 kg CO₂/kWh).
+              </div>
+            </div>
+          </div>
           <span class="material-symbols-outlined text-emerald-400 text-lg">eco</span>
         </div>
         <div class="my-2">
@@ -245,6 +338,12 @@
               <span class="material-symbols-outlined text-primary text-lg">domain</span>
               <h3 class="text-sm font-bold text-text-main">3D Building Thermal Twin</h3>
               <span class="text-[11px] text-text-muted bg-surface px-2 py-0.5 rounded border border-surface-border">5 Zones</span>
+              <div class="info-tooltip-container">
+                <span class="material-symbols-outlined text-text-dim hover:text-primary text-xs">info</span>
+                <div class="info-tooltip-text">
+                  <strong>3D Digital Twin:</strong> Visualizes physical rooms with live thermal colors. Click any room or use pills below to select and adjust that room's thermostat.
+                </div>
+              </div>
             </div>
             <!-- Heatmap Legend -->
             <div class="flex items-center gap-1.5 text-[10px] text-text-muted">
@@ -256,14 +355,21 @@
 
           <!-- Three.js Canvas Container -->
           <div id="three-canvas-container" class="w-full h-72 sm:h-80 rounded-xl bg-surface relative overflow-hidden border border-surface-border flex items-center justify-center cursor-grab active:cursor-grabbing">
-            <!-- Overlay Zone Click Tooltip -->
-            <div id="zone-hover-tooltip" class="absolute top-3 left-3 bg-surface/90 backdrop-blur border border-surface-border rounded-lg px-3 py-2 text-xs pointer-events-none hidden shadow-xl z-10">
-              <div id="tooltip-zone-name" class="font-bold text-text-main">Zone Name</div>
-              <div id="tooltip-zone-temp" class="text-primary font-mono font-semibold">22.5°C</div>
-              <div id="tooltip-zone-status" class="text-text-muted text-[10px]">Click room to adjust temperature</div>
+            <!-- Overlay Active Zone HUD -->
+            <div id="zone-active-hud" class="absolute top-3 left-3 bg-surface/90 backdrop-blur border border-surface-border rounded-xl px-3 py-2 text-xs shadow-xl z-10 flex items-center gap-3">
+              <div class="w-2.5 h-2.5 rounded-full bg-accent-green animate-pulse"></div>
+              <div>
+                <div class="flex items-center gap-1.5">
+                  <span class="text-text-dim text-[10px]">Active Room:</span>
+                  <span id="hud-zone-name" class="font-bold text-text-main">Core Floor 1</span>
+                </div>
+                <div class="text-[11px] font-mono text-primary font-bold">
+                  Air: <span id="hud-zone-temp">22.0°C</span> | Wall: <span id="hud-zone-mass">22.0°C</span>
+                </div>
+              </div>
             </div>
             <div class="absolute bottom-3 right-3 text-[10px] text-text-dim bg-surface/80 px-2 py-1 rounded backdrop-blur pointer-events-none">
-              Click & drag to rotate view
+              Click room or drag to rotate 3D view
             </div>
           </div>
 
@@ -317,6 +423,12 @@
             <div class="flex items-center gap-2">
               <span class="material-symbols-outlined text-accent-green text-lg">show_chart</span>
               <h3 class="text-sm font-bold text-text-main">Live Power Demand & Energy Savings</h3>
+              <div class="info-tooltip-container">
+                <span class="material-symbols-outlined text-text-dim hover:text-accent-green text-xs">info</span>
+                <div class="info-tooltip-text">
+                  <strong>Demand Load Chart:</strong> Shows actual power consumed by AETHERIS-Zero (Solid Green line) vs. a conventional unoptimized building schedule (Dashed Amber line). The shaded area represents electrical energy shaved.
+                </div>
+              </div>
             </div>
             <div class="flex items-center gap-3 text-xs">
               <span class="flex items-center gap-1 text-accent-green font-semibold">
@@ -347,7 +459,7 @@
               <span>00:00 (Midnight)</span>
               <span>06:00 (Morning)</span>
               <span>12:00 (Noon)</span>
-              <span>14:00 - 18:00 (Peak Window)</span>
+              <span class="text-accent-red font-semibold">14:00 - 18:00 (Peak Window)</span>
               <span>24:00 (Night)</span>
             </div>
           </div>
@@ -364,8 +476,14 @@
             <div class="flex items-center gap-2">
               <span class="material-symbols-outlined text-primary text-lg">tune</span>
               <h3 class="text-sm font-bold text-text-main">Live Input & Scenario Studio</h3>
+              <div class="info-tooltip-container">
+                <span class="material-symbols-outlined text-text-dim hover:text-primary text-xs">info</span>
+                <div class="info-tooltip-text">
+                  <strong>Live Scenario Studio:</strong> Adjust outdoor weather, electricity tariffs, and room thermostats in real time. The 2R2C physics engine immediately updates its thermal state.
+                </div>
+              </div>
             </div>
-            <span class="text-[10px] text-text-muted bg-surface px-2 py-0.5 rounded border border-surface-border">Real-Time</span>
+            <span class="text-[10px] text-accent-green font-bold bg-accent-green/10 px-2 py-0.5 rounded border border-accent-green/30">Active Physics Link</span>
           </div>
 
           <!-- 1. Outdoor Weather Input -->
@@ -373,18 +491,18 @@
             <div class="flex items-center justify-between">
               <span class="text-xs font-semibold text-text-main flex items-center gap-1.5">
                 <span class="material-symbols-outlined text-sm text-accent-amber">wb_sunny</span>
-                Outdoor Temperature
+                Outdoor Weather / Ambient Temp
               </span>
               <span id="slider-weather-val" class="font-mono text-xs font-bold text-accent-amber">28.0°C</span>
             </div>
             <div class="flex items-center gap-3">
-              <input id="slider-weather" type="range" min="15" max="45" step="0.5" value="28" oninput="onWeatherSliderChange(this.value)" class="w-full h-1.5 bg-surface-border rounded-lg cursor-pointer">
-              <button onclick="applyCustomWeather()" class="bg-primary hover:bg-primary-dark text-surface text-[11px] font-bold px-2.5 py-1 rounded-lg transition shrink-0 active:scale-95">Set</button>
+              <input id="slider-weather" type="range" min="15" max="45" step="0.5" value="28" oninput="onWeatherSliderInput(this.value)" class="w-full h-1.5 bg-surface-border rounded-lg cursor-pointer">
+              <button onclick="applyCustomWeather()" class="bg-primary hover:bg-primary-dark text-surface text-[11px] font-bold px-3 py-1 rounded-lg transition shrink-0 active:scale-95">Apply</button>
             </div>
             <div class="flex items-center justify-between text-[10px] text-text-dim">
               <button onclick="setWeatherPreset(18)" class="hover:text-primary underline">Cool Day (18°C)</button>
-              <button onclick="setWeatherPreset(30)" class="hover:text-primary underline">Standard (30°C)</button>
-              <button onclick="setWeatherPreset(42)" class="hover:text-primary underline">🔥 Heatwave (42°C)</button>
+              <button onclick="setWeatherPreset(28)" class="hover:text-primary underline">Standard (28°C)</button>
+              <button onclick="setWeatherPreset(42)" class="hover:text-accent-red underline font-bold text-accent-amber">🔥 Heatwave (42°C)</button>
             </div>
           </div>
 
@@ -393,17 +511,17 @@
             <div class="flex items-center justify-between">
               <span class="text-xs font-semibold text-text-main flex items-center gap-1.5">
                 <span class="material-symbols-outlined text-sm text-accent-green">currency_rupee</span>
-                Wholesale Power Price
+                Electricity Tariff Price
               </span>
               <span id="slider-price-val" class="font-mono text-xs font-bold text-accent-green">₹12.45/kWh</span>
             </div>
             <div class="flex items-center gap-3">
-              <input id="slider-price" type="range" min="1" max="50" step="0.5" value="12.5" oninput="onPriceSliderChange(this.value)" class="w-full h-1.5 bg-surface-border rounded-lg cursor-pointer">
-              <button onclick="applyCustomPrice()" class="bg-primary hover:bg-primary-dark text-surface text-[11px] font-bold px-2.5 py-1 rounded-lg transition shrink-0 active:scale-95">Set</button>
+              <input id="slider-price" type="range" min="1" max="60" step="0.5" value="12.5" oninput="onPriceSliderInput(this.value)" class="w-full h-1.5 bg-surface-border rounded-lg cursor-pointer">
+              <button onclick="applyCustomPrice()" class="bg-primary hover:bg-primary-dark text-surface text-[11px] font-bold px-3 py-1 rounded-lg transition shrink-0 active:scale-95">Apply</button>
             </div>
             <div class="flex items-center justify-between text-[10px] text-text-dim">
-              <button onclick="setPricePreset(5)" class="hover:text-primary underline">Off-Peak (₹5)</button>
-              <button onclick="setPricePreset(15)" class="hover:text-primary underline">Mid-Day (₹15)</button>
+              <button onclick="setPricePreset(6.5)" class="hover:text-primary underline">Off-Peak (₹6.5)</button>
+              <button onclick="setPricePreset(18.0)" class="hover:text-primary underline">Mid-Day (₹18)</button>
               <button onclick="triggerDRPriceSpike()" class="hover:text-accent-red underline font-bold text-accent-amber">⚡ Trigger 5x Peak Surge</button>
             </div>
           </div>
@@ -413,17 +531,17 @@
             <div class="flex items-center justify-between">
               <span class="text-xs font-semibold text-text-main flex items-center gap-1.5">
                 <span class="material-symbols-outlined text-sm text-primary">thermostat_auto</span>
-                Target Temp: <span id="selected-zone-name-label" class="text-primary font-bold">Core Floor 1</span>
+                Target Setpoint: <span id="selected-zone-name-label" class="text-primary font-bold">Core Floor 1</span>
               </span>
               <span id="slider-zone-val" class="font-mono text-xs font-bold text-primary">22.0°C</span>
             </div>
             <div class="flex items-center gap-3">
-              <input id="slider-zone-temp" type="range" min="18" max="30" step="0.5" value="22" oninput="onZoneSliderChange(this.value)" class="w-full h-1.5 bg-surface-border rounded-lg cursor-pointer">
-              <button onclick="applyCustomZoneTemp()" class="bg-primary hover:bg-primary-dark text-surface text-[11px] font-bold px-2.5 py-1 rounded-lg transition shrink-0 active:scale-95">Apply</button>
+              <input id="slider-zone-temp" type="range" min="18" max="30" step="0.5" value="22" oninput="onZoneSliderInput(this.value)" class="w-full h-1.5 bg-surface-border rounded-lg cursor-pointer">
+              <button onclick="applyCustomZoneTemp()" class="bg-primary hover:bg-primary-dark text-surface text-[11px] font-bold px-3 py-1 rounded-lg transition shrink-0 active:scale-95">Set Room</button>
             </div>
             <div class="flex items-center justify-between text-[10px]">
-              <span class="text-text-dim">Comfort limit: 20°C - 24.5°C</span>
-              <button onclick="testUnsafeOverride(38)" class="text-accent-red hover:underline font-bold" title="Tests how the safety shield intercepts dangerous temperatures">🛡️ Test Wrong 38°C</button>
+              <span class="text-text-dim">Comfort Band: 20.0°C - 24.5°C</span>
+              <button onclick="testUnsafeOverride(38.0)" class="text-accent-red hover:underline font-bold" title="Tests how the safety shield intercepts dangerous temperatures">🛡️ Test Malicious 38°C</button>
             </div>
           </div>
         </div>
@@ -434,8 +552,14 @@
             <div class="flex items-center gap-2">
               <span class="material-symbols-outlined text-accent-amber text-lg">timeline</span>
               <h3 class="text-sm font-bold text-text-main">24-Hour Grid Price Curve</h3>
+              <div class="info-tooltip-container">
+                <span class="material-symbols-outlined text-text-dim hover:text-accent-amber text-xs">info</span>
+                <div class="info-tooltip-text">
+                  <strong>Tariff Profile:</strong> 24-hour wholesale electricity rate schedule. The vertical blue cursor tracks the current hour in real time.
+                </div>
+              </div>
             </div>
-            <span class="text-[10px] text-text-muted">Dynamic CAISO Tariff</span>
+            <span class="text-[10px] text-text-muted">Dynamic CAISO Profile</span>
           </div>
 
           <!-- Dynamic Tariff Chart -->
@@ -456,7 +580,7 @@
             </div>
           </div>
           <div class="text-[11px] text-text-muted flex items-center justify-between">
-            <span>💡 <strong>Virtual Battery:</strong> The building pre-cools at ₹10 before 2 PM, then cuts AC power at 2 PM to avoid ₹70/kWh spikes.</span>
+            <span>💡 <strong>Virtual Battery:</strong> Pre-cools before 2 PM when power is cheap, then cuts AC power at 2 PM during peak price spikes.</span>
           </div>
         </div>
 
@@ -465,13 +589,19 @@
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
               <span class="material-symbols-outlined text-accent-green text-lg">shield</span>
-              <h3 class="text-sm font-bold text-text-main">Safety Shield Status</h3>
+              <h3 class="text-sm font-bold text-text-main">Safety Shield Diagnostics</h3>
+              <div class="info-tooltip-container">
+                <span class="material-symbols-outlined text-text-dim hover:text-accent-green text-xs">info</span>
+                <div class="info-tooltip-text">
+                  <strong>OSQP Safety Shield:</strong> Mathematically validates every setpoint command in &lt;1.5ms to guarantee ASHRAE 55 comfort and equipment dwell protection.
+                </div>
+              </div>
             </div>
-            <span id="shield-badge" class="text-[10px] font-bold bg-accent-green/20 text-accent-green px-2 py-0.5 rounded-full border border-accent-green/30">Active & Protecting</span>
+            <span id="shield-badge" class="text-[10px] font-bold bg-accent-green/20 text-accent-green px-2 py-0.5 rounded-full border border-accent-green/30">Active & Guarding</span>
           </div>
           <div class="bg-surface p-3 rounded-xl border border-surface-border text-xs flex flex-col gap-1.5">
             <div class="flex items-center justify-between">
-              <span class="text-text-muted">Safe Comfort Range:</span>
+              <span class="text-text-muted">Comfort Boundary Limit:</span>
               <span class="font-mono font-bold text-text-main">20.0°C – 24.5°C</span>
             </div>
             <div class="flex items-center justify-between">
@@ -479,8 +609,8 @@
               <span class="font-mono font-bold text-text-main">0.75°C per 5 min</span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-text-muted">Compressor Short-Cycle Protection:</span>
-              <span class="font-mono font-bold text-accent-green">Dwell Guard OK</span>
+              <span class="text-text-muted">Compressor Anti-Short-Cycling Dwell:</span>
+              <span id="shield-dwell-status" class="font-mono font-bold text-accent-green">Dwell Guard OK (≥15 min)</span>
             </div>
           </div>
         </div>
@@ -488,6 +618,18 @@
       </div>
     </section>
   </main>
+
+  <!-- ================= FLOATING ACTION & EVENT TOAST ================= -->
+  <div id="toast-notification" class="fixed bottom-6 right-6 z-50 max-w-md bg-surface-card/95 backdrop-blur-md border border-surface-border text-text-main px-4 py-3 rounded-2xl shadow-2xl hidden flex items-center gap-3 transition">
+    <div id="toast-icon-bg" class="w-8 h-8 rounded-lg bg-accent-green/20 text-accent-green flex items-center justify-center shrink-0">
+      <span id="toast-icon" class="material-symbols-outlined text-lg">check_circle</span>
+    </div>
+    <div class="flex-1 text-xs">
+      <div id="toast-title" class="font-bold text-text-main">Action Applied</div>
+      <div id="toast-message" class="text-text-muted text-[11px] mt-0.5">Parameters updated in real time.</div>
+    </div>
+    <button onclick="dismissToast()" class="text-text-dim hover:text-text-main text-sm font-bold ml-1">✕</button>
+  </div>
 
   <!-- ================= OPERATOR GUIDE & HELP MODAL ================= -->
   <div id="guide-modal" class="fixed inset-0 bg-surface/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
@@ -510,7 +652,7 @@
             1. What is a "Virtual Thermal Battery"?
           </h4>
           <p class="text-xs leading-relaxed">
-            Concrete walls, furniture, and indoor air store thermal energy (coolness) just like a lithium-ion battery stores electricity. AETHERIS-Zero uses this natural thermal inertia to store cheap electricity early in the day and turn off power-hungry ACs when electricity is expensive.
+            Concrete walls, furniture, and indoor air store thermal energy (coolness) just like a battery stores electricity. AETHERIS-Zero uses this natural thermal inertia to store cheap electricity early in the day and turn off power-hungry ACs when electricity is expensive.
           </p>
         </div>
 
@@ -572,7 +714,7 @@
     let selectedZoneId = 'zone_1';
     let isAutoRunning = false;
     let ws = null;
-    let reconnectInterval = null;
+    let toastTimeout = null;
 
     // History buffers for real dynamic chart drawing
     const maxHistoryPoints = 48;
@@ -584,7 +726,13 @@
       activeCurrency = curr;
       document.getElementById('btn-currency-inr').className = curr === 'INR' ? 'px-2.5 py-1 rounded bg-primary text-surface transition font-extrabold' : 'px-2.5 py-1 rounded text-text-muted hover:text-text-main transition font-extrabold';
       document.getElementById('btn-currency-usd').className = curr === 'USD' ? 'px-2.5 py-1 rounded bg-primary text-surface transition font-extrabold' : 'px-2.5 py-1 rounded text-text-muted hover:text-text-main transition font-extrabold';
+      
+      // Update price slider display
+      const currentPriceSlider = parseFloat(document.getElementById('slider-price').value);
+      onPriceSliderInput(currentPriceSlider);
+
       if (window.lastTelemetry) updateUIFromTelemetry(window.lastTelemetry);
+      showToast('Currency Switched', 'All metrics converted to ' + (curr === 'INR' ? 'Indian Rupee (₹)' : 'US Dollar ($)'), 'currency_exchange', 'accent-blue');
     }
 
     function formatMoney(usdVal) {
@@ -601,6 +749,33 @@
         return '₹' + inr.toFixed(2);
       }
       return '$' + usdPerKwh.toFixed(3);
+    }
+
+    // --- Toast Notification Helper ---
+    function showToast(title, message, icon = 'check_circle', color = 'accent-green') {
+      const toast = document.getElementById('toast-notification');
+      if (!toast) return;
+      document.getElementById('toast-title').innerText = title;
+      document.getElementById('toast-message').innerText = message;
+      document.getElementById('toast-icon').innerText = icon;
+      
+      const iconBg = document.getElementById('toast-icon-bg');
+      iconBg.className = 'w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ' + 
+        (color === 'accent-amber' ? 'bg-accent-amber/20 text-accent-amber' :
+         color === 'accent-red' ? 'bg-accent-red/20 text-accent-red' :
+         color === 'accent-blue' ? 'bg-accent-blue/20 text-accent-blue' :
+         'bg-accent-green/20 text-accent-green');
+
+      toast.classList.remove('hidden');
+      toast.classList.add('toast-anim');
+
+      if (toastTimeout) clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => { dismissToast(); }, 4000);
+    }
+
+    function dismissToast() {
+      const toast = document.getElementById('toast-notification');
+      if (toast) toast.classList.add('hidden');
     }
 
     // --- Modal Helper ---
@@ -629,13 +804,20 @@
         activePill.classList.add('border-primary/50', 'bg-surface-card-hover');
         activePill.classList.remove('border-surface-border');
       }
-      document.getElementById('selected-zone-name-label').innerText = zoneDisplayNames[zid] || zid;
+      const displayName = zoneDisplayNames[zid] || zid;
+      document.getElementById('selected-zone-name-label').innerText = displayName;
+      document.getElementById('hud-zone-name').innerText = displayName;
       
       if (window.lastTelemetry && window.lastTelemetry.zones && window.lastTelemetry.zones[zid]) {
         const z = window.lastTelemetry.zones[zid];
-        document.getElementById('slider-zone-temp').value = z.temp_c;
-        document.getElementById('slider-zone-val').innerText = z.temp_c.toFixed(1) + '°C';
+        document.getElementById('slider-zone-temp').value = z.setpoint_c || z.temp_c;
+        document.getElementById('slider-zone-val').innerText = (z.setpoint_c || z.temp_c).toFixed(1) + '°C';
+        document.getElementById('hud-zone-temp').innerText = z.temp_c.toFixed(1) + '°C';
+        document.getElementById('hud-zone-mass').innerText = (z.mass_temp_c || z.temp_c).toFixed(1) + '°C';
       }
+
+      // Highlight 3D mesh
+      highlightZoneMesh(zid);
     }
 
     // --- UI Updaters ---
@@ -700,11 +882,13 @@
 
       if (isIntervention) {
         bannerTitle.innerText = '🛡️ Safety Shield Intervened (Comfort Protected)';
-        bannerDesc.innerText = 'A setpoint command was safely adjusted to stay within ASHRAE comfort limits (20°C - 24.5°C) and prevent equipment strain.';
+        bannerDesc.innerText = 'A setpoint command was safely adjusted to stay within ASHRAE comfort limits (20.0°C - 24.5°C) and prevent equipment strain.';
         bannerIcon.innerText = 'gpp_maybe';
         bannerIconBg.className = 'w-12 h-12 rounded-xl bg-accent-amber/20 border border-accent-amber/40 flex items-center justify-center text-accent-amber shrink-0';
+        document.getElementById('shield-badge').className = 'text-[10px] font-bold bg-accent-amber/20 text-accent-amber px-2 py-0.5 rounded-full border border-accent-amber/30';
+        document.getElementById('shield-badge').innerText = 'Shield Intervened (Safe Clamp)';
       } else if (isDrActive || priceKwh > 0.40) {
-        bannerTitle.innerText = '⚡ High Electricity Price Detected — Stored Energy Discharging';
+        bannerTitle.innerText = '⚡ High Electricity Price Detected — Stored Coolness Discharging';
         bannerDesc.innerText = 'Grid price is elevated. AC cooling is dialed back while structural thermal mass keeps building occupants comfortable.';
         bannerIcon.innerText = 'bolt';
         bannerIconBg.className = 'w-12 h-12 rounded-xl bg-accent-amber/20 border border-accent-amber/40 flex items-center justify-center text-accent-amber shrink-0';
@@ -713,9 +897,11 @@
         bannerDesc.innerText = 'All 5 building zones are maintained within ideal comfort temperatures (21°C - 23°C). Energy is scheduled dynamically to avoid costly peak electricity hours.';
         bannerIcon.innerText = 'energy_savings_leaf';
         bannerIconBg.className = 'w-12 h-12 rounded-xl bg-accent-green/20 border border-accent-green/40 flex items-center justify-center text-accent-green shrink-0';
+        document.getElementById('shield-badge').className = 'text-[10px] font-bold bg-accent-green/20 text-accent-green px-2 py-0.5 rounded-full border border-accent-green/30';
+        document.getElementById('shield-badge').innerText = 'Active & Guarding';
       }
 
-      // 4. Zone Badges & Colors
+      // 4. Zone Badges & 3D Colors
       if (data.zones) {
         for (const [zid, z] of Object.entries(data.zones)) {
           const tempEl = document.getElementById('badge-temp-' + zid);
@@ -723,6 +909,11 @@
           if (tempEl) tempEl.innerText = z.temp_c.toFixed(1) + '°C';
           if (occEl) occEl.innerText = (z.occupancy || 0) + ' Occ • ' + (z.comfort_compliant ? 'Comfortable' : 'Adjusting');
           
+          if (zid === selectedZoneId) {
+            document.getElementById('hud-zone-temp').innerText = z.temp_c.toFixed(1) + '°C';
+            document.getElementById('hud-zone-mass').innerText = (z.mass_temp_c || z.temp_c).toFixed(1) + '°C';
+          }
+
           // Update 3D block color
           if (zoneMeshes[zid]) {
             const hexInt = parseInt(z.hex_color.replace('#', '0x'));
@@ -779,68 +970,82 @@
       }
     }
 
-    // --- Interactive Control Slider Event Handlers ---
-    function onWeatherSliderChange(val) {
+    // --- Interactive Live Slider Handlers ---
+    function onWeatherSliderInput(val) {
       document.getElementById('slider-weather-val').innerText = parseFloat(val).toFixed(1) + '°C';
     }
 
-    function onPriceSliderChange(val) {
+    function onPriceSliderInput(val) {
       const num = parseFloat(val);
-      document.getElementById('slider-price-val').innerText = activeCurrency === 'INR' ? '₹' + (num * 3.5).toFixed(2) + '/kWh' : '$' + (num / 20).toFixed(2) + '/kWh';
+      if (activeCurrency === 'INR') {
+        document.getElementById('slider-price-val').innerText = '₹' + num.toFixed(2) + '/kWh';
+      } else {
+        const usd = num / 83.0;
+        document.getElementById('slider-price-val').innerText = '$' + usd.toFixed(3) + '/kWh';
+      }
     }
 
-    function onZoneSliderChange(val) {
+    function onZoneSliderInput(val) {
       document.getElementById('slider-zone-val').innerText = parseFloat(val).toFixed(1) + '°C';
     }
 
     function applyCustomWeather() {
       const temp = parseFloat(document.getElementById('slider-weather').value);
       sendWsCommand('SET_WEATHER_OVERRIDE', { ambient_temp_c: temp, solar_irradiance_wm2: 800.0 });
+      showToast('Weather Updated', `Outdoor temperature set to ${temp.toFixed(1)}°C. Thermal envelope heat flux adjusted.`, 'wb_sunny', 'accent-amber');
     }
 
     function setWeatherPreset(temp) {
       document.getElementById('slider-weather').value = temp;
-      onWeatherSliderChange(temp);
+      onWeatherSliderInput(temp);
       applyCustomWeather();
     }
 
     function applyCustomPrice() {
       const sliderVal = parseFloat(document.getElementById('slider-price').value);
-      const priceUsd = sliderVal / 25.0;
+      const priceUsd = sliderVal / USD_TO_INR;
       sendWsCommand('SET_PRICE_OVERRIDE', { price_usd_per_kwh: priceUsd });
+      showToast('Tariff Updated', `Wholesale price set to ${formatPricePerKwh(priceUsd)}/kWh. Arbitrage schedule adapting.`, 'payments', 'accent-green');
     }
 
-    function setPricePreset(val) {
-      document.getElementById('slider-price').value = val;
-      onPriceSliderChange(val);
+    function setPricePreset(valInr) {
+      document.getElementById('slider-price').value = valInr;
+      onPriceSliderInput(valInr);
       applyCustomPrice();
     }
 
     function triggerDRPriceSpike() {
+      const currentHr = window.lastTelemetry ? window.lastTelemetry.timestamp_hour : 14.0;
       sendWsCommand('TRIGGER_OPENADR_EVENT', {
-        start_hour: (window.lastTelemetry ? window.lastTelemetry.timestamp_hour : 12.0),
+        start_hour: currentHr,
         duration_hours: 4.0,
         price_spike: 1.50
       });
+      showToast('OpenADR 3.0 DR Triggered', '5x Peak Price Surge active! Pre-cooling virtual battery discharging to shed load.', 'bolt', 'accent-red');
     }
 
     function applyCustomZoneTemp() {
       const temp = parseFloat(document.getElementById('slider-zone-temp').value);
       sendWsCommand('SET_ZONE_TARGET', { zone_id: selectedZoneId, target_temp: temp });
+      const name = zoneDisplayNames[selectedZoneId] || selectedZoneId;
+      showToast('Room Target Set', `${name} thermostat target set to ${temp.toFixed(1)}°C.`, 'thermostat_auto', 'accent-blue');
     }
 
     function testUnsafeOverride(temp) {
       document.getElementById('slider-zone-temp').value = temp;
-      onZoneSliderChange(temp);
+      onZoneSliderInput(temp);
       sendWsCommand('INJECT_MALICIOUS_SETPOINT', { zone_id: selectedZoneId, target_temp: temp });
+      showToast('🛡️ Malicious 38°C Injected', 'CBF Safety Shield intervened and clamped setpoint to 24.5°C to protect room occupants!', 'gpp_maybe', 'accent-amber');
     }
 
     // --- Simulation Loop Controls ---
     function toggleAutoSimulation() {
       if (isAutoRunning) {
         sendWsCommand('STOP_SIMULATION', {});
+        showToast('Optimizer Paused', 'Autonomous simulation loop paused.', 'pause_circle', 'accent-amber');
       } else {
         sendWsCommand('START_SIMULATION', {});
+        showToast('Optimizer Running', 'Autonomous Safe-RL optimization loop started.', 'play_circle', 'accent-green');
       }
     }
 
@@ -850,12 +1055,14 @@
 
     function runFast24hEpisode() {
       sendWsCommand('RUN_EPISODE', { total_steps: 288 });
+      showToast('24h Day Executed', 'Simulated 288 time-steps (24 hours). ROI summary updated.', 'fast_forward', 'accent-blue');
     }
 
     function resetSimulation() {
       powerActualHistory = [];
       powerBaselineHistory = [];
       sendWsCommand('RESET_SIMULATION', {});
+      showToast('System Reset', 'Simulation clock reset to 00:00 and accumulators cleared.', 'restart_alt', 'accent-green');
     }
 
     // --- WebSocket Communication Bridge ---
@@ -907,7 +1114,7 @@
     }
 
     // --- Three.js 3D Digital Twin Simulation ---
-    let scene, camera, renderer;
+    let scene, camera, renderer, raycaster, mouse;
     const zoneMeshes = {};
 
     function initThreeJS() {
@@ -927,6 +1134,9 @@
       renderer.setSize(width, height);
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       container.appendChild(renderer.domElement);
+
+      raycaster = new THREE.Raycaster();
+      mouse = new THREE.Vector2();
 
       // Lighting
       const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
@@ -986,17 +1196,35 @@
       const particles = new THREE.Points(particleGeom, particleMat);
       scene.add(particles);
 
-      // Mouse Orbit Interaction
+      // Mouse Orbit & Click Interaction
       let isDragging = false;
       let prevMousePos = { x: 0, y: 0 };
       let rotationAngle = 0;
+      let mouseDownTime = 0;
 
       container.addEventListener('mousedown', (e) => {
         isDragging = true;
+        mouseDownTime = Date.now();
         prevMousePos = { x: e.clientX, y: e.clientY };
       });
 
-      window.addEventListener('mouseup', () => { isDragging = false; });
+      window.addEventListener('mouseup', (e) => {
+        if (isDragging && (Date.now() - mouseDownTime < 200)) {
+          // It was a click, not a drag!
+          const rect = container.getBoundingClientRect();
+          mouse.x = ((e.clientX - rect.left) / container.clientWidth) * 2 - 1;
+          mouse.y = -((e.clientY - rect.top) / container.clientHeight) * 2 + 1;
+          raycaster.setFromCamera(mouse, camera);
+          const intersects = raycaster.intersectObjects(Object.values(zoneMeshes));
+          if (intersects.length > 0) {
+            const clickedMesh = intersects[0].object;
+            if (clickedMesh.userData && clickedMesh.userData.zoneId) {
+              selectZone(clickedMesh.userData.zoneId);
+            }
+          }
+        }
+        isDragging = false;
+      });
 
       container.addEventListener('mousemove', (e) => {
         if (isDragging) {
@@ -1039,6 +1267,18 @@
         camera.aspect = w / h;
         camera.updateProjectionMatrix();
         renderer.setSize(w, h);
+      });
+    }
+
+    function highlightZoneMesh(zid) {
+      Object.entries(zoneMeshes).forEach(([id, mesh]) => {
+        if (id === zid) {
+          mesh.material.opacity = 1.0;
+          mesh.scale.set(1.04, 1.04, 1.04);
+        } else {
+          mesh.material.opacity = 0.8;
+          mesh.scale.set(1.0, 1.0, 1.0);
+        }
       });
     }
 

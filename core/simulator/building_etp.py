@@ -399,6 +399,7 @@ class BuildingSimulator:
         self.current_step += 1
         self.sim_time_sec += self.dt
         self.current_hour = self.start_hour + (self.sim_time_sec / 3600.0)
+        self.last_actions = dict(actions)
 
         discomfort_penalty = 0.0
         for z in self.zones_cfg:
@@ -439,15 +440,17 @@ class BuildingSimulator:
             pmv = calculate_pmv(tz, humidity=50.0)
             ppd = calculate_ppd(pmv)
             occ = self.get_occupancy(self.current_hour, z)
+            active_sp = float(self.last_actions.get("zone_setpoints", {}).get(zid, self.zone_target_overrides.get(zid, 22.0)))
 
             zones_state[zid] = {
                 "name": z.get("name", zid),
                 "temp_c": round(tz, 2),
                 "mass_temp_c": round(tm, 2),
-                "setpoint_c": 22.0,
+                "setpoint_c": round(active_sp, 2),
                 "pmv": pmv,
                 "ppd": ppd,
                 "comfort_compliant": is_ashrae55_compliant(pmv) if occ > 0 else True,
+
                 "occupancy": occ,
                 "cooling_load_kw": 0.0
             }

@@ -60,12 +60,18 @@ class ArbitrageEngine:
             deterministic=True
         )
 
+        # Merge any user-specified zone setpoint overrides
+        if hasattr(self.simulator, "zone_target_overrides") and self.simulator.zone_target_overrides:
+            for zid, custom_sp in self.simulator.zone_target_overrides.items():
+                nominal_actions["zone_setpoints"][zid] = float(custom_sp)
+
         # 3. CBF Safety Shield Projection (Guarantees Comfort & Anti-Short-Cycling)
         safe_actions, shield_diag = self.cbf_shield.filter_action(
             state=current_state,
             nominal_actions=nominal_actions,
             dt_sec=self.simulator.dt
         )
+
 
         # 4. Physics Simulator Step
         next_state, reward, done, info = self.simulator.step(safe_actions)
