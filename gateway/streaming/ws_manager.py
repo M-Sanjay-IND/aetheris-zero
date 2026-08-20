@@ -96,7 +96,8 @@ class ConnectionManager:
         if command_handlers and action in command_handlers:
             try:
                 handler = command_handlers[action]
-                result = handler(command_payload.get("params", command_payload))
+                cmd_data = command_payload.get("payload") if "payload" in command_payload else command_payload.get("params", command_payload)
+                result = handler(cmd_data)
                 if asyncio.iscoroutine(result):
                     result = await result
                 return {"status": "SUCCESS", "action": action, "result": result}

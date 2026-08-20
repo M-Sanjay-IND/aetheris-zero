@@ -11,7 +11,7 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect, Query, Body
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
@@ -158,6 +158,11 @@ class SimulationRuntime:
 
     def reset(self) -> Dict[str, Any]:
         """Reset simulation and safety barrier states."""
+        self.is_running_auto_loop = False
+        if self.loop_task and not self.loop_task.done():
+            self.loop_task.cancel()
+        self.loop_task = None
+
         if self.arbitrage_engine:
             self.arbitrage_engine.reset()
         elif self.simulator:
@@ -175,6 +180,11 @@ class SimulationRuntime:
 
     def run_episode(self, total_steps: int = 288) -> Dict[str, Any]:
         """Run full 24h simulation episode and return analytical ROI summary."""
+        self.is_running_auto_loop = False
+        if self.loop_task and not self.loop_task.done():
+            self.loop_task.cancel()
+        self.loop_task = None
+
         if not self.arbitrage_engine:
             self.initialize()
         results = self.arbitrage_engine.run_episode(total_steps=total_steps)
@@ -212,6 +222,7 @@ class SimulationRuntime:
         if self.is_running_auto_loop:
             return
         self.is_running_auto_loop = True
+        await ws_manager.broadcast({"type": "LOOP_STARTED", "running": True})
 
         async def _loop_worker():
             try:
@@ -223,6 +234,7 @@ class SimulationRuntime:
                 pass
             finally:
                 self.is_running_auto_loop = False
+                await ws_manager.broadcast({"type": "LOOP_STOPPED", "running": False})
 
         self.loop_task = asyncio.create_task(_loop_worker())
 
@@ -236,6 +248,7 @@ class SimulationRuntime:
             except asyncio.CancelledError:
                 pass
         self.loop_task = None
+        await ws_manager.broadcast({"type": "LOOP_STOPPED", "running": False})
 
 
 runtime = SimulationRuntime()
@@ -283,6 +296,11 @@ def get_dashboard_html():
         content="<h1>AETHERIS-Zero Digital Twin Dashboard</h1><p>Dashboard template not found.</p>",
         status_code=200
     )
+
+
+@app.get("/favicon.ico", include_in_schema=False)
+def get_favicon():
+    return Response(status_code=204)
 
 
 @app.get("/health")
