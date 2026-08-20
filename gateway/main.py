@@ -506,7 +506,7 @@ class WeatherOverrideRequest(BaseModel):
 async def set_weather(payload: WeatherOverrideRequest):
     """Dynamically update real-world outdoor weather / ambient temperature."""
     runtime.set_weather_override(payload.ambient_temp_c, payload.solar_irradiance_wm2)
-    state = runtime.get_serialized_state()
+    state = runtime.step()
     await ws_manager.broadcast({"type": "TELEMETRY_UPDATE", "telemetry": state})
     return {"status": "success", "ambient_temp_c": payload.ambient_temp_c, "solar_irradiance_wm2": payload.solar_irradiance_wm2, "telemetry": state}
 
@@ -519,7 +519,7 @@ class PriceOverrideRequest(BaseModel):
 async def set_pricing(payload: PriceOverrideRequest):
     """Dynamically update current electricity price in real-time."""
     runtime.set_price_override(payload.price_usd_per_kwh)
-    state = runtime.get_serialized_state()
+    state = runtime.step()
     await ws_manager.broadcast({"type": "TELEMETRY_UPDATE", "telemetry": state})
     return {"status": "success", "price_usd_per_kwh": payload.price_usd_per_kwh, "telemetry": state}
 
@@ -532,7 +532,7 @@ class CustomTariffScheduleRequest(BaseModel):
 async def set_tariff_schedule(payload: CustomTariffScheduleRequest):
     """Update full 24-hour wholesale electricity pricing array."""
     runtime.set_tariff_schedule(payload.hourly_prices)
-    state = runtime.get_serialized_state()
+    state = runtime.step()
     await ws_manager.broadcast({"type": "TELEMETRY_UPDATE", "telemetry": state})
     return {"status": "success", "hourly_prices": payload.hourly_prices, "telemetry": state}
 
@@ -549,6 +549,7 @@ async def set_zone_target(payload: ZoneTargetRequest):
     state = runtime.step({"zone_setpoints": {payload.zone_id: payload.target_temp}})
     await ws_manager.broadcast({"type": "TELEMETRY_UPDATE", "telemetry": state})
     return {"status": "success", "zone_id": payload.zone_id, "target_temp": payload.target_temp, "telemetry": state}
+
 
 
 class ComfortBoundsRequest(BaseModel):
@@ -682,25 +683,44 @@ async def websocket_telemetry_endpoint(websocket: WebSocket):
 
     # Handlers for client-side actions
     command_handlers = {
-        "TRIGGER_OPENADR_EVENT": lambda p: runtime.openadr_ven.create_event(
-            start_hour=p.get("start_hour", 14.0),
-            duration_hours=p.get("duration_hours", 4.0),
-            price_spike_usd=p.get("price_spike", 1.50),
-        ).to_dict(),
-        "INJECT_MALICIOUS_SETPOINT": lambda p: runtime.step({
-            "zone_setpoints": {p.get("zone_id", "zone_1"): p.get("target_temp", 38.0)},
-            "chiller_chw_setpoint": 6.5,
-            "vav_damper_positions": {f"zone_{i}": 0.7 for i in range(1, 6)},
-        }),
+        "TRIGGER_OPENADR_EVENT": lambda p: (
+            runtime.openadr_ven.create_event(
+                start_hour=p.get("start_hour", 14.0),
+                duration_hours=p.get("duration_hours", 4.0),
+                price_spike_usd=p.get("price_spike", 1.50),
+            ),
+            runtime.tariff_feed.inject_spike(p.get("start_hour", 14.0), p.get("duration_hours", 4.0), p.get("price_spike", 1.50)),
+            runtime.step()
+        )[-1],
+        "INJECT_MALICIOUS_SETPOINT": lambda p: (
+            runtime.set_zone_target(p.get("zone_id", "zone_1"), p.get("target_temp", 38.0)),
+            runtime.step({
+                "zone_setpoints": {p.get("zone_id", "zone_1"): p.get("target_temp", 38.0)},
+                "chiller_chw_setpoint": 6.5,
+                "vav_damper_positions": {f"zone_{i}": 0.7 for i in range(1, 6)},
+            })
+        )[-1],
         "INJECT_DWELL_ATTACK": lambda p: runtime.step({
             "zone_setpoints": {f"zone_{i}": 22.0 for i in range(1, 6)},
             "chiller_chw_setpoint": 4.0 if runtime.simulator.current_step % 2 == 0 else 12.0,
             "vav_damper_positions": {f"zone_{i}": 0.7 for i in range(1, 6)},
         }),
-        "SET_WEATHER_OVERRIDE": lambda p: runtime.set_weather_override(p.get("ambient_temp_c"), p.get("solar_irradiance_wm2")),
-        "SET_PRICE_OVERRIDE": lambda p: runtime.set_price_override(p.get("price_usd_per_kwh")),
-        "SET_TARIFF_SCHEDULE": lambda p: runtime.set_tariff_schedule(p.get("hourly_prices", [])),
-        "SET_ZONE_TARGET": lambda p: runtime.step({"zone_setpoints": {p.get("zone_id", "zone_1"): p.get("target_temp", 22.0)}}),
+        "SET_WEATHER_OVERRIDE": lambda p: (
+            runtime.set_weather_override(p.get("ambient_temp_c"), p.get("solar_irradiance_wm2")),
+            runtime.step()
+        )[-1],
+        "SET_PRICE_OVERRIDE": lambda p: (
+            runtime.set_price_override(p.get("price_usd_per_kwh")),
+            runtime.step()
+        )[-1],
+        "SET_TARIFF_SCHEDULE": lambda p: (
+            runtime.set_tariff_schedule(p.get("hourly_prices", [])),
+            runtime.step()
+        )[-1],
+        "SET_ZONE_TARGET": lambda p: (
+            runtime.set_zone_target(p.get("zone_id", "zone_1"), p.get("target_temp", 22.0)),
+            runtime.step({"zone_setpoints": {p.get("zone_id", "zone_1"): p.get("target_temp", 22.0)}})
+        )[-1],
         "SET_COMFORT_BOUNDS": lambda p: runtime.set_comfort_bounds(p.get("t_min", 20.0), p.get("t_max", 24.5), p.get("max_slew", 0.75), p.get("min_dwell", 3)),
         "SET_CONTROLLER_MODE": lambda p: setattr(runtime, "controller_mode", str(p.get("mode", "RL_SAFE_ARBITRAGE")).upper()),
         "TOGGLE_SHADOW_MODE": lambda p: setattr(runtime, "controller_mode", "SHADOW_MODE" if p.get("enabled", True) else "RL_SAFE_ARBITRAGE"),
@@ -710,6 +730,7 @@ async def websocket_telemetry_endpoint(websocket: WebSocket):
         "STOP_SIMULATION": lambda p: runtime.stop_simulation_loop(),
         "RUN_EPISODE": lambda p: runtime.run_episode(total_steps=int(p.get("total_steps", 288))),
     }
+
 
 
     try:

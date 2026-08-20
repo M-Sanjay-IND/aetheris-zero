@@ -107,6 +107,13 @@
     input[type=range] {
       accent-color: #ffa586;
     }
+    .floating-3d-badge {
+      position: absolute;
+      transform: translate(-50%, -100%);
+      pointer-events: none;
+      transition: all 0.15s ease-out;
+      z-index: 20;
+    }
   </style>
 </head>
 
@@ -347,17 +354,17 @@
             </div>
             <!-- Heatmap Legend -->
             <div class="flex items-center gap-1.5 text-[10px] text-text-muted">
-              <span>Cool (20°C)</span>
+              <span>Cool (&lt;21°C)</span>
               <div class="w-16 h-2 rounded bg-gradient-to-r from-blue-500 via-emerald-400 via-amber-400 to-red-500"></div>
-              <span>Warm (25°C+)</span>
+              <span>Warm (&gt;24.5°C)</span>
             </div>
           </div>
 
           <!-- Three.js Canvas Container -->
-          <div id="three-canvas-container" class="w-full h-72 sm:h-80 rounded-xl bg-surface relative overflow-hidden border border-surface-border flex items-center justify-center cursor-grab active:cursor-grabbing">
+          <div id="three-canvas-container" class="w-full h-80 sm:h-96 rounded-xl bg-surface relative overflow-hidden border border-surface-border flex items-center justify-center cursor-grab active:cursor-grabbing">
             <!-- Overlay Active Zone HUD -->
             <div id="zone-active-hud" class="absolute top-3 left-3 bg-surface/90 backdrop-blur border border-surface-border rounded-xl px-3 py-2 text-xs shadow-xl z-10 flex items-center gap-3">
-              <div class="w-2.5 h-2.5 rounded-full bg-accent-green animate-pulse"></div>
+              <div id="hud-zone-dot" class="w-2.5 h-2.5 rounded-full bg-accent-green animate-pulse"></div>
               <div>
                 <div class="flex items-center gap-1.5">
                   <span class="text-text-dim text-[10px]">Active Room:</span>
@@ -368,6 +375,33 @@
                 </div>
               </div>
             </div>
+
+            <!-- Weather Indicator Badge inside 3D Canvas -->
+            <div id="three-weather-badge" class="absolute top-3 right-3 bg-surface/90 backdrop-blur border border-surface-border rounded-xl px-3 py-1.5 text-xs shadow-xl z-10 flex items-center gap-2">
+              <span id="three-weather-icon" class="material-symbols-outlined text-base text-accent-amber">wb_sunny</span>
+              <div>
+                <div class="text-[9px] text-text-dim">Outdoor Weather:</div>
+                <div id="three-weather-text" class="font-mono text-[11px] font-bold text-text-main">28.0°C Ambient</div>
+              </div>
+            </div>
+
+            <!-- 3D Floating HTML Badges directly over the rooms -->
+            <div id="badge-3d-zone_1" class="floating-3d-badge bg-surface-card/90 backdrop-blur border border-primary/50 text-text-main px-2 py-0.5 rounded-md shadow text-[10px] font-mono font-bold flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-accent-green"></span> Core: <span id="badge-3d-temp-zone_1" class="text-primary">22.0°C</span>
+            </div>
+            <div id="badge-3d-zone_2" class="floating-3d-badge bg-surface-card/90 backdrop-blur border border-surface-border text-text-main px-2 py-0.5 rounded-md shadow text-[10px] font-mono font-bold flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-accent-green"></span> North: <span id="badge-3d-temp-zone_2" class="text-text-muted">22.0°C</span>
+            </div>
+            <div id="badge-3d-zone_3" class="floating-3d-badge bg-surface-card/90 backdrop-blur border border-surface-border text-text-main px-2 py-0.5 rounded-md shadow text-[10px] font-mono font-bold flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-accent-green"></span> South: <span id="badge-3d-temp-zone_3" class="text-text-muted">22.0°C</span>
+            </div>
+            <div id="badge-3d-zone_4" class="floating-3d-badge bg-surface-card/90 backdrop-blur border border-surface-border text-text-main px-2 py-0.5 rounded-md shadow text-[10px] font-mono font-bold flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-accent-green"></span> East: <span id="badge-3d-temp-zone_4" class="text-text-muted">22.0°C</span>
+            </div>
+            <div id="badge-3d-zone_5" class="floating-3d-badge bg-surface-card/90 backdrop-blur border border-surface-border text-text-main px-2 py-0.5 rounded-md shadow text-[10px] font-mono font-bold flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-accent-green"></span> West: <span id="badge-3d-temp-zone_5" class="text-text-muted">22.0°C</span>
+            </div>
+
             <div class="absolute bottom-3 right-3 text-[10px] text-text-dim bg-surface/80 px-2 py-1 rounded backdrop-blur pointer-events-none">
               Click room or drag to rotate 3D view
             </div>
@@ -496,7 +530,7 @@
               <span id="slider-weather-val" class="font-mono text-xs font-bold text-accent-amber">28.0°C</span>
             </div>
             <div class="flex items-center gap-3">
-              <input id="slider-weather" type="range" min="15" max="45" step="0.5" value="28" oninput="onWeatherSliderInput(this.value)" class="w-full h-1.5 bg-surface-border rounded-lg cursor-pointer">
+              <input id="slider-weather" type="range" min="15" max="45" step="0.5" value="28" oninput="onWeatherSliderLiveInput(this.value)" class="w-full h-1.5 bg-surface-border rounded-lg cursor-pointer">
               <button onclick="applyCustomWeather()" class="bg-primary hover:bg-primary-dark text-surface text-[11px] font-bold px-3 py-1 rounded-lg transition shrink-0 active:scale-95">Apply</button>
             </div>
             <div class="flex items-center justify-between text-[10px] text-text-dim">
@@ -516,7 +550,7 @@
               <span id="slider-price-val" class="font-mono text-xs font-bold text-accent-green">₹12.45/kWh</span>
             </div>
             <div class="flex items-center gap-3">
-              <input id="slider-price" type="range" min="1" max="60" step="0.5" value="12.5" oninput="onPriceSliderInput(this.value)" class="w-full h-1.5 bg-surface-border rounded-lg cursor-pointer">
+              <input id="slider-price" type="range" min="1" max="60" step="0.5" value="12.5" oninput="onPriceSliderLiveInput(this.value)" class="w-full h-1.5 bg-surface-border rounded-lg cursor-pointer">
               <button onclick="applyCustomPrice()" class="bg-primary hover:bg-primary-dark text-surface text-[11px] font-bold px-3 py-1 rounded-lg transition shrink-0 active:scale-95">Apply</button>
             </div>
             <div class="flex items-center justify-between text-[10px] text-text-dim">
@@ -536,7 +570,7 @@
               <span id="slider-zone-val" class="font-mono text-xs font-bold text-primary">22.0°C</span>
             </div>
             <div class="flex items-center gap-3">
-              <input id="slider-zone-temp" type="range" min="18" max="30" step="0.5" value="22" oninput="onZoneSliderInput(this.value)" class="w-full h-1.5 bg-surface-border rounded-lg cursor-pointer">
+              <input id="slider-zone-temp" type="range" min="18" max="30" step="0.5" value="22" oninput="onZoneSliderLiveInput(this.value)" class="w-full h-1.5 bg-surface-border rounded-lg cursor-pointer">
               <button onclick="applyCustomZoneTemp()" class="bg-primary hover:bg-primary-dark text-surface text-[11px] font-bold px-3 py-1 rounded-lg transition shrink-0 active:scale-95">Set Room</button>
             </div>
             <div class="flex items-center justify-between text-[10px]">
@@ -721,6 +755,9 @@
     let powerActualHistory = [];
     let powerBaselineHistory = [];
 
+    // Debounce timer for smooth slider live-updates
+    let debounceTimer = null;
+
     // --- Currency Helper ---
     function setCurrency(curr) {
       activeCurrency = curr;
@@ -729,7 +766,7 @@
       
       // Update price slider display
       const currentPriceSlider = parseFloat(document.getElementById('slider-price').value);
-      onPriceSliderInput(currentPriceSlider);
+      updatePriceSliderLabel(currentPriceSlider);
 
       if (window.lastTelemetry) updateUIFromTelemetry(window.lastTelemetry);
       showToast('Currency Switched', 'All metrics converted to ' + (curr === 'INR' ? 'Indian Rupee (₹)' : 'US Dollar ($)'), 'currency_exchange', 'accent-blue');
@@ -820,6 +857,14 @@
       highlightZoneMesh(zid);
     }
 
+    // --- Thermal Color Mapping for 3D Mesh ---
+    function getZoneColorHex(tempC) {
+      if (tempC < 21.0) return 0x38bdf8; // Cool Cyan/Blue
+      if (tempC <= 23.5) return 0x10b981; // Ideal Comfort Green
+      if (tempC <= 25.0) return 0xf59e0b; // Warm Amber
+      return 0xef4444; // Hot Red
+    }
+
     // --- UI Updaters ---
     function updateUIFromTelemetry(data) {
       window.lastTelemetry = data;
@@ -901,7 +946,12 @@
         document.getElementById('shield-badge').innerText = 'Active & Guarding';
       }
 
-      // 4. Zone Badges & 3D Colors
+      // 4. Update Outdoor Weather in 3D scene & UI
+      const ambientTemp = data.ambient_temp_c || 28.0;
+      document.getElementById('three-weather-text').innerText = ambientTemp.toFixed(1) + '°C Ambient';
+      update3DWeatherAtmosphere(ambientTemp);
+
+      // 5. Zone Badges, 3D Mesh Colors & Floating 3D Badges
       if (data.zones) {
         for (const [zid, z] of Object.entries(data.zones)) {
           const tempEl = document.getElementById('badge-temp-' + zid);
@@ -909,20 +959,27 @@
           if (tempEl) tempEl.innerText = z.temp_c.toFixed(1) + '°C';
           if (occEl) occEl.innerText = (z.occupancy || 0) + ' Occ • ' + (z.comfort_compliant ? 'Comfortable' : 'Adjusting');
           
+          // 3D Floating Badge text
+          const badge3d = document.getElementById('badge-3d-temp-' + zid);
+          if (badge3d) badge3d.innerText = z.temp_c.toFixed(1) + '°C';
+
           if (zid === selectedZoneId) {
             document.getElementById('hud-zone-temp').innerText = z.temp_c.toFixed(1) + '°C';
             document.getElementById('hud-zone-mass').innerText = (z.mass_temp_c || z.temp_c).toFixed(1) + '°C';
+            document.getElementById('slider-zone-val').innerText = (z.setpoint_c || z.temp_c).toFixed(1) + '°C';
           }
 
-          // Update 3D block color
+          // Live Update 3D block color in Three.js
           if (zoneMeshes[zid]) {
-            const hexInt = parseInt(z.hex_color.replace('#', '0x'));
-            zoneMeshes[zid].material.color.setHex(hexInt);
+            const colorHex = getZoneColorHex(z.temp_c);
+            zoneMeshes[zid].material.color.setHex(colorHex);
+            zoneMeshes[zid].material.emissive.setHex(colorHex);
+            zoneMeshes[zid].material.emissiveIntensity = 0.25;
           }
         }
       }
 
-      // 5. Update Real Dynamic Charts
+      // 6. Update Real Dynamic Charts
       updatePowerChart(totalKw, (data.power && data.power.baseline_hvac_kw) || totalKw);
       updateTariffChartCursor(data.timestamp_hour || 0.0);
     }
@@ -970,23 +1027,18 @@
       }
     }
 
-    // --- Interactive Live Slider Handlers ---
-    function onWeatherSliderInput(val) {
-      document.getElementById('slider-weather-val').innerText = parseFloat(val).toFixed(1) + '°C';
-    }
+    // --- Interactive Live Slider Handlers (Immediate Dynamic Feedback) ---
+    function onWeatherSliderLiveInput(val) {
+      const temp = parseFloat(val);
+      document.getElementById('slider-weather-val').innerText = temp.toFixed(1) + '°C';
+      document.getElementById('three-weather-text').innerText = temp.toFixed(1) + '°C Ambient';
+      update3DWeatherAtmosphere(temp);
 
-    function onPriceSliderInput(val) {
-      const num = parseFloat(val);
-      if (activeCurrency === 'INR') {
-        document.getElementById('slider-price-val').innerText = '₹' + num.toFixed(2) + '/kWh';
-      } else {
-        const usd = num / 83.0;
-        document.getElementById('slider-price-val').innerText = '$' + usd.toFixed(3) + '/kWh';
-      }
-    }
-
-    function onZoneSliderInput(val) {
-      document.getElementById('slider-zone-val').innerText = parseFloat(val).toFixed(1) + '°C';
+      // Debounce live physics send
+      if (debounceTimer) clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        sendWsCommand('SET_WEATHER_OVERRIDE', { ambient_temp_c: temp, solar_irradiance_wm2: 800.0 });
+      }, 100);
     }
 
     function applyCustomWeather() {
@@ -997,8 +1049,30 @@
 
     function setWeatherPreset(temp) {
       document.getElementById('slider-weather').value = temp;
-      onWeatherSliderInput(temp);
+      document.getElementById('slider-weather-val').innerText = temp.toFixed(1) + '°C';
+      document.getElementById('three-weather-text').innerText = temp.toFixed(1) + '°C Ambient';
+      update3DWeatherAtmosphere(temp);
       applyCustomWeather();
+    }
+
+    function updatePriceSliderLabel(num) {
+      if (activeCurrency === 'INR') {
+        document.getElementById('slider-price-val').innerText = '₹' + num.toFixed(2) + '/kWh';
+      } else {
+        const usd = num / USD_TO_INR;
+        document.getElementById('slider-price-val').innerText = '$' + usd.toFixed(3) + '/kWh';
+      }
+    }
+
+    function onPriceSliderLiveInput(val) {
+      const num = parseFloat(val);
+      updatePriceSliderLabel(num);
+
+      if (debounceTimer) clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        const priceUsd = num / USD_TO_INR;
+        sendWsCommand('SET_PRICE_OVERRIDE', { price_usd_per_kwh: priceUsd });
+      }, 100);
     }
 
     function applyCustomPrice() {
@@ -1010,7 +1084,7 @@
 
     function setPricePreset(valInr) {
       document.getElementById('slider-price').value = valInr;
-      onPriceSliderInput(valInr);
+      updatePriceSliderLabel(valInr);
       applyCustomPrice();
     }
 
@@ -1024,6 +1098,23 @@
       showToast('OpenADR 3.0 DR Triggered', '5x Peak Price Surge active! Pre-cooling virtual battery discharging to shed load.', 'bolt', 'accent-red');
     }
 
+    function onZoneSliderLiveInput(val) {
+      const temp = parseFloat(val);
+      document.getElementById('slider-zone-val').innerText = temp.toFixed(1) + '°C';
+      
+      // Live update selected 3D mesh color
+      if (zoneMeshes[selectedZoneId]) {
+        const colorHex = getZoneColorHex(temp);
+        zoneMeshes[selectedZoneId].material.color.setHex(colorHex);
+        zoneMeshes[selectedZoneId].material.emissive.setHex(colorHex);
+      }
+
+      if (debounceTimer) clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        sendWsCommand('SET_ZONE_TARGET', { zone_id: selectedZoneId, target_temp: temp });
+      }, 100);
+    }
+
     function applyCustomZoneTemp() {
       const temp = parseFloat(document.getElementById('slider-zone-temp').value);
       sendWsCommand('SET_ZONE_TARGET', { zone_id: selectedZoneId, target_temp: temp });
@@ -1033,7 +1124,15 @@
 
     function testUnsafeOverride(temp) {
       document.getElementById('slider-zone-temp').value = temp;
-      onZoneSliderInput(temp);
+      document.getElementById('slider-zone-val').innerText = temp.toFixed(1) + '°C';
+      
+      // Animate warning pulse on selected 3D room
+      if (zoneMeshes[selectedZoneId]) {
+        zoneMeshes[selectedZoneId].material.color.setHex(0xef4444);
+        zoneMeshes[selectedZoneId].material.emissive.setHex(0xef4444);
+        zoneMeshes[selectedZoneId].material.emissiveIntensity = 0.8;
+      }
+
       sendWsCommand('INJECT_MALICIOUS_SETPOINT', { zone_id: selectedZoneId, target_temp: temp });
       showToast('🛡️ Malicious 38°C Injected', 'CBF Safety Shield intervened and clamped setpoint to 24.5°C to protect room occupants!', 'gpp_maybe', 'accent-amber');
     }
@@ -1114,8 +1213,9 @@
     }
 
     // --- Three.js 3D Digital Twin Simulation ---
-    let scene, camera, renderer, raycaster, mouse;
+    let scene, camera, renderer, raycaster, mouse, dirLight, ambientLight;
     const zoneMeshes = {};
+    let airflowParticleSpeed = 0.02;
 
     function initThreeJS() {
       const container = document.getElementById('three-canvas-container');
@@ -1130,7 +1230,7 @@
       camera.position.set(0, 14, 20);
       camera.lookAt(0, 0, 0);
 
-      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
       renderer.setSize(width, height);
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       container.appendChild(renderer.domElement);
@@ -1139,10 +1239,10 @@
       mouse = new THREE.Vector2();
 
       // Lighting
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+      ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
       scene.add(ambientLight);
 
-      const dirLight = new THREE.DirectionalLight(0xffa586, 0.8);
+      dirLight = new THREE.DirectionalLight(0xffa586, 0.8);
       dirLight.position.set(10, 20, 10);
       scene.add(dirLight);
 
@@ -1164,26 +1264,28 @@
         const geom = new THREE.BoxGeometry(cfg.size[0], cfg.size[1], cfg.size[2]);
         const mat = new THREE.MeshStandardMaterial({
           color: 0x10b981,
-          roughness: 0.3,
-          metalness: 0.1,
+          roughness: 0.25,
+          metalness: 0.15,
           transparent: true,
-          opacity: 0.85
+          opacity: 0.88,
+          emissive: 0x10b981,
+          emissiveIntensity: 0.2
         });
         const mesh = new THREE.Mesh(geom, mat);
         mesh.position.set(cfg.pos[0], cfg.pos[1], cfg.pos[2]);
-        mesh.userData = { zoneId: cfg.id };
+        mesh.userData = { zoneId: cfg.id, origPos: [...cfg.pos], size: [...cfg.size] };
         scene.add(mesh);
         zoneMeshes[cfg.id] = mesh;
 
         // Wireframe edges
         const wireGeom = new THREE.EdgesGeometry(geom);
-        const wireMat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.25 });
+        const wireMat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.35 });
         const wireframe = new THREE.LineSegments(wireGeom, wireMat);
         mesh.add(wireframe);
       });
 
       // Airflow Particles
-      const particleCount = 120;
+      const particleCount = 150;
       const particleGeom = new THREE.BufferGeometry();
       const particlePositions = new Float32Array(particleCount * 3);
       for (let i = 0; i < particleCount * 3; i += 3) {
@@ -1192,7 +1294,7 @@
         particlePositions[i + 2] = (Math.random() - 0.5) * 16;
       }
       particleGeom.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
-      const particleMat = new THREE.PointsMaterial({ color: 0x38bdf8, size: 0.15, transparent: true, opacity: 0.6 });
+      const particleMat = new THREE.PointsMaterial({ color: 0x38bdf8, size: 0.18, transparent: true, opacity: 0.7 });
       const particles = new THREE.Points(particleGeom, particleMat);
       scene.add(particles);
 
@@ -1210,7 +1312,6 @@
 
       window.addEventListener('mouseup', (e) => {
         if (isDragging && (Date.now() - mouseDownTime < 200)) {
-          // It was a click, not a drag!
           const rect = container.getBoundingClientRect();
           mouse.x = ((e.clientX - rect.left) / container.clientWidth) * 2 - 1;
           mouse.y = -((e.clientY - rect.top) / container.clientHeight) * 2 + 1;
@@ -1237,13 +1338,38 @@
         }
       });
 
+      // Update 3D Screen Projection for Floating Badges
+      function updateFloatingBadges() {
+        const containerRect = container.getBoundingClientRect();
+        Object.entries(zoneMeshes).forEach(([zid, mesh]) => {
+          const badgeEl = document.getElementById('badge-3d-' + zid);
+          if (!badgeEl) return;
+          const pos = new THREE.Vector3();
+          mesh.getWorldPosition(pos);
+          pos.y += (mesh.userData.size[1] / 2) + 0.6; // Position slightly above zone roof
+          pos.project(camera);
+
+          // Convert normalized device coords to container pixel coords
+          const x = ((pos.x * 0.5) + 0.5) * container.clientWidth;
+          const y = (-(pos.y * 0.5) + 0.5) * container.clientHeight;
+
+          if (pos.z < 1) { // Visible in front of camera
+            badgeEl.style.left = x + 'px';
+            badgeEl.style.top = y + 'px';
+            badgeEl.style.display = 'flex';
+          } else {
+            badgeEl.style.display = 'none';
+          }
+        });
+      }
+
       // Render Loop
       function animate() {
         requestAnimationFrame(animate);
         
-        // Gentle idle rotation when not dragging
+        // Gentle idle orbit when idle
         if (!isDragging) {
-          rotationAngle += 0.001;
+          rotationAngle += 0.0008;
           camera.position.x = Math.sin(rotationAngle) * 22;
           camera.position.z = Math.cos(rotationAngle) * 22;
           camera.lookAt(0, 0, 0);
@@ -1252,11 +1378,12 @@
         // Move airflow particles
         const pos = particleGeom.attributes.position.array;
         for (let i = 1; i < particleCount * 3; i += 3) {
-          pos[i] -= 0.02;
+          pos[i] -= airflowParticleSpeed;
           if (pos[i] < -1.5) pos[i] = 3.5;
         }
         particleGeom.attributes.position.needsUpdate = true;
 
+        updateFloatingBadges();
         renderer.render(scene, camera);
       }
       animate();
@@ -1268,16 +1395,51 @@
         camera.updateProjectionMatrix();
         renderer.setSize(w, h);
       });
+
+      // If initial telemetry already loaded before ThreeJS initialized, render it now
+      if (window.lastTelemetry) updateUIFromTelemetry(window.lastTelemetry);
+    }
+
+    function update3DWeatherAtmosphere(tempC) {
+      if (!dirLight || !scene) return;
+      if (tempC >= 38.0) {
+        // Heatwave fiery orange light
+        dirLight.color.setHex(0xff7733);
+        dirLight.intensity = 1.3;
+        scene.background.setHex(0x180f14);
+        airflowParticleSpeed = 0.045; // Faster particles under high thermal load
+      } else if (tempC >= 28.0) {
+        // Warm sunny ambient
+        dirLight.color.setHex(0xffa586);
+        dirLight.intensity = 0.9;
+        scene.background.setHex(0x0c101d);
+        airflowParticleSpeed = 0.025;
+      } else {
+        // Cool crisp day blue light
+        dirLight.color.setHex(0x7dd3fc);
+        dirLight.intensity = 0.65;
+        scene.background.setHex(0x0a1220);
+        airflowParticleSpeed = 0.015;
+      }
     }
 
     function highlightZoneMesh(zid) {
       Object.entries(zoneMeshes).forEach(([id, mesh]) => {
+        const badgeEl = document.getElementById('badge-3d-' + id);
         if (id === zid) {
           mesh.material.opacity = 1.0;
-          mesh.scale.set(1.04, 1.04, 1.04);
+          mesh.scale.set(1.05, 1.05, 1.05);
+          if (badgeEl) {
+            badgeEl.classList.add('border-primary', 'bg-surface-card');
+            badgeEl.classList.remove('border-surface-border');
+          }
         } else {
-          mesh.material.opacity = 0.8;
+          mesh.material.opacity = 0.78;
           mesh.scale.set(1.0, 1.0, 1.0);
+          if (badgeEl) {
+            badgeEl.classList.remove('border-primary');
+            badgeEl.classList.add('border-surface-border');
+          }
         }
       });
     }
