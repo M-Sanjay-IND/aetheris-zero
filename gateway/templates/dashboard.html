@@ -3,11 +3,12 @@
 <head>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <meta name="description" content="AETHERIS-Zero: Autonomous Physics-Informed Safe-RL & Transactive Virtual Power Plant Engine Digital Twin"/>
   <title>AETHERIS-Zero - Mission Control & Digital Twin</title>
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <link href="https://fonts.googleapis.com" rel="preconnect"/>
   <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@600;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
@@ -85,12 +86,12 @@
             "gutter": "16px"
           },
           fontFamily: {
-            "headline-md": ["Hanken Grotesk"],
-            "display-lg": ["Hanken Grotesk"],
-            "label-caps": ["JetBrains Mono"],
-            "body-base": ["Inter"],
-            "display-lg-mobile": ["Hanken Grotesk"],
-            "data-telemetry": ["JetBrains Mono"]
+            "headline-md": ["Hanken Grotesk", "sans-serif"],
+            "display-lg": ["Hanken Grotesk", "sans-serif"],
+            "label-caps": ["JetBrains Mono", "monospace"],
+            "body-base": ["Inter", "sans-serif"],
+            "display-lg-mobile": ["Hanken Grotesk", "sans-serif"],
+            "data-telemetry": ["JetBrains Mono", "monospace"]
           },
           fontSize: {
             "headline-md": ["24px", { lineHeight: "32px", fontWeight: "600" }],
@@ -139,77 +140,90 @@
     .custom-scrollbar::-webkit-scrollbar-thumb:hover {
       background: rgba(255, 165, 134, 0.6); 
     }
+    button:focus-visible {
+      outline: 2px solid #ffa586;
+      outline-offset: 2px;
+    }
   </style>
 </head>
 
 <body class="bg-background text-on-background font-body-base overflow-hidden selection:bg-primary-container selection:text-on-primary-container">
   <!-- Global Background Shader -->
-  <div class="fixed inset-0 w-full h-full z-0 pointer-events-none opacity-60">
+  <div class="fixed inset-0 w-full h-full z-0 pointer-events-none opacity-60" aria-hidden="true">
     <canvas class="w-full h-full" id="bg-shader"></canvas>
   </div>
 
   <!-- TopNavBar -->
-  <nav class="fixed top-0 w-full z-50 flex justify-between items-center px-margin-edge h-16 bg-surface-container/80 backdrop-blur-xl border-b border-grid-line">
-    <!-- Brand -->
-    <div class="flex items-center gap-4">
-      <span class="font-display-lg text-[24px] font-bold tracking-tighter text-primary">AETHERIS-Zero</span>
-      <span class="px-2 py-0.5 rounded text-[10px] font-label-caps bg-primary-container/40 text-primary-fixed border border-primary/30 uppercase">
-        Safe-RL Transactive VPP
-      </span>
-    </div>
-
-    <!-- Navigation Links -->
-    <div class="hidden md:flex gap-8 items-center h-full">
-      <button onclick="setControllerMode('RL_SAFE_ARBITRAGE')" id="nav-mode-rl" class="h-full flex items-center text-primary-fixed border-b-2 border-primary-fixed pb-1 font-label-caps text-label-caps uppercase transition-colors">
-        PPO Safe-RL
-      </button>
-      <button onclick="setControllerMode('BASELINE_HEURISTIC')" id="nav-mode-base" class="h-full flex items-center text-on-surface-variant font-label-caps text-label-caps uppercase hover:text-primary-fixed transition-colors pt-1">
-        Baseline
-      </button>
-      <button onclick="openIngestionModal()" class="h-full flex items-center text-on-surface-variant font-label-caps text-label-caps uppercase hover:text-primary-fixed transition-colors pt-1">
-        Brick Schema
-      </button>
-    </div>
-
-    <!-- Trailing Actions -->
-    <div class="flex items-center gap-4 text-primary">
-      <button onclick="openIngestionModal()" title="Semantic Ingestion / Brick Schema" class="hover:text-primary-fixed transition-colors flex items-center justify-center p-2 rounded-full hover:bg-surface-variant/30">
-        <span class="material-symbols-outlined">schema</span>
-      </button>
-      <div class="flex items-center gap-1.5 px-3 py-1 bg-surface-container-high rounded-full border border-grid-line text-xs font-data-telemetry">
-        <span id="ws-status-dot" class="w-2 h-2 rounded-full bg-primary-fixed animate-pulse"></span>
-        <span id="ws-status-text" class="text-on-surface-variant">LIVE WS</span>
+  <header role="banner">
+    <nav class="fixed top-0 w-full z-50 flex justify-between items-center px-margin-edge h-16 bg-surface-container/80 backdrop-blur-xl border-b border-grid-line" role="navigation" aria-label="Main Navigation">
+      <!-- Brand -->
+      <div class="flex items-center gap-4">
+        <span class="font-display-lg text-[24px] font-bold tracking-tighter text-primary">AETHERIS-Zero</span>
+        <span class="px-2 py-0.5 rounded text-[10px] font-label-caps bg-primary-container/40 text-primary-fixed border border-primary/30 uppercase">
+          Safe-RL Transactive VPP
+        </span>
       </div>
-    </div>
-  </nav>
+
+      <!-- Navigation Links -->
+      <div class="hidden md:flex gap-8 items-center h-full">
+        <button onclick="setControllerMode('RL_SAFE_ARBITRAGE')" id="nav-mode-rl" class="h-full flex items-center text-primary-fixed border-b-2 border-primary-fixed pb-1 font-label-caps text-label-caps uppercase transition-colors" aria-label="Switch to Safe-RL Mode">
+          PPO Safe-RL
+        </button>
+        <button onclick="setControllerMode('BASELINE_HEURISTIC')" id="nav-mode-base" class="h-full flex items-center text-on-surface-variant font-label-caps text-label-caps uppercase hover:text-primary-fixed transition-colors pt-1" aria-label="Switch to Baseline Schedule Mode">
+          Baseline
+        </button>
+        <button onclick="openIngestionModal()" class="h-full flex items-center text-on-surface-variant font-label-caps text-label-caps uppercase hover:text-primary-fixed transition-colors pt-1" aria-label="Open Brick Schema Parser">
+          Brick Schema
+        </button>
+      </div>
+
+      <!-- Trailing Actions -->
+      <div class="flex items-center gap-4 text-primary">
+        <!-- Quick Help Guide Button -->
+        <button onclick="openHelpModal()" title="Operator Guide & Shortcuts [H / ?]" class="px-3 py-1 bg-surface-variant/60 hover:bg-surface-variant rounded border border-primary/30 text-primary-fixed font-label-caps text-xs flex items-center gap-1.5 transition-colors" aria-label="Open Operator Guide">
+          <span class="material-symbols-outlined text-[16px]">help_outline</span>
+          <span class="hidden sm:inline">Guide</span>
+        </button>
+
+        <button onclick="openIngestionModal()" title="Semantic Ingestion / Brick Schema" class="hover:text-primary-fixed transition-colors flex items-center justify-center p-2 rounded-full hover:bg-surface-variant/30" aria-label="Open Semantic Ingestion">
+          <span class="material-symbols-outlined">schema</span>
+        </button>
+
+        <div class="flex items-center gap-1.5 px-3 py-1 bg-surface-container-high rounded-full border border-grid-line text-xs font-data-telemetry" role="status" aria-live="polite">
+          <span id="ws-status-dot" class="w-2 h-2 rounded-full bg-primary-fixed animate-pulse"></span>
+          <span id="ws-status-text" class="text-on-surface-variant">LIVE WS</span>
+        </div>
+      </div>
+    </nav>
+  </header>
 
   <!-- Main Dashboard Layout -->
-  <main class="relative z-10 pt-16 h-screen flex flex-col">
+  <main class="relative z-10 pt-16 h-screen flex flex-col" role="main">
     <!-- Split View Container -->
     <div class="flex-grow flex flex-col md:flex-row gap-gutter p-gutter pb-0 overflow-hidden">
       <!-- Left Column: 3D Digital Twin Stage (60%) -->
-      <section class="w-full md:w-[60%] relative bg-surface-container-low/60 backdrop-blur-md border border-grid-line rounded-lg overflow-hidden inner-glow flex flex-col">
+      <section class="w-full md:w-[60%] relative bg-surface-container-low/60 backdrop-blur-md border border-grid-line rounded-lg overflow-hidden inner-glow flex flex-col" aria-label="3D Building Digital Twin">
         <!-- Header / Telemetry Tag -->
         <div class="absolute top-4 left-4 z-20 flex flex-wrap items-center gap-3">
           <div class="px-3 py-1 bg-surface-variant/80 backdrop-blur-sm border-l-2 border-primary-fixed font-data-telemetry text-data-telemetry text-primary-fixed">
             SYS.TWIN.01
           </div>
-          <div id="safety-barrier-tag" class="flex items-center gap-2 px-3 py-1 bg-surface-container/60 backdrop-blur-sm border border-grid-line rounded-sm">
+          <div id="safety-barrier-tag" class="flex items-center gap-2 px-3 py-1 bg-surface-container/60 backdrop-blur-sm border border-grid-line rounded-sm" role="status" aria-live="assertive">
             <span class="material-symbols-outlined text-primary text-sm" id="safety-icon">verified_user</span>
             <span class="font-label-caps text-label-caps text-primary-fixed uppercase tracking-widest text-[10px]" id="safety-status-text">
               Safety Barrier: OPTIMAL
             </span>
           </div>
-          <div id="dr-event-active-tag" class="hidden px-3 py-1 bg-error-container/40 border border-error rounded-sm text-error font-data-telemetry text-[10px] animate-pulse">
+          <div id="dr-event-active-tag" class="hidden px-3 py-1 bg-error-container/40 border border-error rounded-sm text-error font-data-telemetry text-[10px] animate-pulse" role="alert">
             OPENADR 3.0 DR EVENT ACTIVE
           </div>
         </div>
 
         <!-- 3D Scene Wrapper -->
-        <div class="relative flex-grow w-full h-full" id="threejs-container"></div>
+        <div class="relative flex-grow w-full h-full cursor-grab active:cursor-grabbing" id="threejs-container" role="img" aria-label="Interactive 3D Digital Twin showing 5 temperature-reactive zones and HVAC airflow"></div>
 
         <!-- Overlay Grids/Crosshairs for Technical Aesthetic -->
-        <div class="absolute inset-0 pointer-events-none border border-grid-line/30 m-8 opacity-20">
+        <div class="absolute inset-0 pointer-events-none border border-grid-line/30 m-8 opacity-20" aria-hidden="true">
           <div class="absolute top-0 left-0 w-4 h-4 border-t border-l border-primary-fixed"></div>
           <div class="absolute top-0 right-0 w-4 h-4 border-t border-r border-primary-fixed"></div>
           <div class="absolute bottom-0 left-0 w-4 h-4 border-b border-l border-primary-fixed"></div>
@@ -218,7 +232,7 @@
       </section>
 
       <!-- Right Column: Analytics Rail (40%) -->
-      <section class="w-full md:w-[40%] flex flex-col gap-gutter overflow-y-auto pr-1 pb-gutter custom-scrollbar">
+      <aside class="w-full md:w-[40%] flex flex-col gap-gutter overflow-y-auto pr-1 pb-gutter custom-scrollbar" aria-label="Analytics & Telemetry">
         <!-- Chart 1: Baseline vs AETHERIS Load -->
         <article class="bg-surface-container-high/70 backdrop-blur-xl border border-grid-line rounded-lg p-panel-padding flex flex-col gap-4 relative">
           <div class="flex justify-between items-start">
@@ -240,7 +254,7 @@
             <div class="absolute w-full h-[1px] bg-grid-line/50 top-1/4"></div>
             <div class="absolute w-full h-[1px] bg-grid-line/50 top-3/4"></div>
 
-            <svg class="absolute inset-0 w-full h-full overflow-visible" id="load-chart" preserveAspectRatio="none" viewBox="0 0 100 100">
+            <svg class="absolute inset-0 w-full h-full overflow-visible" id="load-chart" preserveAspectRatio="none" viewBox="0 0 100 100" role="img" aria-label="Load comparison chart">
               <path id="load-baseline-path" class="text-grid-line" d="M0 60 Q 20 55, 40 70 T 80 50 T 100 30" fill="none" stroke="currentColor" stroke-dasharray="4 4" stroke-width="2"></path>
               <path id="load-actual-path" class="text-primary-fixed" d="M0 65 Q 15 65, 30 50 T 70 80 T 100 40" fill="none" stroke="currentColor" stroke-width="2.5"></path>
             </svg>
@@ -266,14 +280,14 @@
               <h3 class="font-headline-md text-headline-md text-on-surface">CAISO LMP Price</h3>
               <p class="font-label-caps text-label-caps text-on-surface-variant uppercase mt-1">Live Price Curve (₹/MWh)</p>
             </div>
-            <div id="price-spike-banner" class="hidden px-2 py-1 bg-error-container/20 border border-error/50 rounded text-error font-data-telemetry text-xs animate-pulse">
+            <div id="price-spike-banner" class="hidden px-2 py-1 bg-error-container/20 border border-error/50 rounded text-error font-data-telemetry text-xs animate-pulse" role="alert">
               SPIKE DETECTED
             </div>
           </div>
 
           <!-- Interactive Chart Area -->
           <div class="h-32 w-full relative mt-2 border-b border-l border-grid-line/50">
-            <svg class="absolute inset-0 w-full h-full overflow-visible" id="price-chart" preserveAspectRatio="none" viewBox="0 0 100 100">
+            <svg class="absolute inset-0 w-full h-full overflow-visible" id="price-chart" preserveAspectRatio="none" viewBox="0 0 100 100" role="img" aria-label="Wholesale price curve">
               <defs>
                 <linearGradient id="priceGrad" x1="0" x2="0" y1="0" y2="1">
                   <stop offset="0%" stop-color="#b51a2b" stop-opacity="0.35"></stop>
@@ -311,11 +325,11 @@
             <span class="material-symbols-outlined text-secondary fill-icon text-2xl">payments</span>
           </div>
         </article>
-      </section>
+      </aside>
     </div>
 
     <!-- Bottom Panel: Control Deck -->
-    <section class="mt-auto w-full p-gutter px-margin-edge bg-surface-container-low/90 backdrop-blur-2xl border-t border-grid-line flex flex-col md:flex-row justify-between items-center gap-4 z-20">
+    <footer class="mt-auto w-full p-gutter px-margin-edge bg-surface-container-low/90 backdrop-blur-2xl border-t border-grid-line flex flex-col md:flex-row justify-between items-center gap-4 z-20" role="contentinfo" aria-label="Mission Control Deck">
       <div class="flex items-center gap-4">
         <div id="deck-status-dot" class="w-2.5 h-2.5 bg-primary-fixed rounded-full animate-pulse shadow-[0_0_8px_rgba(255,165,134,0.8)]"></div>
         <div class="flex flex-col">
@@ -325,61 +339,140 @@
       </div>
 
       <div class="flex items-center gap-2">
-        <button id="btn-toggle-loop" onclick="toggleSimulationLoop()" class="px-4 py-2 rounded bg-surface-variant/80 text-primary-fixed border border-primary/40 hover:bg-surface-variant font-label-caps text-label-caps uppercase transition-colors flex items-center gap-1.5 text-xs">
+        <button id="btn-toggle-loop" onclick="toggleSimulationLoop()" class="px-4 py-2 rounded bg-surface-variant/80 text-primary-fixed border border-primary/40 hover:bg-surface-variant font-label-caps text-label-caps uppercase transition-colors flex items-center gap-1.5 text-xs" title="Start/Pause Loop [Space]">
           <span class="material-symbols-outlined text-[16px]" id="btn-loop-icon">play_arrow</span>
           <span id="btn-loop-text">Start Loop</span>
         </button>
-        <button onclick="stepSimulation()" class="px-3 py-2 rounded border border-grid-line text-on-surface-variant font-label-caps text-label-caps uppercase hover:bg-surface-variant/40 transition-colors text-xs">
+        <button onclick="stepSimulation()" class="px-3 py-2 rounded border border-grid-line text-on-surface-variant font-label-caps text-label-caps uppercase hover:bg-surface-variant/40 transition-colors text-xs" title="Single Step Forward [S]">
           <span class="material-symbols-outlined text-[16px]">skip_next</span>
         </button>
-        <button onclick="resetSimulation()" class="px-3 py-2 rounded border border-grid-line text-on-surface-variant font-label-caps text-label-caps uppercase hover:bg-surface-variant/40 transition-colors text-xs">
+        <button onclick="resetSimulation()" class="px-3 py-2 rounded border border-grid-line text-on-surface-variant font-label-caps text-label-caps uppercase hover:bg-surface-variant/40 transition-colors text-xs" title="Reset Simulation [R]">
           <span class="material-symbols-outlined text-[16px]">restart_alt</span>
         </button>
       </div>
 
       <div class="flex flex-wrap items-center gap-3">
         <!-- 24h Episode Runner -->
-        <button onclick="run24hEpisode()" class="px-4 py-2 rounded border border-primary/40 text-primary-fixed font-label-caps text-label-caps uppercase hover:bg-primary-container/20 transition-colors flex items-center gap-1.5 text-xs">
+        <button onclick="run24hEpisode()" class="px-4 py-2 rounded border border-primary/40 text-primary-fixed font-label-caps text-label-caps uppercase hover:bg-primary-container/20 transition-colors flex items-center gap-1.5 text-xs" title="Run 24h Benchmark Episode">
           <span class="material-symbols-outlined text-[16px]">speed</span>
           24h ROI Run
         </button>
 
         <!-- Toggle Shadow Mode -->
-        <button id="btn-shadow" onclick="toggleShadowMode()" class="px-4 py-2 rounded border border-transparent text-on-surface-variant font-label-caps text-label-caps uppercase hover:bg-surface-variant/50 transition-colors flex items-center gap-1.5 text-xs">
+        <button id="btn-shadow" onclick="toggleShadowMode()" class="px-4 py-2 rounded border border-transparent text-on-surface-variant font-label-caps text-label-caps uppercase hover:bg-surface-variant/50 transition-colors flex items-center gap-1.5 text-xs" title="Toggle AI Shadow Mode">
           <span class="material-symbols-outlined text-[16px]" id="shadow-icon">visibility_off</span>
           <span id="shadow-btn-text">Shadow Mode</span>
         </button>
 
         <!-- Simulate Setpoint Override -->
-        <button onclick="injectMaliciousFault()" class="px-4 py-2 rounded border border-error text-error font-label-caps text-label-caps uppercase hover:bg-error/10 transition-colors flex items-center gap-1.5 text-xs pulse-danger">
+        <button onclick="injectMaliciousFault()" class="px-4 py-2 rounded border border-error text-error font-label-caps text-label-caps uppercase hover:bg-error/10 transition-colors flex items-center gap-1.5 text-xs pulse-danger" title="Simulate 38°C Fault Override [O]">
           <span class="material-symbols-outlined text-[16px]">bug_report</span>
           Override (38°C)
         </button>
 
         <!-- Trigger OpenADR DR Event -->
-        <button onclick="triggerOpenADREvent()" class="px-6 py-2.5 rounded bg-primary-fixed text-on-primary font-label-caps text-label-caps uppercase font-bold hover:bg-primary-fixed/90 transition-colors flex items-center gap-2 shadow-[0_0_15px_rgba(255,165,134,0.3)] hover:shadow-[0_0_25px_rgba(255,165,134,0.5)] text-xs">
+        <button onclick="triggerOpenADREvent()" class="px-6 py-2.5 rounded bg-primary-fixed text-on-primary font-label-caps text-label-caps uppercase font-bold hover:bg-primary-fixed/90 transition-colors flex items-center gap-2 shadow-[0_0_15px_rgba(255,165,134,0.3)] hover:shadow-[0_0_25px_rgba(255,165,134,0.5)] text-xs" title="Trigger OpenADR 3.0 DR Event [D]">
           <span class="material-symbols-outlined text-[16px] fill-icon">bolt</span>
           Trigger OpenADR DR
         </button>
       </div>
-    </section>
+    </footer>
   </main>
 
+  <!-- Operator Guide & Help Modal -->
+  <div id="help-modal" class="hidden fixed inset-0 z-50 bg-background/80 backdrop-blur-md flex items-center justify-center p-4" role="dialog" aria-labelledby="help-title" aria-modal="true">
+    <div class="bg-surface-container-high border border-primary/40 rounded-lg w-full max-w-3xl max-h-[85vh] flex flex-col overflow-hidden shadow-2xl">
+      <div class="p-4 border-b border-grid-line flex justify-between items-center bg-surface-container">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary-fixed text-2xl">menu_book</span>
+          <h3 id="help-title" class="font-headline-md text-lg text-on-surface">AETHERIS-Zero: Operator Guide & Overview</h3>
+        </div>
+        <button onclick="closeHelpModal()" class="text-on-surface-variant hover:text-on-surface p-1 rounded hover:bg-surface-variant/40" aria-label="Close Guide">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <div class="p-6 overflow-y-auto flex flex-col gap-6 text-sm">
+        <section>
+          <h4 class="font-headline-md text-base text-primary-fixed mb-2 flex items-center gap-2">
+            <span class="material-symbols-outlined text-lg">bolt</span> 1. What is AETHERIS-Zero?
+          </h4>
+          <p class="text-on-surface-variant leading-relaxed">
+            AETHERIS-Zero is an autonomous <strong>Safe Reinforcement Learning (Safe-RL)</strong> engine that transforms commercial buildings into <strong>Transactive Virtual Power Plants (VPPs)</strong>. By exploiting the inherent thermal inertia of building concrete and air as a "virtual battery", it pre-cools zones when electricity prices are low and deep-sheds HVAC power during extreme wholesale LMP price spikes—all while mathematically guaranteeing 100% ASHRAE 55 occupant comfort.
+          </p>
+        </section>
+
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="p-3 bg-surface-container-lowest rounded border border-grid-line">
+            <h5 class="font-headline-md text-sm text-primary-fixed mb-1 flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-base">domain</span> 3D Digital Twin
+            </h5>
+            <p class="text-xs text-on-surface-variant">
+              The 5 building floors react dynamically to zone temperatures. Cyan (&lt;20.5°C) is cool, Green/Peach is optimal comfort, Red (&gt;24.5°C) is warm. Airflow particle velocity reflects active HVAC fan & chiller power.
+            </p>
+          </div>
+          <div class="p-3 bg-surface-container-lowest rounded border border-grid-line">
+            <h5 class="font-headline-md text-sm text-primary-fixed mb-1 flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-base">shield</span> OSQP CBF Safety Shield
+            </h5>
+            <p class="text-xs text-on-surface-variant">
+              Every action passes through a continuous Control Barrier Function Quadratic Program (CBF-QP) solved in &lt;1.5ms. If a rogue setpoint (e.g. 38°C) is injected, the shield automatically projects it to safe limits.
+            </p>
+          </div>
+          <div class="p-3 bg-surface-container-lowest rounded border border-grid-line">
+            <h5 class="font-headline-md text-sm text-primary-fixed mb-1 flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-base">payments</span> CAISO LMP & Regional ₹ Pricing
+            </h5>
+            <p class="text-xs text-on-surface-variant">
+              Displays live wholesale electricity prices in Indian Rupee (₹/MWh). When high price spikes occur (&gt;₹41,500/MWh), the virtual battery discharges stored coolness to avoid expensive grid draw.
+            </p>
+          </div>
+          <div class="p-3 bg-surface-container-lowest rounded border border-grid-line">
+            <h5 class="font-headline-md text-sm text-primary-fixed mb-1 flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-base">speed</span> 24h ROI Fast-Forward
+            </h5>
+            <p class="text-xs text-on-surface-variant">
+              Click <strong>24h ROI Run</strong> to simulate a full 288-step day in seconds and view quantified financial savings (30-35%), peak kW shaved, and carbon footprint avoided.
+            </p>
+          </div>
+        </section>
+
+        <section class="p-3 bg-surface-container-lowest rounded border border-grid-line">
+          <h4 class="font-headline-md text-sm text-primary-fixed mb-2 flex items-center gap-2">
+            <span class="material-symbols-outlined text-base">keyboard</span> Keyboard Shortcuts
+          </h4>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs font-data-telemetry">
+            <div><kbd class="px-2 py-0.5 bg-surface-container-high rounded border border-grid-line">Space</kbd> Play / Pause Loop</div>
+            <div><kbd class="px-2 py-0.5 bg-surface-container-high rounded border border-grid-line">S</kbd> Step 1 Forward</div>
+            <div><kbd class="px-2 py-0.5 bg-surface-container-high rounded border border-grid-line">R</kbd> Reset Simulation</div>
+            <div><kbd class="px-2 py-0.5 bg-surface-container-high rounded border border-grid-line">O</kbd> Override (38°C)</div>
+            <div><kbd class="px-2 py-0.5 bg-surface-container-high rounded border border-grid-line">D</kbd> OpenADR DR Event</div>
+            <div><kbd class="px-2 py-0.5 bg-surface-container-high rounded border border-grid-line">H / ?</kbd> Open This Guide</div>
+          </div>
+        </section>
+      </div>
+      <div class="p-4 border-t border-grid-line flex justify-end bg-surface-container">
+        <button onclick="closeHelpModal()" class="px-6 py-2 bg-primary-fixed text-on-primary font-label-caps uppercase font-bold rounded hover:bg-primary-fixed/90 transition-colors text-xs">
+          Got It, Let's Operate
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Semantic Ingestion Modal -->
-  <div id="ingestion-modal" class="hidden fixed inset-0 z-50 bg-background/80 backdrop-blur-md flex items-center justify-center p-4">
+  <div id="ingestion-modal" class="hidden fixed inset-0 z-50 bg-background/80 backdrop-blur-md flex items-center justify-center p-4" role="dialog" aria-labelledby="ingestion-title" aria-modal="true">
     <div class="bg-surface-container-high border border-grid-line rounded-lg w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden shadow-2xl">
       <div class="p-4 border-b border-grid-line flex justify-between items-center bg-surface-container">
         <div class="flex items-center gap-2">
           <span class="material-symbols-outlined text-primary-fixed">schema</span>
-          <h3 class="font-headline-md text-base text-on-surface">Semantic Ingestion & Brick Schema v1.3</h3>
+          <h3 id="ingestion-title" class="font-headline-md text-base text-on-surface">Semantic Ingestion & Brick Schema v1.3</h3>
         </div>
-        <button onclick="closeIngestionModal()" class="text-on-surface-variant hover:text-on-surface">
+        <button onclick="closeIngestionModal()" class="text-on-surface-variant hover:text-on-surface p-1 rounded" aria-label="Close Ingestion Modal">
           <span class="material-symbols-outlined">close</span>
         </button>
       </div>
       <div class="p-6 overflow-y-auto flex flex-col gap-4">
         <div>
-          <label class="block font-label-caps text-xs text-on-surface-variant uppercase mb-1">
+          <label for="tag-input" class="block font-label-caps text-xs text-on-surface-variant uppercase mb-1">
             Zero-Shot BACnet / Modbus Tag Tokenizer
           </label>
           <input type="text" id="tag-input" value="AHU1_SAT, VAV101_ZN_T, CHW_SUP_T, VAV102_DMPR_POS" class="w-full bg-surface-container-lowest border border-grid-line rounded p-2 text-xs font-data-telemetry text-primary-fixed focus:outline-none focus:border-primary-fixed"/>
@@ -400,14 +493,14 @@
   </div>
 
   <!-- 24h ROI Episode Modal -->
-  <div id="roi-modal" class="hidden fixed inset-0 z-50 bg-background/80 backdrop-blur-md flex items-center justify-center p-4">
+  <div id="roi-modal" class="hidden fixed inset-0 z-50 bg-background/80 backdrop-blur-md flex items-center justify-center p-4" role="dialog" aria-labelledby="roi-title" aria-modal="true">
     <div class="bg-surface-container-high border border-secondary/40 rounded-lg w-full max-w-xl p-6 flex flex-col gap-4 shadow-2xl">
       <div class="flex justify-between items-center border-b border-grid-line pb-3">
         <div class="flex items-center gap-2">
           <span class="material-symbols-outlined text-secondary text-2xl">insights</span>
-          <h3 class="font-headline-md text-lg text-on-surface">24-Hour Benchmark ROI Report</h3>
+          <h3 id="roi-title" class="font-headline-md text-lg text-on-surface">24-Hour Benchmark ROI Report</h3>
         </div>
-        <button onclick="closeRoiModal()" class="text-on-surface-variant hover:text-on-surface">
+        <button onclick="closeRoiModal()" class="text-on-surface-variant hover:text-on-surface p-1 rounded" aria-label="Close ROI Modal">
           <span class="material-symbols-outlined">close</span>
         </button>
       </div>
@@ -785,6 +878,13 @@
 
     function setControllerMode(mode) {
       sendWS('SET_CONTROLLER_MODE', { mode });
+      if (mode === 'RL_SAFE_ARBITRAGE') {
+        document.getElementById('nav-mode-rl').className = 'h-full flex items-center text-primary-fixed border-b-2 border-primary-fixed pb-1 font-label-caps text-label-caps uppercase transition-colors';
+        document.getElementById('nav-mode-base').className = 'h-full flex items-center text-on-surface-variant font-label-caps text-label-caps uppercase hover:text-primary-fixed transition-colors pt-1';
+      } else {
+        document.getElementById('nav-mode-base').className = 'h-full flex items-center text-primary-fixed border-b-2 border-primary-fixed pb-1 font-label-caps text-label-caps uppercase transition-colors';
+        document.getElementById('nav-mode-rl').className = 'h-full flex items-center text-on-surface-variant font-label-caps text-label-caps uppercase hover:text-primary-fixed transition-colors pt-1';
+      }
     }
 
     function showRoiModal(summary) {
@@ -799,6 +899,14 @@
 
     function closeRoiModal() {
       document.getElementById('roi-modal').classList.add('hidden');
+    }
+
+    function openHelpModal() {
+      document.getElementById('help-modal').classList.remove('hidden');
+    }
+
+    function closeHelpModal() {
+      document.getElementById('help-modal').classList.add('hidden');
     }
 
     function openIngestionModal() {
@@ -834,6 +942,52 @@
         box.classList.remove('hidden');
       });
     }
+
+    // --- Keyboard Navigation & Accessibility Shortcuts ---
+    window.addEventListener('keydown', (e) => {
+      // Ignore when typing inside inputs
+      if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+        if (e.key === 'Escape') {
+          closeHelpModal();
+          closeIngestionModal();
+          closeRoiModal();
+        }
+        return;
+      }
+
+      switch (e.key) {
+        case ' ':
+          e.preventDefault();
+          toggleSimulationLoop();
+          break;
+        case 's':
+        case 'S':
+          stepSimulation();
+          break;
+        case 'r':
+        case 'R':
+          resetSimulation();
+          break;
+        case 'o':
+        case 'O':
+          injectMaliciousFault();
+          break;
+        case 'd':
+        case 'D':
+          triggerOpenADREvent();
+          break;
+        case 'h':
+        case 'H':
+        case '?':
+          openHelpModal();
+          break;
+        case 'Escape':
+          closeHelpModal();
+          closeIngestionModal();
+          closeRoiModal();
+          break;
+      }
+    });
   </script>
 </body>
 </html>
