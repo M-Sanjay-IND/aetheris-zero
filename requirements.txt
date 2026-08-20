@@ -10,3 +10,4 @@ rdflib
 pandas
 requests
 python-dotenv
+httpx
