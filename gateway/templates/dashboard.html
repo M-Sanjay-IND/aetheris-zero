@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <meta name="description" content="AETHERIS-Zero: Autonomous Physics-Informed Safe-RL & Transactive Virtual Power Plant Engine Digital Twin"/>
-  <title>AETHERIS-Zero - Mission Control & Digital Twin</title>
+  <meta name="description" content="AETHERIS-Zero: Autonomous Smart Building Digital Twin and Energy Optimization Platform"/>
+  <title>AETHERIS-Zero - Smart Building Energy Manager</title>
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <link href="https://fonts.googleapis.com" rel="preconnect"/>
   <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
@@ -18,662 +18,1017 @@
       theme: {
         extend: {
           colors: {
-            "surface": "#0e1323",
-            "surface-dim": "#0e1323",
-            "surface-bright": "#34394a",
-            "surface-container-lowest": "#080d1d",
-            "surface-container-low": "#161b2b",
-            "surface-container": "#161b2b",
-            "surface-container-high": "#242f49",
-            "surface-container-highest": "#34394a",
-            "on-surface": "#e2e2e9",
-            "on-surface-variant": "#c4c6d0",
-            "inverse-surface": "#e2e2e9",
-            "inverse-on-surface": "#cfd4e5",
-            "outline": "#8e9099",
-            "outline-variant": "#44474e",
-            "surface-tint": "#ffa586",
+            "surface": "#0c101d",
+            "surface-card": "#151b2e",
+            "surface-card-hover": "#1c243d",
+            "surface-border": "#283454",
             "primary": "#ffa586",
-            "on-primary": "#ffffff",
-            "primary-container": "#541a2b",
-            "on-primary-container": "#ffdad6",
-            "inverse-primary": "#ffa586",
-            "secondary": "#ffa586",
-            "on-secondary": "#ffffff",
-            "secondary-container": "#541a2b",
-            "on-secondary-container": "#ffdad6",
-            "tertiary": "#ffa586",
-            "on-tertiary": "#ffffff",
-            "tertiary-container": "#b51a2b",
-            "on-tertiary-container": "#e2e2e9",
-            "error": "#b51a2b",
-            "on-error": "#ffffff",
-            "error-container": "#541a2b",
-            "on-error-container": "#ffdad6",
-            "primary-fixed": "#ffa586",
-            "primary-fixed-dim": "#ffa586",
-            "on-primary-fixed": "#1a1b21",
-            "on-primary-fixed-variant": "#44474e",
-            "secondary-fixed": "#ffa586",
-            "secondary-fixed-dim": "#ffa586",
-            "on-secondary-fixed": "#1a1b21",
-            "on-secondary-fixed-variant": "#44474e",
-            "tertiary-fixed": "#ffa586",
-            "tertiary-fixed-dim": "#ffa586",
-            "on-tertiary-fixed": "#1a1b21",
-            "on-tertiary-fixed-variant": "#44474e",
-            "background": "#0e1323",
-            "on-background": "#e2e2e9",
-            "surface-variant": "#242f49",
-            "dusk-violet": "#0e1323",
-            "muted-rose": "#b51a2b",
-            "soft-peach": "#ffa586",
-            "off-white": "#f8f9ff",
-            "surface-overlay": "rgba(14, 19, 35, 0.7)",
-            "grid-line": "#384358",
-          },
-          borderRadius: {
-            "DEFAULT": "0.125rem",
-            "lg": "0.25rem",
-            "xl": "0.5rem",
-            "full": "0.75rem"
-          },
-          spacing: {
-            "unit": "4px",
-            "grid-column-gap": "16px",
-            "margin-edge": "24px",
-            "panel-padding": "20px",
-            "gutter": "16px"
+            "primary-dark": "#d97455",
+            "accent-green": "#10b981",
+            "accent-blue": "#38bdf8",
+            "accent-amber": "#f59e0b",
+            "accent-red": "#ef4444",
+            "text-main": "#f1f5f9",
+            "text-muted": "#94a3b8",
+            "text-dim": "#64748b"
           },
           fontFamily: {
-            "headline-md": ["Hanken Grotesk", "sans-serif"],
-            "display-lg": ["Hanken Grotesk", "sans-serif"],
-            "label-caps": ["JetBrains Mono", "monospace"],
-            "body-base": ["Inter", "sans-serif"],
-            "display-lg-mobile": ["Hanken Grotesk", "sans-serif"],
-            "data-telemetry": ["JetBrains Mono", "monospace"]
-          },
-          fontSize: {
-            "headline-md": ["24px", { lineHeight: "32px", fontWeight: "600" }],
-            "display-lg": ["48px", { lineHeight: "56px", letterSpacing: "-0.02em", fontWeight: "700" }],
-            "label-caps": ["11px", { lineHeight: "16px", letterSpacing: "0.1em", fontWeight: "700" }],
-            "body-base": ["16px", { lineHeight: "24px", fontWeight: "400" }],
-            "display-lg-mobile": ["32px", { lineHeight: "40px", letterSpacing: "-0.01em", fontWeight: "700" }],
-            "data-telemetry": ["14px", { lineHeight: "20px", letterSpacing: "0.02em", fontWeight: "500" }]
+            "sans": ["'Plus Jakarta Sans'", "sans-serif"],
+            "mono": ["'JetBrains Mono'", "monospace"]
           }
-        },
-      },
+        }
+      }
     }
   </script>
   <style>
     .material-symbols-outlined {
       font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      vertical-align: middle;
     }
     .fill-icon {
       font-variation-settings: 'FILL' 1;
     }
-    .inner-glow {
-      box-shadow: inset 0 0 10px rgba(255, 165, 134, 0.1);
+    .custom-scroll::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
     }
-    .safety-glow {
-      box-shadow: inset 0 0 20px rgba(181, 26, 43, 0.15), 0 0 15px rgba(181, 26, 43, 0.3);
-    }
-    .pulse-danger {
-      animation: pulse-border 2s infinite;
-    }
-    @keyframes pulse-border {
-      0% { border-color: rgba(181, 26, 43, 0.4); box-shadow: 0 0 0 rgba(181, 26, 43, 0); }
-      50% { border-color: rgba(181, 26, 43, 1); box-shadow: 0 0 10px rgba(181, 26, 43, 0.3); }
-      100% { border-color: rgba(181, 26, 43, 0.4); box-shadow: 0 0 0 rgba(181, 26, 43, 0); }
-    }
-    .custom-scrollbar::-webkit-scrollbar {
-      width: 4px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-track {
-      background: rgba(196, 198, 208, 0.1); 
+    .custom-scroll::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
       border-radius: 4px;
     }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: rgba(255, 165, 134, 0.3); 
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: rgba(255, 165, 134, 0.25);
       border-radius: 4px;
     }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-      background: rgba(255, 165, 134, 0.6); 
+    .custom-scroll::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 165, 134, 0.5);
     }
-    button:focus-visible {
-      outline: 2px solid #ffa586;
-      outline-offset: 2px;
+    @keyframes pulse-slow {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.85; transform: scale(1.02); }
+    }
+    .animate-pulse-slow {
+      animation: pulse-slow 3s infinite ease-in-out;
+    }
+    input[type=range] {
+      accent-color: #ffa586;
     }
   </style>
 </head>
 
-<body class="bg-background text-on-background font-body-base overflow-hidden selection:bg-primary-container selection:text-on-primary-container">
-  <!-- Global Background Shader -->
-  <div class="fixed inset-0 w-full h-full z-0 pointer-events-none opacity-60" aria-hidden="true">
-    <canvas class="w-full h-full" id="bg-shader"></canvas>
-  </div>
+<body class="bg-surface text-text-main font-sans min-h-screen flex flex-col antialiased selection:bg-primary selection:text-surface overflow-x-hidden">
 
-  <!-- TopNavBar -->
-  <header role="banner">
-    <nav class="fixed top-0 w-full z-50 flex justify-between items-center px-margin-edge h-16 bg-surface-container/80 backdrop-blur-xl border-b border-grid-line" role="navigation" aria-label="Main Navigation">
-      <!-- Brand -->
-      <div class="flex items-center gap-4">
-        <span class="font-display-lg text-[24px] font-bold tracking-tighter text-primary">AETHERIS-Zero</span>
-        <span class="px-2 py-0.5 rounded text-[10px] font-label-caps bg-primary-container/40 text-primary-fixed border border-primary/30 uppercase">
-          Safe-RL Transactive VPP
-        </span>
+  <!-- ================= TOP HEADER / APP BAR ================= -->
+  <header class="bg-surface-card border-b border-surface-border sticky top-0 z-40 px-4 lg:px-6 py-3 flex flex-wrap items-center justify-between gap-3 shadow-lg">
+    <!-- Brand & System Status -->
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-primary to-accent-amber flex items-center justify-center text-surface font-black text-xl shadow-md">
+        ⚡
       </div>
-
-      <!-- Navigation Links -->
-      <div class="hidden md:flex gap-8 items-center h-full">
-        <button onclick="setControllerMode('RL_SAFE_ARBITRAGE')" id="nav-mode-rl" class="h-full flex items-center text-primary-fixed border-b-2 border-primary-fixed pb-1 font-label-caps text-label-caps uppercase transition-colors" aria-label="Switch to Safe-RL Mode">
-          PPO Safe-RL
-        </button>
-        <button onclick="setControllerMode('BASELINE_HEURISTIC')" id="nav-mode-base" class="h-full flex items-center text-on-surface-variant font-label-caps text-label-caps uppercase hover:text-primary-fixed transition-colors pt-1" aria-label="Switch to Baseline Schedule Mode">
-          Baseline
-        </button>
-        <button onclick="openIngestionModal()" class="h-full flex items-center text-on-surface-variant font-label-caps text-label-caps uppercase hover:text-primary-fixed transition-colors pt-1" aria-label="Open Brick Schema Parser">
-          Brick Schema
-        </button>
+      <div>
+        <div class="flex items-center gap-2">
+          <h1 class="font-extrabold text-lg tracking-tight text-text-main">AETHERIS-Zero</h1>
+          <span class="bg-accent-green/20 text-accent-green text-[11px] font-bold px-2 py-0.5 rounded-full border border-accent-green/30 flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-accent-green animate-ping"></span> Live Connected
+          </span>
+        </div>
+        <p class="text-xs text-text-muted hidden sm:block">Autonomous AI Building Energy Saver & Virtual Power Plant</p>
       </div>
-
-      <!-- Trailing Actions -->
-      <div class="flex items-center gap-4 text-primary">
-        <!-- Quick Help Guide Button -->
-        <button onclick="openHelpModal()" title="Operator Guide & Shortcuts [H / ?]" class="px-3 py-1 bg-surface-variant/60 hover:bg-surface-variant rounded border border-primary/30 text-primary-fixed font-label-caps text-xs flex items-center gap-1.5 transition-colors" aria-label="Open Operator Guide">
-          <span class="material-symbols-outlined text-[16px]">help_outline</span>
-          <span class="hidden sm:inline">Guide</span>
-        </button>
-
-        <button onclick="openIngestionModal()" title="Semantic Ingestion / Brick Schema" class="hover:text-primary-fixed transition-colors flex items-center justify-center p-2 rounded-full hover:bg-surface-variant/30" aria-label="Open Semantic Ingestion">
-          <span class="material-symbols-outlined">schema</span>
-        </button>
-
-        <div class="flex items-center gap-1.5 px-3 py-1 bg-surface-container-high rounded-full border border-grid-line text-xs font-data-telemetry" role="status" aria-live="polite">
-          <span id="ws-status-dot" class="w-2 h-2 rounded-full bg-primary-fixed animate-pulse"></span>
-          <span id="ws-status-text" class="text-on-surface-variant">LIVE WS</span>
-        </div>
-      </div>
-    </nav>
-  </header>
-
-  <!-- Main Dashboard Layout -->
-  <main class="relative z-10 pt-16 h-screen flex flex-col" role="main">
-    <!-- Split View Container -->
-    <div class="flex-grow flex flex-col md:flex-row gap-gutter p-gutter pb-0 overflow-hidden">
-      <!-- Left Column: 3D Digital Twin Stage (60%) -->
-      <section class="w-full md:w-[60%] relative bg-surface-container-low/60 backdrop-blur-md border border-grid-line rounded-lg overflow-hidden inner-glow flex flex-col" aria-label="3D Building Digital Twin">
-        <!-- Header / Telemetry Tag -->
-        <div class="absolute top-4 left-4 z-20 flex flex-wrap items-center gap-3">
-          <div class="px-3 py-1 bg-surface-variant/80 backdrop-blur-sm border-l-2 border-primary-fixed font-data-telemetry text-data-telemetry text-primary-fixed">
-            SYS.TWIN.01
-          </div>
-          <div id="safety-barrier-tag" class="flex items-center gap-2 px-3 py-1 bg-surface-container/60 backdrop-blur-sm border border-grid-line rounded-sm" role="status" aria-live="assertive">
-            <span class="material-symbols-outlined text-primary text-sm" id="safety-icon">verified_user</span>
-            <span class="font-label-caps text-label-caps text-primary-fixed uppercase tracking-widest text-[10px]" id="safety-status-text">
-              Safety Barrier: OPTIMAL
-            </span>
-          </div>
-          <div id="dr-event-active-tag" class="hidden px-3 py-1 bg-error-container/40 border border-error rounded-sm text-error font-data-telemetry text-[10px] animate-pulse" role="alert">
-            OPENADR 3.0 DR EVENT ACTIVE
-          </div>
-        </div>
-
-        <!-- 3D Scene Wrapper -->
-        <div class="relative flex-grow w-full h-full cursor-grab active:cursor-grabbing" id="threejs-container" role="img" aria-label="Interactive 3D Digital Twin showing 5 temperature-reactive zones and HVAC airflow"></div>
-
-        <!-- Overlay Grids/Crosshairs for Technical Aesthetic -->
-        <div class="absolute inset-0 pointer-events-none border border-grid-line/30 m-8 opacity-20" aria-hidden="true">
-          <div class="absolute top-0 left-0 w-4 h-4 border-t border-l border-primary-fixed"></div>
-          <div class="absolute top-0 right-0 w-4 h-4 border-t border-r border-primary-fixed"></div>
-          <div class="absolute bottom-0 left-0 w-4 h-4 border-b border-l border-primary-fixed"></div>
-          <div class="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-primary-fixed"></div>
-        </div>
-      </section>
-
-      <!-- Right Column: Analytics Rail (40%) -->
-      <aside class="w-full md:w-[40%] flex flex-col gap-gutter overflow-y-auto pr-1 pb-gutter custom-scrollbar" aria-label="Analytics & Telemetry">
-        <!-- Chart 1: Baseline vs AETHERIS Load -->
-        <article class="bg-surface-container-high/70 backdrop-blur-xl border border-grid-line rounded-lg p-panel-padding flex flex-col gap-4 relative">
-          <div class="flex justify-between items-start">
-            <div>
-              <h3 class="font-headline-md text-headline-md text-on-surface">Load Analysis</h3>
-              <p class="font-label-caps text-label-caps text-on-surface-variant uppercase mt-1">Baseline vs. AETHERIS Load</p>
-            </div>
-            <div class="flex flex-col items-end">
-              <span id="power-actual-text" class="font-data-telemetry text-sm text-primary-fixed font-bold">42.5 kW</span>
-              <span id="power-shaved-text" class="font-label-caps text-[10px] text-on-surface-variant">Shaved: -25.5 kW</span>
-            </div>
-          </div>
-
-          <!-- Interactive Chart Area -->
-          <div class="h-40 w-full relative mt-2 border-b border-l border-grid-line/50">
-            <div class="absolute -left-6 bottom-0 font-data-telemetry text-[10px] text-on-surface-variant">0</div>
-            <div class="absolute -left-8 top-0 font-data-telemetry text-[10px] text-on-surface-variant">kW</div>
-            <div class="absolute w-full h-[1px] bg-grid-line/50 top-1/2"></div>
-            <div class="absolute w-full h-[1px] bg-grid-line/50 top-1/4"></div>
-            <div class="absolute w-full h-[1px] bg-grid-line/50 top-3/4"></div>
-
-            <svg class="absolute inset-0 w-full h-full overflow-visible" id="load-chart" preserveAspectRatio="none" viewBox="0 0 100 100" role="img" aria-label="Load comparison chart">
-              <path id="load-baseline-path" class="text-grid-line" d="M0 60 Q 20 55, 40 70 T 80 50 T 100 30" fill="none" stroke="currentColor" stroke-dasharray="4 4" stroke-width="2"></path>
-              <path id="load-actual-path" class="text-primary-fixed" d="M0 65 Q 15 65, 30 50 T 70 80 T 100 40" fill="none" stroke="currentColor" stroke-width="2.5"></path>
-            </svg>
-          </div>
-
-          <!-- Legend -->
-          <div class="flex gap-6 mt-2">
-            <div class="flex items-center gap-2">
-              <div class="w-3 h-3 bg-grid-line rounded-sm"></div>
-              <span class="font-data-telemetry text-data-telemetry text-on-surface-variant">Baseline</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <div class="w-3 h-3 bg-primary-fixed rounded-sm shadow-[0_0_8px_rgba(255,165,134,0.4)]"></div>
-              <span class="font-data-telemetry text-data-telemetry text-primary-fixed">AETHERIS</span>
-            </div>
-          </div>
-        </article>
-
-        <!-- Chart 2: CAISO LMP Price -->
-        <article class="bg-surface-container-high/70 backdrop-blur-xl border border-grid-line rounded-lg p-panel-padding flex flex-col gap-4 relative">
-          <div class="flex justify-between items-start">
-            <div>
-              <h3 class="font-headline-md text-headline-md text-on-surface">CAISO LMP Price</h3>
-              <p class="font-label-caps text-label-caps text-on-surface-variant uppercase mt-1">Live Price Curve (₹/MWh)</p>
-            </div>
-            <div id="price-spike-banner" class="hidden px-2 py-1 bg-error-container/20 border border-error/50 rounded text-error font-data-telemetry text-xs animate-pulse" role="alert">
-              SPIKE DETECTED
-            </div>
-          </div>
-
-          <!-- Interactive Chart Area -->
-          <div class="h-32 w-full relative mt-2 border-b border-l border-grid-line/50">
-            <svg class="absolute inset-0 w-full h-full overflow-visible" id="price-chart" preserveAspectRatio="none" viewBox="0 0 100 100" role="img" aria-label="Wholesale price curve">
-              <defs>
-                <linearGradient id="priceGrad" x1="0" x2="0" y1="0" y2="1">
-                  <stop offset="0%" stop-color="#b51a2b" stop-opacity="0.35"></stop>
-                  <stop offset="100%" stop-color="#b51a2b" stop-opacity="0.0"></stop>
-                </linearGradient>
-              </defs>
-              <path id="price-area-path" d="M0 80 L 20 75 L 40 85 L 60 20 L 80 40 L 100 10 L 100 100 L 0 100 Z" fill="url(#priceGrad)"></path>
-              <path id="price-line-path" class="text-error" d="M0 80 L 20 75 L 40 85 L 60 20 L 80 40 L 100 10" fill="none" stroke="currentColor" stroke-width="2"></path>
-              <circle id="price-dot" class="fill-error" cx="100" cy="10" r="3">
-                <animate attributeName="r" dur="2s" repeatCount="indefinite" values="3;6;3"></animate>
-              </circle>
-            </svg>
-          </div>
-          <div class="text-right">
-            <span id="price-current-text" class="font-data-telemetry text-[24px] font-bold text-error">₹11,827.50</span>
-          </div>
-        </article>
-
-        <!-- Metric Card: Accumulated Savings -->
-        <article class="bg-surface-container-highest/80 backdrop-blur-xl border border-secondary/20 rounded-lg p-panel-padding flex items-center justify-between relative overflow-hidden group">
-          <div class="absolute inset-0 bg-gradient-to-r from-secondary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-          <div>
-            <p id="savings-roi-label" class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-2">
-              Accumulated Savings (30.2% ROI)
-            </p>
-            <div class="font-display-lg text-[32px] text-secondary">
-              <span id="savings-int-text">₹4,060,360</span><span id="savings-dec-text" class="text-[20px] text-secondary/70">.45</span>
-            </div>
-            <div class="flex gap-4 mt-2 font-data-telemetry text-xs text-on-surface-variant">
-              <span>Peak Reduction: <strong id="peak-red-text" class="text-primary-fixed">31.0%</strong></span>
-              <span>SLA: <strong class="text-primary-fixed">100% ASHRAE 55</strong></span>
-            </div>
-          </div>
-          <div class="w-12 h-12 rounded-full bg-secondary-container/20 border border-secondary/30 flex items-center justify-center">
-            <span class="material-symbols-outlined text-secondary fill-icon text-2xl">payments</span>
-          </div>
-        </article>
-      </aside>
     </div>
 
-    <!-- Bottom Panel: Control Deck -->
-    <footer class="mt-auto w-full p-gutter px-margin-edge bg-surface-container-low/90 backdrop-blur-2xl border-t border-grid-line flex flex-col md:flex-row justify-between items-center gap-4 z-20" role="contentinfo" aria-label="Mission Control Deck">
-      <div class="flex items-center gap-4">
-        <div id="deck-status-dot" class="w-2.5 h-2.5 bg-primary-fixed rounded-full animate-pulse shadow-[0_0_8px_rgba(255,165,134,0.8)]"></div>
-        <div class="flex flex-col">
-          <span id="deck-status-msg" class="font-data-telemetry text-data-telemetry text-on-surface-variant uppercase tracking-wider text-xs">System Armed & Optimal</span>
-          <span id="deck-time-step" class="font-data-telemetry text-xs text-primary-fixed font-bold">14:30 | Step 174 | Mode: RL_SAFE_ARBITRAGE</span>
-        </div>
+    <!-- Quick Time & Currency Switcher -->
+    <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
+      <!-- Time Clock -->
+      <div class="bg-surface px-3 py-1.5 rounded-lg border border-surface-border flex items-center gap-2 text-xs font-mono">
+        <span class="material-symbols-outlined text-sm text-primary">schedule</span>
+        <span class="text-text-muted">Sim Time:</span>
+        <span id="sim-clock-display" class="font-bold text-text-main">00:00</span>
+        <span id="sim-step-badge" class="text-text-dim text-[10px] bg-surface-card px-1.5 py-0.5 rounded">Step 0</span>
       </div>
 
-      <div class="flex items-center gap-2">
-        <button id="btn-toggle-loop" onclick="toggleSimulationLoop()" class="px-4 py-2 rounded bg-surface-variant/80 text-primary-fixed border border-primary/40 hover:bg-surface-variant font-label-caps text-label-caps uppercase transition-colors flex items-center gap-1.5 text-xs" title="Start/Pause Loop [Space]">
-          <span class="material-symbols-outlined text-[16px]" id="btn-loop-icon">play_arrow</span>
-          <span id="btn-loop-text">Start Loop</span>
-        </button>
-        <button onclick="stepSimulation()" class="px-3 py-2 rounded border border-grid-line text-on-surface-variant font-label-caps text-label-caps uppercase hover:bg-surface-variant/40 transition-colors text-xs" title="Single Step Forward [S]">
-          <span class="material-symbols-outlined text-[16px]">skip_next</span>
-        </button>
-        <button onclick="resetSimulation()" class="px-3 py-2 rounded border border-grid-line text-on-surface-variant font-label-caps text-label-caps uppercase hover:bg-surface-variant/40 transition-colors text-xs" title="Reset Simulation [R]">
-          <span class="material-symbols-outlined text-[16px]">restart_alt</span>
-        </button>
+      <!-- Currency Switcher -->
+      <div class="bg-surface rounded-lg p-0.5 border border-surface-border flex items-center text-xs font-bold">
+        <button id="btn-currency-inr" onclick="setCurrency('INR')" class="px-2.5 py-1 rounded bg-primary text-surface transition font-extrabold">₹ INR</button>
+        <button id="btn-currency-usd" onclick="setCurrency('USD')" class="px-2.5 py-1 rounded text-text-muted hover:text-text-main transition font-extrabold">$ USD</button>
       </div>
 
-      <div class="flex flex-wrap items-center gap-3">
-        <!-- 24h Episode Runner -->
-        <button onclick="run24hEpisode()" class="px-4 py-2 rounded border border-primary/40 text-primary-fixed font-label-caps text-label-caps uppercase hover:bg-primary-container/20 transition-colors flex items-center gap-1.5 text-xs" title="Run 24h Benchmark Episode">
-          <span class="material-symbols-outlined text-[16px]">speed</span>
-          24h ROI Run
-        </button>
-
-        <!-- Toggle Shadow Mode -->
-        <button id="btn-shadow" onclick="toggleShadowMode()" class="px-4 py-2 rounded border border-transparent text-on-surface-variant font-label-caps text-label-caps uppercase hover:bg-surface-variant/50 transition-colors flex items-center gap-1.5 text-xs" title="Toggle AI Shadow Mode">
-          <span class="material-symbols-outlined text-[16px]" id="shadow-icon">visibility_off</span>
-          <span id="shadow-btn-text">Shadow Mode</span>
-        </button>
-
-        <!-- Simulate Setpoint Override -->
-        <button onclick="injectMaliciousFault()" class="px-4 py-2 rounded border border-error text-error font-label-caps text-label-caps uppercase hover:bg-error/10 transition-colors flex items-center gap-1.5 text-xs pulse-danger" title="Simulate 38°C Fault Override [O]">
-          <span class="material-symbols-outlined text-[16px]">bug_report</span>
-          Override (38°C)
-        </button>
-
-        <!-- Trigger OpenADR DR Event -->
-        <button onclick="triggerOpenADREvent()" class="px-6 py-2.5 rounded bg-primary-fixed text-on-primary font-label-caps text-label-caps uppercase font-bold hover:bg-primary-fixed/90 transition-colors flex items-center gap-2 shadow-[0_0_15px_rgba(255,165,134,0.3)] hover:shadow-[0_0_25px_rgba(255,165,134,0.5)] text-xs" title="Trigger OpenADR 3.0 DR Event [D]">
-          <span class="material-symbols-outlined text-[16px] fill-icon">bolt</span>
-          Trigger OpenADR DR
-        </button>
-      </div>
-    </footer>
-  </main>
-
-  <!-- Operator Guide & Help Modal -->
-  <div id="help-modal" class="hidden fixed inset-0 z-50 bg-background/80 backdrop-blur-md flex items-center justify-center p-4" role="dialog" aria-labelledby="help-title" aria-modal="true">
-    <div class="bg-surface-container-high border border-primary/40 rounded-lg w-full max-w-3xl max-h-[85vh] flex flex-col overflow-hidden shadow-2xl">
-      <div class="p-4 border-b border-grid-line flex justify-between items-center bg-surface-container">
-        <div class="flex items-center gap-2">
-          <span class="material-symbols-outlined text-primary-fixed text-2xl">menu_book</span>
-          <h3 id="help-title" class="font-headline-md text-lg text-on-surface">AETHERIS-Zero: Operator Guide & Overview</h3>
-        </div>
-        <button onclick="closeHelpModal()" class="text-on-surface-variant hover:text-on-surface p-1 rounded hover:bg-surface-variant/40" aria-label="Close Guide">
-          <span class="material-symbols-outlined">close</span>
-        </button>
-      </div>
-      <div class="p-6 overflow-y-auto flex flex-col gap-6 text-sm">
-        <section>
-          <h4 class="font-headline-md text-base text-primary-fixed mb-2 flex items-center gap-2">
-            <span class="material-symbols-outlined text-lg">bolt</span> 1. What is AETHERIS-Zero?
-          </h4>
-          <p class="text-on-surface-variant leading-relaxed">
-            AETHERIS-Zero is an autonomous <strong>Safe Reinforcement Learning (Safe-RL)</strong> engine that transforms commercial buildings into <strong>Transactive Virtual Power Plants (VPPs)</strong>. By exploiting the inherent thermal inertia of building concrete and air as a "virtual battery", it pre-cools zones when electricity prices are low and deep-sheds HVAC power during extreme wholesale LMP price spikes—all while mathematically guaranteeing 100% ASHRAE 55 occupant comfort.
-          </p>
-        </section>
-
-        <section class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="p-3 bg-surface-container-lowest rounded border border-grid-line">
-            <h5 class="font-headline-md text-sm text-primary-fixed mb-1 flex items-center gap-1.5">
-              <span class="material-symbols-outlined text-base">domain</span> 3D Digital Twin
-            </h5>
-            <p class="text-xs text-on-surface-variant">
-              The 5 building floors react dynamically to zone temperatures. Cyan (&lt;20.5°C) is cool, Green/Peach is optimal comfort, Red (&gt;24.5°C) is warm. Airflow particle velocity reflects active HVAC fan & chiller power.
-            </p>
-          </div>
-          <div class="p-3 bg-surface-container-lowest rounded border border-grid-line">
-            <h5 class="font-headline-md text-sm text-primary-fixed mb-1 flex items-center gap-1.5">
-              <span class="material-symbols-outlined text-base">shield</span> OSQP CBF Safety Shield
-            </h5>
-            <p class="text-xs text-on-surface-variant">
-              Every action passes through a continuous Control Barrier Function Quadratic Program (CBF-QP) solved in &lt;1.5ms. If a rogue setpoint (e.g. 38°C) is injected, the shield automatically projects it to safe limits.
-            </p>
-          </div>
-          <div class="p-3 bg-surface-container-lowest rounded border border-grid-line">
-            <h5 class="font-headline-md text-sm text-primary-fixed mb-1 flex items-center gap-1.5">
-              <span class="material-symbols-outlined text-base">payments</span> CAISO LMP & Regional ₹ Pricing
-            </h5>
-            <p class="text-xs text-on-surface-variant">
-              Displays live wholesale electricity prices in Indian Rupee (₹/MWh). When high price spikes occur (&gt;₹41,500/MWh), the virtual battery discharges stored coolness to avoid expensive grid draw.
-            </p>
-          </div>
-          <div class="p-3 bg-surface-container-lowest rounded border border-grid-line">
-            <h5 class="font-headline-md text-sm text-primary-fixed mb-1 flex items-center gap-1.5">
-              <span class="material-symbols-outlined text-base">speed</span> 24h ROI Fast-Forward
-            </h5>
-            <p class="text-xs text-on-surface-variant">
-              Click <strong>24h ROI Run</strong> to simulate a full 288-step day in seconds and view quantified financial savings (30-35%), peak kW shaved, and carbon footprint avoided.
-            </p>
-          </div>
-        </section>
-
-        <section class="p-3 bg-surface-container-lowest rounded border border-grid-line">
-          <h4 class="font-headline-md text-sm text-primary-fixed mb-2 flex items-center gap-2">
-            <span class="material-symbols-outlined text-base">keyboard</span> Keyboard Shortcuts
-          </h4>
-          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs font-data-telemetry">
-            <div><kbd class="px-2 py-0.5 bg-surface-container-high rounded border border-grid-line">Space</kbd> Play / Pause Loop</div>
-            <div><kbd class="px-2 py-0.5 bg-surface-container-high rounded border border-grid-line">S</kbd> Step 1 Forward</div>
-            <div><kbd class="px-2 py-0.5 bg-surface-container-high rounded border border-grid-line">R</kbd> Reset Simulation</div>
-            <div><kbd class="px-2 py-0.5 bg-surface-container-high rounded border border-grid-line">O</kbd> Override (38°C)</div>
-            <div><kbd class="px-2 py-0.5 bg-surface-container-high rounded border border-grid-line">D</kbd> OpenADR DR Event</div>
-            <div><kbd class="px-2 py-0.5 bg-surface-container-high rounded border border-grid-line">H / ?</kbd> Open This Guide</div>
-          </div>
-        </section>
-      </div>
-      <div class="p-4 border-t border-grid-line flex justify-end bg-surface-container">
-        <button onclick="closeHelpModal()" class="px-6 py-2 bg-primary-fixed text-on-primary font-label-caps uppercase font-bold rounded hover:bg-primary-fixed/90 transition-colors text-xs">
-          Got It, Let's Operate
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Semantic Ingestion Modal -->
-  <div id="ingestion-modal" class="hidden fixed inset-0 z-50 bg-background/80 backdrop-blur-md flex items-center justify-center p-4" role="dialog" aria-labelledby="ingestion-title" aria-modal="true">
-    <div class="bg-surface-container-high border border-grid-line rounded-lg w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden shadow-2xl">
-      <div class="p-4 border-b border-grid-line flex justify-between items-center bg-surface-container">
-        <div class="flex items-center gap-2">
-          <span class="material-symbols-outlined text-primary-fixed">schema</span>
-          <h3 id="ingestion-title" class="font-headline-md text-base text-on-surface">Semantic Ingestion & Brick Schema v1.3</h3>
-        </div>
-        <button onclick="closeIngestionModal()" class="text-on-surface-variant hover:text-on-surface p-1 rounded" aria-label="Close Ingestion Modal">
-          <span class="material-symbols-outlined">close</span>
-        </button>
-      </div>
-      <div class="p-6 overflow-y-auto flex flex-col gap-4">
-        <div>
-          <label for="tag-input" class="block font-label-caps text-xs text-on-surface-variant uppercase mb-1">
-            Zero-Shot BACnet / Modbus Tag Tokenizer
-          </label>
-          <input type="text" id="tag-input" value="AHU1_SAT, VAV101_ZN_T, CHW_SUP_T, VAV102_DMPR_POS" class="w-full bg-surface-container-lowest border border-grid-line rounded p-2 text-xs font-data-telemetry text-primary-fixed focus:outline-none focus:border-primary-fixed"/>
-        </div>
-        <button onclick="parseTags()" class="w-full py-2 bg-primary-fixed text-on-primary font-label-caps text-xs uppercase font-bold rounded hover:bg-primary-fixed/90 transition-colors">
-          Parse Tags & Extract Brick Priors
-        </button>
-        <div id="parse-results-box" class="hidden">
-          <h4 class="font-label-caps text-xs text-on-surface-variant uppercase mb-2">Classified Entities</h4>
-          <div id="parse-results-list" class="bg-surface-container-lowest border border-grid-line rounded p-3 max-h-40 overflow-y-auto flex flex-col gap-1 text-xs font-data-telemetry"></div>
-        </div>
-        <div id="turtle-box">
-          <h4 class="font-label-caps text-xs text-on-surface-variant uppercase mb-2">Brick Schema Turtle (RDF Graph)</h4>
-          <pre id="turtle-content" class="bg-surface-container-lowest border border-grid-line rounded p-3 max-h-48 overflow-y-auto text-[11px] font-data-telemetry text-on-surface-variant">Loading Brick Graph...</pre>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 24h ROI Episode Modal -->
-  <div id="roi-modal" class="hidden fixed inset-0 z-50 bg-background/80 backdrop-blur-md flex items-center justify-center p-4" role="dialog" aria-labelledby="roi-title" aria-modal="true">
-    <div class="bg-surface-container-high border border-secondary/40 rounded-lg w-full max-w-xl p-6 flex flex-col gap-4 shadow-2xl">
-      <div class="flex justify-between items-center border-b border-grid-line pb-3">
-        <div class="flex items-center gap-2">
-          <span class="material-symbols-outlined text-secondary text-2xl">insights</span>
-          <h3 id="roi-title" class="font-headline-md text-lg text-on-surface">24-Hour Benchmark ROI Report</h3>
-        </div>
-        <button onclick="closeRoiModal()" class="text-on-surface-variant hover:text-on-surface p-1 rounded" aria-label="Close ROI Modal">
-          <span class="material-symbols-outlined">close</span>
-        </button>
-      </div>
-      <div id="roi-modal-body" class="flex flex-col gap-3 font-data-telemetry text-sm">
-        <div class="flex justify-between p-3 bg-surface-container-lowest rounded border border-grid-line">
-          <span class="text-on-surface-variant">Energy Cost Savings:</span>
-          <span id="roi-cost-savings" class="text-secondary font-bold">₹3,214.50 (30.2%)</span>
-        </div>
-        <div class="flex justify-between p-3 bg-surface-container-lowest rounded border border-grid-line">
-          <span class="text-on-surface-variant">Peak Demand Shaved:</span>
-          <span id="roi-peak-shaved" class="text-primary-fixed font-bold">26.1 kW (31.0%)</span>
-        </div>
-        <div class="flex justify-between p-3 bg-surface-container-lowest rounded border border-grid-line">
-          <span class="text-on-surface-variant">Carbon Footprint Avoided:</span>
-          <span id="roi-carbon" class="text-primary-fixed font-bold">38.7 kg CO2</span>
-        </div>
-        <div class="flex justify-between p-3 bg-surface-container-lowest rounded border border-grid-line">
-          <span class="text-on-surface-variant">Comfort Violations (SLA):</span>
-          <span class="text-primary-fixed font-bold">0 Violations (100% ASHRAE 55)</span>
-        </div>
-      </div>
-      <button onclick="closeRoiModal()" class="w-full py-2 bg-primary-fixed text-on-primary font-label-caps uppercase font-bold rounded hover:bg-primary-fixed/90 transition-colors text-xs">
-        Close Report
+      <!-- Help / Guide Modal Button -->
+      <button onclick="toggleModal('guide-modal')" class="bg-surface hover:bg-surface-border text-text-main px-3 py-1.5 rounded-lg border border-surface-border text-xs font-semibold flex items-center gap-1 transition" title="View easy user guide">
+        <span class="material-symbols-outlined text-base text-primary">help</span>
+        <span class="hidden md:inline">How It Works</span>
       </button>
     </div>
+  </header>
+
+  <!-- ================= MAIN DASHBOARD CONTAINER ================= -->
+  <main class="flex-1 p-4 lg:p-6 max-w-[1600px] w-full mx-auto flex flex-col gap-5">
+
+    <!-- 1. PLAIN-ENGLISH STATUS BANNER -->
+    <section id="system-status-banner" class="bg-gradient-to-r from-surface-card to-surface-card-hover border border-surface-border rounded-2xl p-4 shadow-md flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-all">
+      <div class="flex items-start gap-3.5">
+        <div id="status-banner-icon-bg" class="w-12 h-12 rounded-xl bg-accent-green/20 border border-accent-green/40 flex items-center justify-center text-accent-green shrink-0">
+          <span id="status-banner-icon" class="material-symbols-outlined text-2xl fill-icon">energy_savings_leaf</span>
+        </div>
+        <div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <h2 id="status-banner-title" class="text-base font-bold text-text-main">AI Optimizer Active: Comfort Protected & Saving Electricity</h2>
+            <span id="status-mode-pill" class="bg-primary/20 text-primary text-[11px] font-bold px-2 py-0.5 rounded-md border border-primary/30">Autonomous RL Mode</span>
+          </div>
+          <p id="status-banner-desc" class="text-xs text-text-muted mt-0.5 max-w-3xl">
+            All 5 building zones are maintained within ideal comfort temperatures (21°C - 23°C). Energy is scheduled dynamically to avoid costly peak electricity hours.
+          </p>
+        </div>
+      </div>
+
+      <!-- Primary Action Buttons (Super Simple) -->
+      <div class="flex items-center gap-2 w-full md:w-auto justify-end flex-wrap">
+        <button id="btn-toggle-loop" onclick="toggleAutoSimulation()" class="flex-1 md:flex-none bg-primary hover:bg-primary-dark text-surface font-bold px-4 py-2 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow transition active:scale-95">
+          <span id="loop-icon" class="material-symbols-outlined text-base">play_arrow</span>
+          <span id="loop-text">Start Auto Optimizer</span>
+        </button>
+
+        <button onclick="stepSimulation()" class="bg-surface-card hover:bg-surface-border text-text-main border border-surface-border font-semibold px-3 py-2 rounded-xl text-xs flex items-center gap-1 transition active:scale-95" title="Step forward 5 minutes">
+          <span class="material-symbols-outlined text-base">skip_next</span>
+          <span>+5 Min</span>
+        </button>
+
+        <button onclick="runFast24hEpisode()" class="bg-surface-card hover:bg-surface-border text-accent-blue border border-accent-blue/40 font-semibold px-3 py-2 rounded-xl text-xs flex items-center gap-1 transition active:scale-95" title="Simulate a full 24-hour day in 1 second">
+          <span class="material-symbols-outlined text-base">fast_forward</span>
+          <span>Full 24h Day</span>
+        </button>
+
+        <button onclick="resetSimulation()" class="bg-surface-card hover:bg-accent-red/20 hover:text-accent-red text-text-muted border border-surface-border font-semibold px-3 py-2 rounded-xl text-xs flex items-center gap-1 transition active:scale-95" title="Reset back to 00:00">
+          <span class="material-symbols-outlined text-base">restart_alt</span>
+          <span>Reset</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- 2. KEY PERFORMANCE METRICS ROW (100% Dynamic, Clear Labels) -->
+    <section class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
+      <!-- Card 1: Money Saved -->
+      <div class="bg-surface-card border border-surface-border rounded-2xl p-4 flex flex-col justify-between hover:border-primary/50 transition">
+        <div class="flex items-center justify-between text-text-muted text-xs">
+          <span class="font-medium">Total Cost Saved</span>
+          <span class="material-symbols-outlined text-primary text-lg">savings</span>
+        </div>
+        <div class="my-2">
+          <div id="metric-savings-val" class="text-2xl font-extrabold text-primary tracking-tight">₹0.00</div>
+          <div id="metric-savings-pct" class="text-[11px] text-accent-green font-semibold mt-0.5">+0.0% vs standard AC</div>
+        </div>
+        <div class="text-[10px] text-text-dim">Accumulated in real time</div>
+      </div>
+
+      <!-- Card 2: Electricity Price -->
+      <div class="bg-surface-card border border-surface-border rounded-2xl p-4 flex flex-col justify-between hover:border-accent-amber/50 transition">
+        <div class="flex items-center justify-between text-text-muted text-xs">
+          <span class="font-medium">Electricity Price</span>
+          <span class="material-symbols-outlined text-accent-amber text-lg">payments</span>
+        </div>
+        <div class="my-2">
+          <div id="metric-price-val" class="text-2xl font-extrabold text-text-main tracking-tight">₹12.45<span class="text-xs text-text-muted font-normal">/kWh</span></div>
+          <div id="metric-price-level" class="text-[11px] text-text-muted font-medium mt-0.5">Off-Peak (Cheap)</div>
+        </div>
+        <div class="text-[10px] text-text-dim" id="metric-price-mwh">₹12,450 / MWh</div>
+      </div>
+
+      <!-- Card 3: Total Power Load -->
+      <div class="bg-surface-card border border-surface-border rounded-2xl p-4 flex flex-col justify-between hover:border-accent-blue/50 transition">
+        <div class="flex items-center justify-between text-text-muted text-xs">
+          <span class="font-medium">Current Power Draw</span>
+          <span class="material-symbols-outlined text-accent-blue text-lg">bolt</span>
+        </div>
+        <div class="my-2">
+          <div id="metric-power-val" class="text-2xl font-extrabold text-accent-blue tracking-tight">0.0 <span class="text-xs text-text-muted font-normal">kW</span></div>
+          <div id="metric-power-breakdown" class="text-[11px] text-text-muted mt-0.5">Chiller: 0 kW | Fan: 0 kW</div>
+        </div>
+        <div class="text-[10px] text-text-dim" id="metric-power-shaved">Power Shaved: 0.0 kW</div>
+      </div>
+
+      <!-- Card 4: Building Comfort -->
+      <div class="bg-surface-card border border-surface-border rounded-2xl p-4 flex flex-col justify-between hover:border-accent-green/50 transition">
+        <div class="flex items-center justify-between text-text-muted text-xs">
+          <span class="font-medium">Room Comfort</span>
+          <span class="material-symbols-outlined text-accent-green text-lg">thermostat</span>
+        </div>
+        <div class="my-2">
+          <div id="metric-comfort-val" class="text-2xl font-extrabold text-accent-green tracking-tight">100%</div>
+          <div id="metric-comfort-status" class="text-[11px] text-text-muted mt-0.5">ASHRAE 55 Compliant</div>
+        </div>
+        <div class="text-[10px] text-text-dim" id="metric-occupant-count">0 Occupants Active</div>
+      </div>
+
+      <!-- Card 5: Carbon Emissions Avoided -->
+      <div class="bg-surface-card border border-surface-border rounded-2xl p-4 col-span-2 sm:col-span-1 flex flex-col justify-between hover:border-emerald-400/50 transition">
+        <div class="flex items-center justify-between text-text-muted text-xs">
+          <span class="font-medium">CO₂ Avoided</span>
+          <span class="material-symbols-outlined text-emerald-400 text-lg">eco</span>
+        </div>
+        <div class="my-2">
+          <div id="metric-carbon-val" class="text-2xl font-extrabold text-emerald-400 tracking-tight">0.0 <span class="text-xs text-text-muted font-normal">kg</span></div>
+          <div class="text-[11px] text-text-muted mt-0.5">Greenhouse Gas Cut</div>
+        </div>
+        <div class="text-[10px] text-text-dim">Cleaner Grid Impact</div>
+      </div>
+    </section>
+
+    <!-- 3. MAIN WORKSPACE: 3D DIGITAL TWIN + LIVE INTERACTIVE CONTROLS + CHARTS -->
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+
+      <!-- LEFT / CENTER: 3D DIGITAL TWIN & ROOM INSPECTOR (7 COLS) -->
+      <div class="lg:col-span-7 flex flex-col gap-4">
+        
+        <!-- 3D Thermal Building Box -->
+        <div class="bg-surface-card border border-surface-border rounded-2xl p-4 flex flex-col gap-3 relative overflow-hidden shadow-md">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-primary text-lg">domain</span>
+              <h3 class="text-sm font-bold text-text-main">3D Building Thermal Twin</h3>
+              <span class="text-[11px] text-text-muted bg-surface px-2 py-0.5 rounded border border-surface-border">5 Zones</span>
+            </div>
+            <!-- Heatmap Legend -->
+            <div class="flex items-center gap-1.5 text-[10px] text-text-muted">
+              <span>Cool (20°C)</span>
+              <div class="w-16 h-2 rounded bg-gradient-to-r from-blue-500 via-emerald-400 via-amber-400 to-red-500"></div>
+              <span>Warm (25°C+)</span>
+            </div>
+          </div>
+
+          <!-- Three.js Canvas Container -->
+          <div id="three-canvas-container" class="w-full h-72 sm:h-80 rounded-xl bg-surface relative overflow-hidden border border-surface-border flex items-center justify-center cursor-grab active:cursor-grabbing">
+            <!-- Overlay Zone Click Tooltip -->
+            <div id="zone-hover-tooltip" class="absolute top-3 left-3 bg-surface/90 backdrop-blur border border-surface-border rounded-lg px-3 py-2 text-xs pointer-events-none hidden shadow-xl z-10">
+              <div id="tooltip-zone-name" class="font-bold text-text-main">Zone Name</div>
+              <div id="tooltip-zone-temp" class="text-primary font-mono font-semibold">22.5°C</div>
+              <div id="tooltip-zone-status" class="text-text-muted text-[10px]">Click room to adjust temperature</div>
+            </div>
+            <div class="absolute bottom-3 right-3 text-[10px] text-text-dim bg-surface/80 px-2 py-1 rounded backdrop-blur pointer-events-none">
+              Click & drag to rotate view
+            </div>
+          </div>
+
+          <!-- Zone Quick Selector Pills -->
+          <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-1">
+            <button onclick="selectZone('zone_1')" id="pill-zone_1" class="zone-pill bg-surface hover:bg-surface-border border border-primary/50 text-left p-2.5 rounded-xl transition text-xs">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-text-main text-[11px]">Core Floor 1</span>
+                <span id="badge-temp-zone_1" class="font-mono text-primary font-bold text-[11px]">22.0°C</span>
+              </div>
+              <div class="text-[10px] text-text-dim mt-0.5" id="badge-occ-zone_1">0 Occ • Compliant</div>
+            </button>
+
+            <button onclick="selectZone('zone_2')" id="pill-zone_2" class="zone-pill bg-surface hover:bg-surface-border border border-surface-border text-left p-2.5 rounded-xl transition text-xs">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-text-main text-[11px]">North Office</span>
+                <span id="badge-temp-zone_2" class="font-mono text-text-muted font-bold text-[11px]">22.0°C</span>
+              </div>
+              <div class="text-[10px] text-text-dim mt-0.5" id="badge-occ-zone_2">0 Occ • Compliant</div>
+            </button>
+
+            <button onclick="selectZone('zone_3')" id="pill-zone_3" class="zone-pill bg-surface hover:bg-surface-border border border-surface-border text-left p-2.5 rounded-xl transition text-xs">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-text-main text-[11px]">South Office</span>
+                <span id="badge-temp-zone_3" class="font-mono text-text-muted font-bold text-[11px]">22.0°C</span>
+              </div>
+              <div class="text-[10px] text-text-dim mt-0.5" id="badge-occ-zone_3">0 Occ • Compliant</div>
+            </button>
+
+            <button onclick="selectZone('zone_4')" id="pill-zone_4" class="zone-pill bg-surface hover:bg-surface-border border border-surface-border text-left p-2.5 rounded-xl transition text-xs">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-text-main text-[11px]">East Office</span>
+                <span id="badge-temp-zone_4" class="font-mono text-text-muted font-bold text-[11px]">22.0°C</span>
+              </div>
+              <div class="text-[10px] text-text-dim mt-0.5" id="badge-occ-zone_4">0 Occ • Compliant</div>
+            </button>
+
+            <button onclick="selectZone('zone_5')" id="pill-zone_5" class="zone-pill bg-surface hover:bg-surface-border border border-surface-border text-left p-2.5 rounded-xl transition text-xs col-span-2 sm:col-span-1">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-text-main text-[11px]">West Office</span>
+                <span id="badge-temp-zone_5" class="font-mono text-text-muted font-bold text-[11px]">22.0°C</span>
+              </div>
+              <div class="text-[10px] text-text-dim mt-0.5" id="badge-occ-zone_5">0 Occ • Compliant</div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Real-Time Power & Baseline Demand Chart (100% Dynamic SVG) -->
+        <div class="bg-surface-card border border-surface-border rounded-2xl p-4 flex flex-col gap-3 shadow-md">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-accent-green text-lg">show_chart</span>
+              <h3 class="text-sm font-bold text-text-main">Live Power Demand & Energy Savings</h3>
+            </div>
+            <div class="flex items-center gap-3 text-xs">
+              <span class="flex items-center gap-1 text-accent-green font-semibold">
+                <span class="w-2.5 h-0.5 bg-accent-green rounded"></span> AI Controlled (Actual)
+              </span>
+              <span class="flex items-center gap-1 text-text-muted">
+                <span class="w-2.5 h-0.5 bg-accent-amber border-b border-dashed border-accent-amber"></span> Standard Old AC (Baseline)
+              </span>
+            </div>
+          </div>
+
+          <!-- Dynamic SVG Chart Canvas -->
+          <div class="w-full h-44 bg-surface rounded-xl border border-surface-border p-2 relative overflow-hidden flex flex-col justify-end">
+            <svg id="power-chart-svg" class="w-full h-full overflow-visible" preserveAspectRatio="none" viewBox="0 0 500 120">
+              <!-- Grid lines -->
+              <line x1="0" y1="30" x2="500" y2="30" stroke="#283454" stroke-width="1" stroke-dasharray="2,2"/>
+              <line x1="0" y1="60" x2="500" y2="60" stroke="#283454" stroke-width="1" stroke-dasharray="2,2"/>
+              <line x1="0" y1="90" x2="500" y2="90" stroke="#283454" stroke-width="1" stroke-dasharray="2,2"/>
+              
+              <!-- Baseline Line (Dashed) -->
+              <polyline id="chart-baseline-polyline" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="3,3" points="0,90 500,90"/>
+              
+              <!-- Actual AI Controlled Area & Line -->
+              <polygon id="chart-actual-polygon" fill="rgba(16, 185, 129, 0.15)" points="0,90 0,90 500,90 500,120 0,120"/>
+              <polyline id="chart-actual-polyline" fill="none" stroke="#10b981" stroke-width="2.5" points="0,90 500,90"/>
+            </svg>
+            <div class="flex items-center justify-between text-[10px] text-text-dim px-1 pt-1">
+              <span>00:00 (Midnight)</span>
+              <span>06:00 (Morning)</span>
+              <span>12:00 (Noon)</span>
+              <span>14:00 - 18:00 (Peak Window)</span>
+              <span>24:00 (Night)</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT COLUMN: INTERACTIVE CONTROL & SCENARIO STUDIO (5 COLS) -->
+      <div class="lg:col-span-5 flex flex-col gap-4">
+
+        <!-- PANEL 1: LIVE REAL-WORLD INPUTS (Weather, Pricing, Room Thermostat) -->
+        <div class="bg-surface-card border border-surface-border rounded-2xl p-4 flex flex-col gap-4 shadow-md">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-primary text-lg">tune</span>
+              <h3 class="text-sm font-bold text-text-main">Live Input & Scenario Studio</h3>
+            </div>
+            <span class="text-[10px] text-text-muted bg-surface px-2 py-0.5 rounded border border-surface-border">Real-Time</span>
+          </div>
+
+          <!-- 1. Outdoor Weather Input -->
+          <div class="bg-surface p-3 rounded-xl border border-surface-border flex flex-col gap-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-text-main flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-sm text-accent-amber">wb_sunny</span>
+                Outdoor Temperature
+              </span>
+              <span id="slider-weather-val" class="font-mono text-xs font-bold text-accent-amber">28.0°C</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <input id="slider-weather" type="range" min="15" max="45" step="0.5" value="28" oninput="onWeatherSliderChange(this.value)" class="w-full h-1.5 bg-surface-border rounded-lg cursor-pointer">
+              <button onclick="applyCustomWeather()" class="bg-primary hover:bg-primary-dark text-surface text-[11px] font-bold px-2.5 py-1 rounded-lg transition shrink-0 active:scale-95">Set</button>
+            </div>
+            <div class="flex items-center justify-between text-[10px] text-text-dim">
+              <button onclick="setWeatherPreset(18)" class="hover:text-primary underline">Cool Day (18°C)</button>
+              <button onclick="setWeatherPreset(30)" class="hover:text-primary underline">Standard (30°C)</button>
+              <button onclick="setWeatherPreset(42)" class="hover:text-primary underline">🔥 Heatwave (42°C)</button>
+            </div>
+          </div>
+
+          <!-- 2. Electricity Tariff Price Input -->
+          <div class="bg-surface p-3 rounded-xl border border-surface-border flex flex-col gap-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-text-main flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-sm text-accent-green">currency_rupee</span>
+                Wholesale Power Price
+              </span>
+              <span id="slider-price-val" class="font-mono text-xs font-bold text-accent-green">₹12.45/kWh</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <input id="slider-price" type="range" min="1" max="50" step="0.5" value="12.5" oninput="onPriceSliderChange(this.value)" class="w-full h-1.5 bg-surface-border rounded-lg cursor-pointer">
+              <button onclick="applyCustomPrice()" class="bg-primary hover:bg-primary-dark text-surface text-[11px] font-bold px-2.5 py-1 rounded-lg transition shrink-0 active:scale-95">Set</button>
+            </div>
+            <div class="flex items-center justify-between text-[10px] text-text-dim">
+              <button onclick="setPricePreset(5)" class="hover:text-primary underline">Off-Peak (₹5)</button>
+              <button onclick="setPricePreset(15)" class="hover:text-primary underline">Mid-Day (₹15)</button>
+              <button onclick="triggerDRPriceSpike()" class="hover:text-accent-red underline font-bold text-accent-amber">⚡ Trigger 5x Peak Surge</button>
+            </div>
+          </div>
+
+          <!-- 3. Selected Zone Thermostat / Target Adjuster -->
+          <div class="bg-surface p-3 rounded-xl border border-surface-border flex flex-col gap-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-text-main flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-sm text-primary">thermostat_auto</span>
+                Target Temp: <span id="selected-zone-name-label" class="text-primary font-bold">Core Floor 1</span>
+              </span>
+              <span id="slider-zone-val" class="font-mono text-xs font-bold text-primary">22.0°C</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <input id="slider-zone-temp" type="range" min="18" max="30" step="0.5" value="22" oninput="onZoneSliderChange(this.value)" class="w-full h-1.5 bg-surface-border rounded-lg cursor-pointer">
+              <button onclick="applyCustomZoneTemp()" class="bg-primary hover:bg-primary-dark text-surface text-[11px] font-bold px-2.5 py-1 rounded-lg transition shrink-0 active:scale-95">Apply</button>
+            </div>
+            <div class="flex items-center justify-between text-[10px]">
+              <span class="text-text-dim">Comfort limit: 20°C - 24.5°C</span>
+              <button onclick="testUnsafeOverride(38)" class="text-accent-red hover:underline font-bold" title="Tests how the safety shield intercepts dangerous temperatures">🛡️ Test Wrong 38°C</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANEL 2: 24-HOUR ELECTRICITY PRICE SCHEDULE -->
+        <div class="bg-surface-card border border-surface-border rounded-2xl p-4 flex flex-col gap-3 shadow-md">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-accent-amber text-lg">timeline</span>
+              <h3 class="text-sm font-bold text-text-main">24-Hour Grid Price Curve</h3>
+            </div>
+            <span class="text-[10px] text-text-muted">Dynamic CAISO Tariff</span>
+          </div>
+
+          <!-- Dynamic Tariff Chart -->
+          <div class="w-full h-28 bg-surface rounded-xl border border-surface-border p-2 relative overflow-hidden flex flex-col justify-end">
+            <svg id="tariff-chart-svg" class="w-full h-full overflow-visible" preserveAspectRatio="none" viewBox="0 0 240 80">
+              <!-- Peak Highlight Band (Hours 14 to 18) -->
+              <rect x="140" y="0" width="40" height="80" fill="rgba(239, 68, 68, 0.12)" stroke="rgba(239, 68, 68, 0.3)" stroke-width="1" stroke-dasharray="2,2"/>
+              <!-- Tariff Curve Polyline -->
+              <polyline id="tariff-polyline" fill="none" stroke="#ffa586" stroke-width="2" points="0,65 60,65 110,45 140,15 180,15 210,50 240,65"/>
+              <!-- Current Time Cursor Line -->
+              <line id="tariff-cursor-line" x1="0" y1="0" x2="0" y2="80" stroke="#38bdf8" stroke-width="2"/>
+            </svg>
+            <div class="flex items-center justify-between text-[9px] text-text-dim px-1 pt-1">
+              <span>00:00 (Cheap)</span>
+              <span>12:00</span>
+              <span class="text-accent-red font-bold">14:00 - 18:00 (PEAK EXPENSIVE)</span>
+              <span>24:00</span>
+            </div>
+          </div>
+          <div class="text-[11px] text-text-muted flex items-center justify-between">
+            <span>💡 <strong>Virtual Battery:</strong> The building pre-cools at ₹10 before 2 PM, then cuts AC power at 2 PM to avoid ₹70/kWh spikes.</span>
+          </div>
+        </div>
+
+        <!-- PANEL 3: SAFETY SHIELD REAL-TIME DIAGNOSTICS -->
+        <div class="bg-surface-card border border-surface-border rounded-2xl p-4 flex flex-col gap-2.5 shadow-md">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-accent-green text-lg">shield</span>
+              <h3 class="text-sm font-bold text-text-main">Safety Shield Status</h3>
+            </div>
+            <span id="shield-badge" class="text-[10px] font-bold bg-accent-green/20 text-accent-green px-2 py-0.5 rounded-full border border-accent-green/30">Active & Protecting</span>
+          </div>
+          <div class="bg-surface p-3 rounded-xl border border-surface-border text-xs flex flex-col gap-1.5">
+            <div class="flex items-center justify-between">
+              <span class="text-text-muted">Safe Comfort Range:</span>
+              <span class="font-mono font-bold text-text-main">20.0°C – 24.5°C</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-text-muted">Max Temp Slew Rate:</span>
+              <span class="font-mono font-bold text-text-main">0.75°C per 5 min</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-text-muted">Compressor Short-Cycle Protection:</span>
+              <span class="font-mono font-bold text-accent-green">Dwell Guard OK</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <!-- ================= OPERATOR GUIDE & HELP MODAL ================= -->
+  <div id="guide-modal" class="fixed inset-0 bg-surface/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-surface-card border border-surface-border rounded-2xl max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+      <!-- Modal Header -->
+      <div class="p-4 border-b border-surface-border flex items-center justify-between bg-surface">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-primary/20 text-primary flex items-center justify-center font-bold">?</div>
+          <h3 class="font-bold text-base text-text-main">How AETHERIS-Zero Works (Simple Guide)</h3>
+        </div>
+        <button onclick="toggleModal('guide-modal')" class="text-text-muted hover:text-text-main text-lg font-bold p-1">✕</button>
+      </div>
+
+      <!-- Modal Body (Custom Scroll) -->
+      <div class="p-5 overflow-y-auto custom-scroll text-sm text-text-muted space-y-4">
+        
+        <div class="bg-surface p-3.5 rounded-xl border border-surface-border">
+          <h4 class="font-bold text-text-main text-sm flex items-center gap-1.5 mb-1">
+            <span class="material-symbols-outlined text-primary text-base">battery_charging_full</span>
+            1. What is a "Virtual Thermal Battery"?
+          </h4>
+          <p class="text-xs leading-relaxed">
+            Concrete walls, furniture, and indoor air store thermal energy (coolness) just like a lithium-ion battery stores electricity. AETHERIS-Zero uses this natural thermal inertia to store cheap electricity early in the day and turn off power-hungry ACs when electricity is expensive.
+          </p>
+        </div>
+
+        <div class="bg-surface p-3.5 rounded-xl border border-surface-border">
+          <h4 class="font-bold text-text-main text-sm flex items-center gap-1.5 mb-1">
+            <span class="material-symbols-outlined text-accent-green text-base">savings</span>
+            2. How does it save 20% to 35% on electricity bills?
+          </h4>
+          <p class="text-xs leading-relaxed">
+            Electricity tariffs change throughout the day (e.g. ₹8/kWh at night vs. ₹45/kWh during afternoon peak 2 PM - 6 PM). The AI automatically:
+          </p>
+          <ul class="list-disc pl-5 mt-1 text-xs space-y-1">
+            <li><strong>Pre-cools</strong> the building to ~21°C before 2 PM when electricity is cheap.</li>
+            <li><strong>Sheds AC load</strong> during the expensive 2 PM - 6 PM peak window while structural coolness keeps rooms comfortable.</li>
+          </ul>
+        </div>
+
+        <div class="bg-surface p-3.5 rounded-xl border border-surface-border">
+          <h4 class="font-bold text-text-main text-sm flex items-center gap-1.5 mb-1">
+            <span class="material-symbols-outlined text-accent-blue text-base">shield_with_heart</span>
+            3. Why is it 100% Safe (Safety Shield)?
+          </h4>
+          <p class="text-xs leading-relaxed">
+            A real-time mathematical shield (OSQP Quadratic Programming) sits between the AI and the building AC equipment. It guarantees:
+          </p>
+          <ul class="list-disc pl-5 mt-1 text-xs space-y-1">
+            <li>Room temperatures never leave the ASHRAE comfort band (20.0°C to 24.5°C).</li>
+            <li>Air conditioning compressors never short-cycle or burn out.</li>
+          </ul>
+        </div>
+
+        <div class="bg-surface p-3.5 rounded-xl border border-surface-border">
+          <h4 class="font-bold text-text-main text-sm flex items-center gap-1.5 mb-1">
+            <span class="material-symbols-outlined text-accent-amber text-base">keyboard</span>
+            4. Quick Keyboard Shortcuts
+          </h4>
+          <div class="grid grid-cols-2 gap-2 text-xs font-mono mt-1">
+            <div><kbd class="bg-surface-card px-1.5 py-0.5 rounded border border-surface-border">Space</kbd> Start/Pause Simulation</div>
+            <div><kbd class="bg-surface-card px-1.5 py-0.5 rounded border border-surface-border">S</kbd> Advance 5 Minutes</div>
+            <div><kbd class="bg-surface-card px-1.5 py-0.5 rounded border border-surface-border">F</kbd> Fast 24-Hour Day</div>
+            <div><kbd class="bg-surface-card px-1.5 py-0.5 rounded border border-surface-border">R</kbd> Reset Simulation</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-3 bg-surface border-t border-surface-border flex justify-end">
+        <button onclick="toggleModal('guide-modal')" class="bg-primary hover:bg-primary-dark text-surface font-bold px-4 py-1.5 rounded-xl text-xs transition">Got It!</button>
+      </div>
+    </div>
   </div>
 
+  <!-- ================= JAVASCRIPT: DYNAMIC DATA ENGINE & THREE.JS TWIN ================= -->
   <script>
-    // --- Global State ---
+    // --- Application State ---
+    let activeCurrency = 'INR'; // 'INR' or 'USD'
+    const USD_TO_INR = 83.0;
+    let selectedZoneId = 'zone_1';
+    let isAutoRunning = false;
     let ws = null;
-    let isLoopRunning = false;
-    let isShadowMode = false;
-    let historyData = [];
-    let zoneMeshes = [];
-    let flowParticles = null;
+    let reconnectInterval = null;
 
-    // --- Background Shader ---
-    (function initShader() {
-      const canvas = document.getElementById('bg-shader');
-      const gl = canvas.getContext('webgl');
-      if (!gl) return;
+    // History buffers for real dynamic chart drawing
+    const maxHistoryPoints = 48;
+    let powerActualHistory = [];
+    let powerBaselineHistory = [];
 
-      const vsSource = `
-        attribute vec2 position;
-        varying vec2 v_texCoord;
-        void main() {
-          v_texCoord = position * 0.5 + 0.5;
-          gl_Position = vec4(position, 0.0, 1.0);
-        }
-      `;
-      const fsSource = `
-        precision highp float;
-        varying vec2 v_texCoord;
-        uniform float u_time;
-        void main() {
-          vec2 uv = v_texCoord;
-          vec2 g_uv = uv * 40.0;
-          vec2 r_uv = fract(g_uv - 0.5) - 0.5;
-          float dist = length(r_uv);
-          float grid = smoothstep(0.48, 0.5, 1.0 - dist);
-          float scan = sin(uv.y * 20.0 - u_time * 2.0) * 0.1 + 0.1;
-          float stream = pow(abs(sin(uv.x * 5.0 + u_time * 0.5)), 10.0) * 0.1;
-          vec3 color = vec3(0.05, 0.07, 0.14);
-          color += vec3(1.0, 0.65, 0.53) * grid * 0.05;
-          color += vec3(0.71, 0.10, 0.17) * scan * 0.2;
-          color += vec3(1.0, 0.65, 0.53) * stream * 0.4;
-          gl_FragColor = vec4(color, 1.0);
-        }
-      `;
-      function compile(type, src) {
-        const s = gl.createShader(type);
-        gl.shaderSource(s, src);
-        gl.compileShader(s);
-        return s;
+    // --- Currency Helper ---
+    function setCurrency(curr) {
+      activeCurrency = curr;
+      document.getElementById('btn-currency-inr').className = curr === 'INR' ? 'px-2.5 py-1 rounded bg-primary text-surface transition font-extrabold' : 'px-2.5 py-1 rounded text-text-muted hover:text-text-main transition font-extrabold';
+      document.getElementById('btn-currency-usd').className = curr === 'USD' ? 'px-2.5 py-1 rounded bg-primary text-surface transition font-extrabold' : 'px-2.5 py-1 rounded text-text-muted hover:text-text-main transition font-extrabold';
+      if (window.lastTelemetry) updateUIFromTelemetry(window.lastTelemetry);
+    }
+
+    function formatMoney(usdVal) {
+      if (activeCurrency === 'INR') {
+        const inr = usdVal * USD_TO_INR;
+        return '₹' + inr.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
       }
-      const prog = gl.createProgram();
-      gl.attachShader(prog, compile(gl.VERTEX_SHADER, vsSource));
-      gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, fsSource));
-      gl.linkProgram(prog);
-      gl.useProgram(prog);
+      return '$' + usdVal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
 
-      const buf = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, -1,1, 1,-1, 1,1]), gl.STATIC_DRAW);
-      const posLoc = gl.getAttribLocation(prog, "position");
-      gl.enableVertexAttribArray(posLoc);
-      gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
-
-      const timeLoc = gl.getUniformLocation(prog, "u_time");
-      let start = Date.now();
-      function renderShader() {
-        canvas.width = canvas.clientWidth;
-        canvas.height = canvas.clientHeight;
-        gl.viewport(0, 0, canvas.width, canvas.height);
-        gl.uniform1f(timeLoc, (Date.now() - start) / 1000.0);
-        gl.drawArrays(gl.TRIANGLES, 0, 6);
-        requestAnimationFrame(renderShader);
+    function formatPricePerKwh(usdPerKwh) {
+      if (activeCurrency === 'INR') {
+        const inr = usdPerKwh * USD_TO_INR;
+        return '₹' + inr.toFixed(2);
       }
-      renderShader();
-    })();
+      return '$' + usdPerKwh.toFixed(3);
+    }
 
-    // --- Three.js Digital Twin Scene ---
-    (function initThreeScene() {
-      const container = document.getElementById('threejs-container');
+    // --- Modal Helper ---
+    function toggleModal(id) {
+      const modal = document.getElementById(id);
+      if (modal) modal.classList.toggle('hidden');
+    }
+
+    // --- Zone Selection ---
+    const zoneDisplayNames = {
+      'zone_1': 'Core Floor 1',
+      'zone_2': 'North Office',
+      'zone_3': 'South Office',
+      'zone_4': 'East Office',
+      'zone_5': 'West Office'
+    };
+
+    function selectZone(zid) {
+      selectedZoneId = zid;
+      document.querySelectorAll('.zone-pill').forEach(el => {
+        el.classList.remove('border-primary/50', 'bg-surface-card-hover');
+        el.classList.add('border-surface-border');
+      });
+      const activePill = document.getElementById('pill-' + zid);
+      if (activePill) {
+        activePill.classList.add('border-primary/50', 'bg-surface-card-hover');
+        activePill.classList.remove('border-surface-border');
+      }
+      document.getElementById('selected-zone-name-label').innerText = zoneDisplayNames[zid] || zid;
+      
+      if (window.lastTelemetry && window.lastTelemetry.zones && window.lastTelemetry.zones[zid]) {
+        const z = window.lastTelemetry.zones[zid];
+        document.getElementById('slider-zone-temp').value = z.temp_c;
+        document.getElementById('slider-zone-val').innerText = z.temp_c.toFixed(1) + '°C';
+      }
+    }
+
+    // --- UI Updaters ---
+    function updateUIFromTelemetry(data) {
+      window.lastTelemetry = data;
+
+      // 1. Time Display
+      document.getElementById('sim-clock-display').innerText = data.time_display || '00:00';
+      document.getElementById('sim-step-badge').innerText = 'Step ' + (data.step || 0);
+
+      // 2. Metrics Cards
+      const savingsUsd = (data.metrics && data.metrics.cumulative_savings_usd) || 0.0;
+      const savingsPct = (data.metrics && data.metrics.cost_savings_pct) || 0.0;
+      document.getElementById('metric-savings-val').innerText = formatMoney(savingsUsd);
+      document.getElementById('metric-savings-pct').innerText = (savingsPct >= 0 ? '+' : '') + savingsPct.toFixed(1) + '% vs standard AC';
+
+      const priceKwh = data.dynamic_lmp_price || 0.15;
+      document.getElementById('metric-price-val').innerHTML = formatPricePerKwh(priceKwh) + '<span class="text-xs text-text-muted font-normal">/kWh</span>';
+      document.getElementById('metric-price-mwh').innerText = activeCurrency === 'INR' 
+        ? '₹' + (priceKwh * 1000 * USD_TO_INR).toLocaleString('en-IN') + ' / MWh'
+        : '$' + (priceKwh * 1000).toFixed(1) + ' / MWh';
+      
+      const priceLevelEl = document.getElementById('metric-price-level');
+      if (priceKwh > 0.40) {
+        priceLevelEl.innerText = '🔴 Expensive Peak Surge';
+        priceLevelEl.className = 'text-[11px] text-accent-red font-bold mt-0.5';
+      } else if (priceKwh > 0.20) {
+        priceLevelEl.innerText = '🟡 Mid-Day Regular';
+        priceLevelEl.className = 'text-[11px] text-accent-amber font-semibold mt-0.5';
+      } else {
+        priceLevelEl.innerText = '🟢 Off-Peak (Cheap)';
+        priceLevelEl.className = 'text-[11px] text-accent-green font-semibold mt-0.5';
+      }
+
+      const totalKw = (data.power && data.power.total_hvac_kw) || 0.0;
+      const chillerKw = (data.power && data.power.chiller_kw) || 0.0;
+      const fanKw = (data.power && data.power.fans_kw) || 0.0;
+      const shavedKw = (data.power && data.power.demand_shaved_kw) || 0.0;
+      document.getElementById('metric-power-val').innerHTML = totalKw.toFixed(1) + ' <span class="text-xs text-text-muted font-normal">kW</span>';
+      document.getElementById('metric-power-breakdown').innerText = 'Chiller: ' + chillerKw.toFixed(1) + ' kW | Fans: ' + fanKw.toFixed(1) + ' kW';
+      document.getElementById('metric-power-shaved').innerText = 'Power Shaved: ' + shavedKw.toFixed(1) + ' kW';
+
+      const comfortPct = (data.metrics && data.metrics.comfort_compliance_pct) !== undefined ? data.metrics.comfort_compliance_pct : 100.0;
+      document.getElementById('metric-comfort-val').innerText = comfortPct.toFixed(0) + '%';
+      
+      let totalOcc = 0;
+      if (data.zones) {
+        Object.values(data.zones).forEach(z => { totalOcc += (z.occupancy || 0); });
+      }
+      document.getElementById('metric-occupant-count').innerText = totalOcc + ' Occupants in Building';
+
+      const carbonKg = (data.metrics && data.metrics.carbon_avoided_kg) || 0.0;
+      document.getElementById('metric-carbon-val').innerHTML = carbonKg.toFixed(1) + ' <span class="text-xs text-text-muted font-normal">kg</span>';
+
+      // 3. Status Banner
+      const isIntervention = data.safety && data.safety.intervention_active;
+      const isDrActive = data.grid_dr_event_active;
+      const bannerTitle = document.getElementById('status-banner-title');
+      const bannerDesc = document.getElementById('status-banner-desc');
+      const bannerIcon = document.getElementById('status-banner-icon');
+      const bannerIconBg = document.getElementById('status-banner-icon-bg');
+
+      if (isIntervention) {
+        bannerTitle.innerText = '🛡️ Safety Shield Intervened (Comfort Protected)';
+        bannerDesc.innerText = 'A setpoint command was safely adjusted to stay within ASHRAE comfort limits (20°C - 24.5°C) and prevent equipment strain.';
+        bannerIcon.innerText = 'gpp_maybe';
+        bannerIconBg.className = 'w-12 h-12 rounded-xl bg-accent-amber/20 border border-accent-amber/40 flex items-center justify-center text-accent-amber shrink-0';
+      } else if (isDrActive || priceKwh > 0.40) {
+        bannerTitle.innerText = '⚡ High Electricity Price Detected — Stored Energy Discharging';
+        bannerDesc.innerText = 'Grid price is elevated. AC cooling is dialed back while structural thermal mass keeps building occupants comfortable.';
+        bannerIcon.innerText = 'bolt';
+        bannerIconBg.className = 'w-12 h-12 rounded-xl bg-accent-amber/20 border border-accent-amber/40 flex items-center justify-center text-accent-amber shrink-0';
+      } else {
+        bannerTitle.innerText = 'AI Optimizer Active: Comfort Protected & Saving Electricity';
+        bannerDesc.innerText = 'All 5 building zones are maintained within ideal comfort temperatures (21°C - 23°C). Energy is scheduled dynamically to avoid costly peak electricity hours.';
+        bannerIcon.innerText = 'energy_savings_leaf';
+        bannerIconBg.className = 'w-12 h-12 rounded-xl bg-accent-green/20 border border-accent-green/40 flex items-center justify-center text-accent-green shrink-0';
+      }
+
+      // 4. Zone Badges & Colors
+      if (data.zones) {
+        for (const [zid, z] of Object.entries(data.zones)) {
+          const tempEl = document.getElementById('badge-temp-' + zid);
+          const occEl = document.getElementById('badge-occ-' + zid);
+          if (tempEl) tempEl.innerText = z.temp_c.toFixed(1) + '°C';
+          if (occEl) occEl.innerText = (z.occupancy || 0) + ' Occ • ' + (z.comfort_compliant ? 'Comfortable' : 'Adjusting');
+          
+          // Update 3D block color
+          if (zoneMeshes[zid]) {
+            const hexInt = parseInt(z.hex_color.replace('#', '0x'));
+            zoneMeshes[zid].material.color.setHex(hexInt);
+          }
+        }
+      }
+
+      // 5. Update Real Dynamic Charts
+      updatePowerChart(totalKw, (data.power && data.power.baseline_hvac_kw) || totalKw);
+      updateTariffChartCursor(data.timestamp_hour || 0.0);
+    }
+
+    // --- Dynamic SVG Chart Helpers ---
+    function updatePowerChart(actualKw, baselineKw) {
+      powerActualHistory.push(actualKw);
+      powerBaselineHistory.push(baselineKw);
+      if (powerActualHistory.length > maxHistoryPoints) {
+        powerActualHistory.shift();
+        powerBaselineHistory.shift();
+      }
+
+      const maxKw = Math.max(100, ...powerActualHistory, ...powerBaselineHistory);
+      const w = 500;
+      const h = 120;
+      const n = powerActualHistory.length;
+      if (n < 2) return;
+
+      let actualPts = [];
+      let baselinePts = [];
+
+      for (let i = 0; i < n; i++) {
+        const x = (i / (n - 1)) * w;
+        const yAct = h - ((powerActualHistory[i] / maxKw) * (h - 20)) - 10;
+        const yBase = h - ((powerBaselineHistory[i] / maxKw) * (h - 20)) - 10;
+        actualPts.push(x.toFixed(1) + ',' + yAct.toFixed(1));
+        baselinePts.push(x.toFixed(1) + ',' + yBase.toFixed(1));
+      }
+
+      document.getElementById('chart-actual-polyline').setAttribute('points', actualPts.join(' '));
+      document.getElementById('chart-baseline-polyline').setAttribute('points', baselinePts.join(' '));
+      
+      const polyPts = '0,' + h + ' ' + actualPts.join(' ') + ' ' + w + ',' + h;
+      document.getElementById('chart-actual-polygon').setAttribute('points', polyPts);
+    }
+
+    function updateTariffChartCursor(hour) {
+      const normHour = (hour % 24.0);
+      const cursorX = (normHour / 24.0) * 240;
+      const line = document.getElementById('tariff-cursor-line');
+      if (line) {
+        line.setAttribute('x1', cursorX.toFixed(1));
+        line.setAttribute('x2', cursorX.toFixed(1));
+      }
+    }
+
+    // --- Interactive Control Slider Event Handlers ---
+    function onWeatherSliderChange(val) {
+      document.getElementById('slider-weather-val').innerText = parseFloat(val).toFixed(1) + '°C';
+    }
+
+    function onPriceSliderChange(val) {
+      const num = parseFloat(val);
+      document.getElementById('slider-price-val').innerText = activeCurrency === 'INR' ? '₹' + (num * 3.5).toFixed(2) + '/kWh' : '$' + (num / 20).toFixed(2) + '/kWh';
+    }
+
+    function onZoneSliderChange(val) {
+      document.getElementById('slider-zone-val').innerText = parseFloat(val).toFixed(1) + '°C';
+    }
+
+    function applyCustomWeather() {
+      const temp = parseFloat(document.getElementById('slider-weather').value);
+      sendWsCommand('SET_WEATHER_OVERRIDE', { ambient_temp_c: temp, solar_irradiance_wm2: 800.0 });
+    }
+
+    function setWeatherPreset(temp) {
+      document.getElementById('slider-weather').value = temp;
+      onWeatherSliderChange(temp);
+      applyCustomWeather();
+    }
+
+    function applyCustomPrice() {
+      const sliderVal = parseFloat(document.getElementById('slider-price').value);
+      const priceUsd = sliderVal / 25.0;
+      sendWsCommand('SET_PRICE_OVERRIDE', { price_usd_per_kwh: priceUsd });
+    }
+
+    function setPricePreset(val) {
+      document.getElementById('slider-price').value = val;
+      onPriceSliderChange(val);
+      applyCustomPrice();
+    }
+
+    function triggerDRPriceSpike() {
+      sendWsCommand('TRIGGER_OPENADR_EVENT', {
+        start_hour: (window.lastTelemetry ? window.lastTelemetry.timestamp_hour : 12.0),
+        duration_hours: 4.0,
+        price_spike: 1.50
+      });
+    }
+
+    function applyCustomZoneTemp() {
+      const temp = parseFloat(document.getElementById('slider-zone-temp').value);
+      sendWsCommand('SET_ZONE_TARGET', { zone_id: selectedZoneId, target_temp: temp });
+    }
+
+    function testUnsafeOverride(temp) {
+      document.getElementById('slider-zone-temp').value = temp;
+      onZoneSliderChange(temp);
+      sendWsCommand('INJECT_MALICIOUS_SETPOINT', { zone_id: selectedZoneId, target_temp: temp });
+    }
+
+    // --- Simulation Loop Controls ---
+    function toggleAutoSimulation() {
+      if (isAutoRunning) {
+        sendWsCommand('STOP_SIMULATION', {});
+      } else {
+        sendWsCommand('START_SIMULATION', {});
+      }
+    }
+
+    function stepSimulation() {
+      sendWsCommand('STEP_SIMULATION', {});
+    }
+
+    function runFast24hEpisode() {
+      sendWsCommand('RUN_EPISODE', { total_steps: 288 });
+    }
+
+    function resetSimulation() {
+      powerActualHistory = [];
+      powerBaselineHistory = [];
+      sendWsCommand('RESET_SIMULATION', {});
+    }
+
+    // --- WebSocket Communication Bridge ---
+    function connectWebSocket() {
+      const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const wsUrl = proto + '//' + window.location.host + '/ws/telemetry';
+      ws = new WebSocket(wsUrl);
+
+      ws.onopen = function() {
+        console.log('Connected to AETHERIS-Zero WebSocket telemetry stream');
+      };
+
+      ws.onmessage = function(evt) {
+        try {
+          const msg = JSON.parse(evt.data);
+          if (msg.type === 'INITIAL_STATE' || msg.type === 'TELEMETRY_UPDATE' || msg.type === 'SIMULATION_RESET') {
+            if (msg.telemetry) updateUIFromTelemetry(msg.telemetry);
+          } else if (msg.type === 'LOOP_STARTED') {
+            isAutoRunning = true;
+            document.getElementById('loop-icon').innerText = 'pause';
+            document.getElementById('loop-text').innerText = 'Pause Optimizer';
+            document.getElementById('btn-toggle-loop').className = 'flex-1 md:flex-none bg-accent-amber hover:bg-accent-amber/80 text-surface font-bold px-4 py-2 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow transition active:scale-95';
+          } else if (msg.type === 'LOOP_STOPPED') {
+            isAutoRunning = false;
+            document.getElementById('loop-icon').innerText = 'play_arrow';
+            document.getElementById('loop-text').innerText = 'Start Auto Optimizer';
+            document.getElementById('btn-toggle-loop').className = 'flex-1 md:flex-none bg-primary hover:bg-primary-dark text-surface font-bold px-4 py-2 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow transition active:scale-95';
+          }
+        } catch (e) {
+          console.error('Error parsing WS frame:', e);
+        }
+      };
+
+      ws.onclose = function() {
+        setTimeout(connectWebSocket, 2000);
+      };
+    }
+
+    function sendWsCommand(action, payload) {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ action: action, payload: payload }));
+      } else {
+        // Fallback REST POST
+        if (action === 'STEP_SIMULATION') fetch('/api/v1/control/step', { method: 'POST' });
+        if (action === 'RESET_SIMULATION') fetch('/api/v1/control/reset', { method: 'POST' });
+        if (action === 'START_SIMULATION') fetch('/api/v1/simulation/start', { method: 'POST' });
+        if (action === 'STOP_SIMULATION') fetch('/api/v1/simulation/stop', { method: 'POST' });
+      }
+    }
+
+    // --- Three.js 3D Digital Twin Simulation ---
+    let scene, camera, renderer;
+    const zoneMeshes = {};
+
+    function initThreeJS() {
+      const container = document.getElementById('three-canvas-container');
       if (!container) return;
+      const width = container.clientWidth;
+      const height = container.clientHeight;
 
-      const width = container.clientWidth || 800;
-      const height = container.clientHeight || 500;
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x0c101d);
 
-      const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
-      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+      camera.position.set(0, 14, 20);
+      camera.lookAt(0, 0, 0);
+
+      renderer = new THREE.WebGLRenderer({ antialias: true });
       renderer.setSize(width, height);
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       container.appendChild(renderer.domElement);
 
-      const ambientLight = new THREE.AmbientLight(0x384358, 1.8);
+      // Lighting
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
       scene.add(ambientLight);
-      const dirLight = new THREE.DirectionalLight(0xffa586, 1.5);
-      dirLight.position.set(5, 10, 7);
+
+      const dirLight = new THREE.DirectionalLight(0xffa586, 0.8);
+      dirLight.position.set(10, 20, 10);
       scene.add(dirLight);
 
-      const building = new THREE.Group();
-      scene.add(building);
+      // Grid Floor
+      const grid = new THREE.GridHelper(24, 24, 0x384358, 0x1c243d);
+      grid.position.y = -1.5;
+      scene.add(grid);
 
-      const glassMat = new THREE.MeshPhongMaterial({ color: 0x0e1323, transparent: true, opacity: 0.2, shininess: 90 });
-      const wireMat = new THREE.MeshBasicMaterial({ color: 0xb51a2b, wireframe: true, transparent: true, opacity: 0.35 });
-      const baseGeom = new THREE.BoxGeometry(4, 8, 4);
-      building.add(new THREE.Mesh(baseGeom, glassMat));
-      building.add(new THREE.Mesh(baseGeom, wireMat));
+      // 5-Zone Building Layout
+      const zoneConfigs = [
+        { id: 'zone_1', pos: [0, 0, 0], size: [5, 2.5, 5] },       // Core
+        { id: 'zone_2', pos: [0, 0, -4.5], size: [5, 2.2, 3] },    // North
+        { id: 'zone_3', pos: [0, 0, 4.5], size: [5, 2.2, 3] },     // South
+        { id: 'zone_4', pos: [4.5, 0, 0], size: [3, 2.2, 5] },     // East
+        { id: 'zone_5', pos: [-4.5, 0, 0], size: [3, 2.2, 5] },    // West
+      ];
 
-      const palette = [0xb51a2b, 0xffa586, 0x541a2b, 0x384358, 0x242f49];
-      for (let i = 0; i < 5; i++) {
-        const zGeom = new THREE.BoxGeometry(4.1, 1.5, 4.1);
-        const zMat = new THREE.MeshPhongMaterial({
-          color: palette[i % palette.length],
+      zoneConfigs.forEach(cfg => {
+        const geom = new THREE.BoxGeometry(cfg.size[0], cfg.size[1], cfg.size[2]);
+        const mat = new THREE.MeshStandardMaterial({
+          color: 0x10b981,
+          roughness: 0.3,
+          metalness: 0.1,
           transparent: true,
-          opacity: 0.35,
-          emissive: palette[i % palette.length],
-          emissiveIntensity: 0.25
+          opacity: 0.85
         });
-        const zMesh = new THREE.Mesh(zGeom, zMat);
-        zMesh.position.y = -3.2 + (i * 1.6);
-        building.add(zMesh);
-        zoneMeshes.push(zMesh);
-      }
+        const mesh = new THREE.Mesh(geom, mat);
+        mesh.position.set(cfg.pos[0], cfg.pos[1], cfg.pos[2]);
+        mesh.userData = { zoneId: cfg.id };
+        scene.add(mesh);
+        zoneMeshes[cfg.id] = mesh;
+
+        // Wireframe edges
+        const wireGeom = new THREE.EdgesGeometry(geom);
+        const wireMat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.25 });
+        const wireframe = new THREE.LineSegments(wireGeom, wireMat);
+        mesh.add(wireframe);
+      });
 
       // Airflow Particles
-      const pCount = 140;
-      const pGeom = new THREE.BufferGeometry();
-      const pPos = new Float32Array(pCount * 3);
-      for (let i = 0; i < pCount; i++) {
-        pPos[i * 3] = (Math.random() - 0.5) * 4;
-        pPos[i * 3 + 1] = (Math.random() - 0.5) * 8;
-        pPos[i * 3 + 2] = (Math.random() - 0.5) * 4;
+      const particleCount = 120;
+      const particleGeom = new THREE.BufferGeometry();
+      const particlePositions = new Float32Array(particleCount * 3);
+      for (let i = 0; i < particleCount * 3; i += 3) {
+        particlePositions[i] = (Math.random() - 0.5) * 16;
+        particlePositions[i + 1] = Math.random() * 4 - 1;
+        particlePositions[i + 2] = (Math.random() - 0.5) * 16;
       }
-      pGeom.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
-      const pMat = new THREE.PointsMaterial({ color: 0xffa586, size: 0.07, transparent: true, opacity: 0.7 });
-      flowParticles = new THREE.Points(pGeom, pMat);
-      building.add(flowParticles);
+      particleGeom.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
+      const particleMat = new THREE.PointsMaterial({ color: 0x38bdf8, size: 0.15, transparent: true, opacity: 0.6 });
+      const particles = new THREE.Points(particleGeom, particleMat);
+      scene.add(particles);
 
-      camera.position.z = 10;
-      camera.position.y = 1;
+      // Mouse Orbit Interaction
+      let isDragging = false;
+      let prevMousePos = { x: 0, y: 0 };
+      let rotationAngle = 0;
 
+      container.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        prevMousePos = { x: e.clientX, y: e.clientY };
+      });
+
+      window.addEventListener('mouseup', () => { isDragging = false; });
+
+      container.addEventListener('mousemove', (e) => {
+        if (isDragging) {
+          const deltaX = e.clientX - prevMousePos.x;
+          rotationAngle += deltaX * 0.005;
+          camera.position.x = Math.sin(rotationAngle) * 22;
+          camera.position.z = Math.cos(rotationAngle) * 22;
+          camera.lookAt(0, 0, 0);
+          prevMousePos = { x: e.clientX, y: e.clientY };
+        }
+      });
+
+      // Render Loop
       function animate() {
         requestAnimationFrame(animate);
-        building.rotation.y += 0.003;
-        const positions = flowParticles.geometry.attributes.position.array;
-        for (let i = 0; i < pCount; i++) {
-          positions[i * 3 + 1] += 0.02;
-          if (positions[i * 3 + 1] > 4) positions[i * 3 + 1] = -4;
+        
+        // Gentle idle rotation when not dragging
+        if (!isDragging) {
+          rotationAngle += 0.001;
+          camera.position.x = Math.sin(rotationAngle) * 22;
+          camera.position.z = Math.cos(rotationAngle) * 22;
+          camera.lookAt(0, 0, 0);
         }
-        flowParticles.geometry.attributes.position.needsUpdate = true;
+
+        // Move airflow particles
+        const pos = particleGeom.attributes.position.array;
+        for (let i = 1; i < particleCount * 3; i += 3) {
+          pos[i] -= 0.02;
+          if (pos[i] < -1.5) pos[i] = 3.5;
+        }
+        particleGeom.attributes.position.needsUpdate = true;
+
         renderer.render(scene, camera);
       }
       animate();
@@ -681,312 +1036,26 @@
       window.addEventListener('resize', () => {
         const w = container.clientWidth;
         const h = container.clientHeight;
-        renderer.setSize(w, h);
         camera.aspect = w / h;
         camera.updateProjectionMatrix();
-      });
-    })();
-
-    // --- WebSocket Telemetry Stream ---
-    function connectWS() {
-      const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const wsUrl = `${proto}//${location.host}/ws/telemetry`;
-      ws = new WebSocket(wsUrl);
-
-      ws.onopen = () => {
-        document.getElementById('ws-status-dot').className = 'w-2 h-2 rounded-full bg-primary-fixed animate-pulse shadow-[0_0_6px_rgba(255,165,134,0.8)]';
-        document.getElementById('ws-status-text').textContent = 'LIVE WS';
-      };
-
-      ws.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data);
-          if (data.type === 'INITIAL_STATE' || data.type === 'TELEMETRY_UPDATE') {
-            updateDashboard(data.telemetry);
-          } else if (data.type === 'LOOP_STARTED') {
-            setLoopState(true);
-          } else if (data.type === 'LOOP_STOPPED') {
-            setLoopState(false);
-          } else if (data.type === 'EPISODE_SUMMARY') {
-            showRoiModal(data.summary);
-          }
-        } catch (e) {
-          console.error(e);
-        }
-      };
-
-      ws.onclose = () => {
-        document.getElementById('ws-status-dot').className = 'w-2 h-2 rounded-full bg-error';
-        document.getElementById('ws-status-text').textContent = 'OFFLINE';
-        setTimeout(connectWS, 2000);
-      };
-    }
-    connectWS();
-
-    function updateDashboard(frame) {
-      if (!frame) return;
-      historyData.push(frame);
-      if (historyData.length > 50) historyData.shift();
-
-      // 1. Safety Status
-      const safety = frame.safety || {};
-      const isIntervened = safety.intervention_active;
-      const tagBox = document.getElementById('safety-barrier-tag');
-      const tagText = document.getElementById('safety-status-text');
-      const tagIcon = document.getElementById('safety-icon');
-
-      if (isIntervened) {
-        tagBox.className = 'flex items-center gap-2 px-3 py-1 bg-error-container/40 border border-error rounded-sm text-error safety-glow animate-pulse';
-        tagText.textContent = `Safety Barrier: ${safety.shield_status || 'INTERVENED'}`;
-        tagIcon.textContent = 'warning';
-      } else {
-        tagBox.className = 'flex items-center gap-2 px-3 py-1 bg-surface-container/60 backdrop-blur-sm border border-grid-line rounded-sm';
-        tagText.textContent = 'Safety Barrier: OPTIMAL';
-        tagIcon.textContent = 'verified_user';
-      }
-
-      // DR Active Tag
-      const drTag = document.getElementById('dr-event-active-tag');
-      if (frame.grid_dr_event_active) {
-        drTag.classList.remove('hidden');
-      } else {
-        drTag.classList.add('hidden');
-      }
-
-      // 2. Zone Meshes Colors
-      if (frame.zones) {
-        const zKeys = Object.keys(frame.zones);
-        zoneMeshes.forEach((mesh, i) => {
-          const zState = frame.zones[zKeys[i] || `zone_${i+1}`];
-          if (zState) {
-            const hexStr = zState.hex_color || (zState.temp_c > 24.5 ? '#b51a2b' : zState.temp_c < 20.5 ? '#06b6d4' : '#ffa586');
-            const col = new THREE.Color(hexStr);
-            mesh.material.color = col;
-            mesh.material.emissive = col;
-            mesh.material.emissiveIntensity = (zState.heat_intensity || 0.5) * 0.4;
-          }
-        });
-      }
-
-      // 3. Power Analysis
-      const power = frame.power || {};
-      const actKw = (power.total_hvac_kw || 42.5).toFixed(1);
-      const shavedKw = Math.max(0, (power.demand_shaved_kw || 0)).toFixed(1);
-      document.getElementById('power-actual-text').textContent = `${actKw} kW`;
-      document.getElementById('power-shaved-text').textContent = `Shaved: -${shavedKw} kW`;
-
-      // 4. CAISO Price Curve in ₹/MWh
-      const pUsd = frame.dynamic_lmp_price || 0.15;
-      const pInr = (pUsd * 1000 * 83).toLocaleString('en-IN', { maximumFractionDigits: 2 });
-      document.getElementById('price-current-text').textContent = `₹${pInr}`;
-
-      const isSpike = frame.grid_dr_event_active || pUsd >= 0.50;
-      const spikeBanner = document.getElementById('price-spike-banner');
-      if (isSpike) {
-        spikeBanner.classList.remove('hidden');
-      } else {
-        spikeBanner.classList.add('hidden');
-      }
-
-      // 5. Accumulated Savings (INR)
-      const metrics = frame.metrics || {};
-      const savingsUsd = metrics.cost_savings_usd || 48920.0;
-      const savingsInr = savingsUsd * 83;
-      const intPart = Math.floor(savingsInr).toLocaleString('en-IN');
-      const decPart = (savingsInr % 1).toFixed(2).substring(1);
-      document.getElementById('savings-int-text').textContent = `₹${intPart}`;
-      document.getElementById('savings-dec-text').textContent = decPart;
-
-      const roiPct = (metrics.cost_savings_pct || 30.2).toFixed(1);
-      document.getElementById('savings-roi-label').textContent = `Accumulated Savings (${roiPct}% ROI)`;
-      document.getElementById('peak-red-text').textContent = `${(metrics.peak_demand_reduction_pct || 31.0).toFixed(1)}%`;
-
-      // 6. Deck Status
-      const step = frame.step || 0;
-      const timeStr = frame.time_of_day_str || '14:30';
-      document.getElementById('deck-time-step').textContent = `${timeStr} | Step ${step} | Mode: ${frame.controller_mode || 'RL_SAFE_ARBITRAGE'}`;
-    }
-
-    // --- Action Handlers ---
-    function sendWS(action, params = {}) {
-      if (ws && ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify({ action, params, timestamp: Date.now() }));
-      }
-    }
-
-    function toggleSimulationLoop() {
-      if (isLoopRunning) {
-        sendWS('STOP_SIMULATION');
-      } else {
-        sendWS('START_SIMULATION');
-      }
-    }
-
-    function setLoopState(running) {
-      isLoopRunning = running;
-      const btn = document.getElementById('btn-toggle-loop');
-      const txt = document.getElementById('btn-loop-text');
-      const icon = document.getElementById('btn-loop-icon');
-      if (running) {
-        txt.textContent = 'Pause Loop';
-        icon.textContent = 'pause';
-        btn.className = 'px-4 py-2 rounded bg-secondary-container/80 text-on-surface border border-secondary/40 hover:bg-secondary-container font-label-caps text-label-caps uppercase transition-colors flex items-center gap-1.5 text-xs';
-      } else {
-        txt.textContent = 'Start Loop';
-        icon.textContent = 'play_arrow';
-        btn.className = 'px-4 py-2 rounded bg-surface-variant/80 text-primary-fixed border border-primary/40 hover:bg-surface-variant font-label-caps text-label-caps uppercase transition-colors flex items-center gap-1.5 text-xs';
-      }
-    }
-
-    function stepSimulation() {
-      sendWS('STEP_SIMULATION');
-    }
-
-    function resetSimulation() {
-      sendWS('RESET_SIMULATION');
-      historyData = [];
-    }
-
-    function toggleShadowMode() {
-      isShadowMode = !isShadowMode;
-      sendWS('TOGGLE_SHADOW_MODE', { enabled: isShadowMode });
-      const btn = document.getElementById('btn-shadow');
-      const txt = document.getElementById('shadow-btn-text');
-      const icon = document.getElementById('shadow-icon');
-      if (isShadowMode) {
-        txt.textContent = 'Shadow: ON';
-        icon.textContent = 'visibility';
-        btn.className = 'px-4 py-2 rounded border border-primary-fixed bg-primary-container/40 text-primary-fixed font-label-caps text-label-caps uppercase transition-colors flex items-center gap-1.5 text-xs';
-      } else {
-        txt.textContent = 'Shadow Mode';
-        icon.textContent = 'visibility_off';
-        btn.className = 'px-4 py-2 rounded border border-transparent text-on-surface-variant font-label-caps text-label-caps uppercase hover:bg-surface-variant/50 transition-colors flex items-center gap-1.5 text-xs';
-      }
-    }
-
-    function injectMaliciousFault() {
-      sendWS('INJECT_MALICIOUS_SETPOINT', { zone_id: 'zone_1', target_temp: 38.0 });
-    }
-
-    function triggerOpenADREvent() {
-      sendWS('TRIGGER_OPENADR_EVENT', { price_spike: 1.50, start_hour: 14.0, duration_hours: 4.0 });
-    }
-
-    function run24hEpisode() {
-      sendWS('RUN_EPISODE', { total_steps: 288 });
-    }
-
-    function setControllerMode(mode) {
-      sendWS('SET_CONTROLLER_MODE', { mode });
-      if (mode === 'RL_SAFE_ARBITRAGE') {
-        document.getElementById('nav-mode-rl').className = 'h-full flex items-center text-primary-fixed border-b-2 border-primary-fixed pb-1 font-label-caps text-label-caps uppercase transition-colors';
-        document.getElementById('nav-mode-base').className = 'h-full flex items-center text-on-surface-variant font-label-caps text-label-caps uppercase hover:text-primary-fixed transition-colors pt-1';
-      } else {
-        document.getElementById('nav-mode-base').className = 'h-full flex items-center text-primary-fixed border-b-2 border-primary-fixed pb-1 font-label-caps text-label-caps uppercase transition-colors';
-        document.getElementById('nav-mode-rl').className = 'h-full flex items-center text-on-surface-variant font-label-caps text-label-caps uppercase hover:text-primary-fixed transition-colors pt-1';
-      }
-    }
-
-    function showRoiModal(summary) {
-      if (!summary) return;
-      const modal = document.getElementById('roi-modal');
-      modal.classList.remove('hidden');
-      const costInr = ((summary.cost_savings_usd || 0) * 83).toLocaleString('en-IN', { maximumFractionDigits: 2 });
-      document.getElementById('roi-cost-savings').textContent = `₹${costInr} (${summary.cost_savings_pct || 30.2}%)`;
-      document.getElementById('roi-peak-shaved').textContent = `${summary.peak_demand_reduction_pct || 31.0}%`;
-      document.getElementById('roi-carbon').textContent = `${summary.carbon_avoided_kg || 38.7} kg CO2`;
-    }
-
-    function closeRoiModal() {
-      document.getElementById('roi-modal').classList.add('hidden');
-    }
-
-    function openHelpModal() {
-      document.getElementById('help-modal').classList.remove('hidden');
-    }
-
-    function closeHelpModal() {
-      document.getElementById('help-modal').classList.add('hidden');
-    }
-
-    function openIngestionModal() {
-      document.getElementById('ingestion-modal').classList.remove('hidden');
-      fetch('/api/v1/ingestion/graph-turtle')
-        .then(r => r.json())
-        .then(d => { document.getElementById('turtle-content').textContent = d.turtle || ''; });
-    }
-
-    function closeIngestionModal() {
-      document.getElementById('ingestion-modal').classList.add('hidden');
-    }
-
-    function parseTags() {
-      const raw = document.getElementById('tag-input').value;
-      const tags = raw.split(',').map(s => s.trim()).filter(Boolean);
-      fetch('/api/v1/ingestion/parse-tags', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tags })
-      })
-      .then(r => r.json())
-      .then(d => {
-        const box = document.getElementById('parse-results-box');
-        const list = document.getElementById('parse-results-list');
-        list.innerHTML = '';
-        (d.points || []).forEach(p => {
-          const row = document.createElement('div');
-          row.className = 'flex justify-between border-b border-grid-line/30 pb-1';
-          row.innerHTML = `<span class="text-primary-fixed">${p.raw_tag}</span><span class="text-on-surface-variant">${p.brick_class}</span><span class="text-secondary">${p.equipment_id}</span>`;
-          list.appendChild(row);
-        });
-        box.classList.remove('hidden');
+        renderer.setSize(w, h);
       });
     }
 
-    // --- Keyboard Navigation & Accessibility Shortcuts ---
+    // --- Keyboard Navigation Shortcuts ---
     window.addEventListener('keydown', (e) => {
-      // Ignore when typing inside inputs
-      if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
-        if (e.key === 'Escape') {
-          closeHelpModal();
-          closeIngestionModal();
-          closeRoiModal();
-        }
-        return;
-      }
+      if (e.target.tagName === 'INPUT') return;
+      if (e.code === 'Space') { e.preventDefault(); toggleAutoSimulation(); }
+      else if (e.key === 's' || e.key === 'S') { stepSimulation(); }
+      else if (e.key === 'f' || e.key === 'F') { runFast24hEpisode(); }
+      else if (e.key === 'r' || e.key === 'R') { resetSimulation(); }
+      else if (e.key === 'h' || e.key === 'H' || e.key === '?') { toggleModal('guide-modal'); }
+    });
 
-      switch (e.key) {
-        case ' ':
-          e.preventDefault();
-          toggleSimulationLoop();
-          break;
-        case 's':
-        case 'S':
-          stepSimulation();
-          break;
-        case 'r':
-        case 'R':
-          resetSimulation();
-          break;
-        case 'o':
-        case 'O':
-          injectMaliciousFault();
-          break;
-        case 'd':
-        case 'D':
-          triggerOpenADREvent();
-          break;
-        case 'h':
-        case 'H':
-        case '?':
-          openHelpModal();
-          break;
-        case 'Escape':
-          closeHelpModal();
-          closeIngestionModal();
-          closeRoiModal();
-          break;
-      }
+    // --- Initialize on Page Load ---
+    window.addEventListener('DOMContentLoaded', () => {
+      initThreeJS();
+      connectWebSocket();
     });
   </script>
 </body>

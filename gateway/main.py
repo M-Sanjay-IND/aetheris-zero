@@ -174,6 +174,33 @@ class SimulationRuntime:
         results = self.arbitrage_engine.run_episode(total_steps=total_steps)
         return results
 
+    def set_weather_override(self, ambient_temp: Optional[float] = None, solar_irradiance: Optional[float] = None) -> None:
+        """Dynamically override weather conditions (ambient temp & solar irradiance)."""
+        if self.simulator:
+            self.simulator.set_weather_override(ambient_temp, solar_irradiance)
+
+    def set_price_override(self, price_usd: Optional[float] = None) -> None:
+        """Dynamically override electricity price."""
+        if self.simulator:
+            self.simulator.set_price_override(price_usd)
+
+    def set_tariff_schedule(self, hourly_prices: List[float]) -> None:
+        """Set custom 24-hour tariff schedule array."""
+        if self.simulator:
+            self.simulator.set_custom_tariff_schedule(hourly_prices)
+
+    def set_zone_target(self, zone_id: str, target_temp: float) -> None:
+        """Set individual zone target temperature."""
+        if self.simulator:
+            self.simulator.set_zone_target(zone_id, target_temp)
+
+    def set_comfort_bounds(self, t_min: float = 20.0, t_max: float = 24.5, max_slew: float = 0.75, min_dwell_steps: int = 3) -> None:
+        """Adjust CBF safety shield comfort and equipment constraints."""
+        self.cbf_shield.t_min = float(t_min)
+        self.cbf_shield.t_max = float(t_max)
+        self.cbf_shield.max_slew_per_step = float(max_slew)
+        self.cbf_shield.min_dwell_steps = int(min_dwell_steps)
+
     async def start_simulation_loop(self) -> None:
         """Start asynchronous background loop stepping simulation and broadcasting frames."""
         if self.is_running_auto_loop:
@@ -205,9 +232,8 @@ class SimulationRuntime:
         self.loop_task = None
 
 
-
-
 runtime = SimulationRuntime()
+
 
 
 @asynccontextmanager
@@ -471,6 +497,74 @@ async def toggle_shadow_mode(payload: ToggleShadowRequest):
 
 
 
+class WeatherOverrideRequest(BaseModel):
+    ambient_temp_c: Optional[float] = Field(default=None, description="Outdoor temperature in °C")
+    solar_irradiance_wm2: Optional[float] = Field(default=None, description="Solar irradiance in W/m²")
+
+
+@app.post("/api/v1/control/set-weather")
+async def set_weather(payload: WeatherOverrideRequest):
+    """Dynamically update real-world outdoor weather / ambient temperature."""
+    runtime.set_weather_override(payload.ambient_temp_c, payload.solar_irradiance_wm2)
+    state = runtime.get_serialized_state()
+    await ws_manager.broadcast({"type": "TELEMETRY_UPDATE", "telemetry": state})
+    return {"status": "success", "ambient_temp_c": payload.ambient_temp_c, "solar_irradiance_wm2": payload.solar_irradiance_wm2, "telemetry": state}
+
+
+class PriceOverrideRequest(BaseModel):
+    price_usd_per_kwh: Optional[float] = Field(default=None, description="Electricity price in $/kWh")
+
+
+@app.post("/api/v1/control/set-pricing")
+async def set_pricing(payload: PriceOverrideRequest):
+    """Dynamically update current electricity price in real-time."""
+    runtime.set_price_override(payload.price_usd_per_kwh)
+    state = runtime.get_serialized_state()
+    await ws_manager.broadcast({"type": "TELEMETRY_UPDATE", "telemetry": state})
+    return {"status": "success", "price_usd_per_kwh": payload.price_usd_per_kwh, "telemetry": state}
+
+
+class CustomTariffScheduleRequest(BaseModel):
+    hourly_prices: List[float] = Field(..., description="24-hour tariff schedule in $/kWh")
+
+
+@app.post("/api/v1/control/set-tariff-schedule")
+async def set_tariff_schedule(payload: CustomTariffScheduleRequest):
+    """Update full 24-hour wholesale electricity pricing array."""
+    runtime.set_tariff_schedule(payload.hourly_prices)
+    state = runtime.get_serialized_state()
+    await ws_manager.broadcast({"type": "TELEMETRY_UPDATE", "telemetry": state})
+    return {"status": "success", "hourly_prices": payload.hourly_prices, "telemetry": state}
+
+
+class ZoneTargetRequest(BaseModel):
+    zone_id: str
+    target_temp: float
+
+
+@app.post("/api/v1/control/set-zone-target")
+async def set_zone_target(payload: ZoneTargetRequest):
+    """Set custom comfort temperature setpoint for a specific zone."""
+    runtime.set_zone_target(payload.zone_id, payload.target_temp)
+    state = runtime.step({"zone_setpoints": {payload.zone_id: payload.target_temp}})
+    await ws_manager.broadcast({"type": "TELEMETRY_UPDATE", "telemetry": state})
+    return {"status": "success", "zone_id": payload.zone_id, "target_temp": payload.target_temp, "telemetry": state}
+
+
+class ComfortBoundsRequest(BaseModel):
+    t_min: float = 20.0
+    t_max: float = 24.5
+    max_slew_per_step: float = 0.75
+    min_dwell_steps: int = 3
+
+
+@app.post("/api/v1/control/set-comfort-bounds")
+async def set_comfort_bounds(payload: ComfortBoundsRequest):
+    """Configure safety shield comfort thresholds and equipment slew rate limits."""
+    runtime.set_comfort_bounds(payload.t_min, payload.t_max, payload.max_slew_per_step, payload.min_dwell_steps)
+    return {"status": "success", "bounds": payload.dict()}
+
+
 class StepRequest(BaseModel):
     actions: Optional[Dict[str, Any]] = None
 
@@ -603,6 +697,11 @@ async def websocket_telemetry_endpoint(websocket: WebSocket):
             "chiller_chw_setpoint": 4.0 if runtime.simulator.current_step % 2 == 0 else 12.0,
             "vav_damper_positions": {f"zone_{i}": 0.7 for i in range(1, 6)},
         }),
+        "SET_WEATHER_OVERRIDE": lambda p: runtime.set_weather_override(p.get("ambient_temp_c"), p.get("solar_irradiance_wm2")),
+        "SET_PRICE_OVERRIDE": lambda p: runtime.set_price_override(p.get("price_usd_per_kwh")),
+        "SET_TARIFF_SCHEDULE": lambda p: runtime.set_tariff_schedule(p.get("hourly_prices", [])),
+        "SET_ZONE_TARGET": lambda p: runtime.step({"zone_setpoints": {p.get("zone_id", "zone_1"): p.get("target_temp", 22.0)}}),
+        "SET_COMFORT_BOUNDS": lambda p: runtime.set_comfort_bounds(p.get("t_min", 20.0), p.get("t_max", 24.5), p.get("max_slew", 0.75), p.get("min_dwell", 3)),
         "SET_CONTROLLER_MODE": lambda p: setattr(runtime, "controller_mode", str(p.get("mode", "RL_SAFE_ARBITRAGE")).upper()),
         "TOGGLE_SHADOW_MODE": lambda p: setattr(runtime, "controller_mode", "SHADOW_MODE" if p.get("enabled", True) else "RL_SAFE_ARBITRAGE"),
         "RESET_SIMULATION": lambda p: runtime.reset(),
@@ -611,6 +710,7 @@ async def websocket_telemetry_endpoint(websocket: WebSocket):
         "STOP_SIMULATION": lambda p: runtime.stop_simulation_loop(),
         "RUN_EPISODE": lambda p: runtime.run_episode(total_steps=int(p.get("total_steps", 288))),
     }
+
 
     try:
         # Send initial state immediately

@@ -22,13 +22,14 @@ def test_dashboard_html_endpoints(client):
     assert res_root.status_code == 200
     assert "text/html" in res_root.headers.get("content-type", "")
     assert "AETHERIS-Zero" in res_root.text
-    assert "SYS.TWIN.01" in res_root.text
-    assert "threejs-container" in res_root.text
+    assert "three-canvas-container" in res_root.text
+    assert "Live Input & Scenario Studio" in res_root.text
 
     # 2. Test /dashboard alias
     res_dash = client.get("/dashboard")
     assert res_dash.status_code == 200
     assert "AETHERIS-Zero" in res_dash.text
+
 
 
 def test_dashboard_websocket_realtime_interactions(client):
@@ -91,4 +92,32 @@ def test_inr_currency_and_metrics_accuracy(client):
     assert "supply_fan_kw" in power
     assert "total_hvac_kw" in power
     assert power["total_hvac_kw"] >= 0.0
+
+
+def test_dynamic_live_parameter_inputs(client):
+    # 1. Test Dynamic Weather Override
+    res_weather = client.post("/api/v1/control/set-weather", json={"ambient_temp_c": 37.5, "solar_irradiance_wm2": 950.0})
+    assert res_weather.status_code == 200
+    assert res_weather.json()["ambient_temp_c"] == 37.5
+
+    # 2. Test Dynamic Price Override
+    res_price = client.post("/api/v1/control/set-pricing", json={"price_usd_per_kwh": 0.45})
+    assert res_price.status_code == 200
+    assert res_price.json()["price_usd_per_kwh"] == 0.45
+
+    # 3. Test Dynamic Zone Target Setpoint
+    res_zone = client.post("/api/v1/control/set-zone-target", json={"zone_id": "zone_2", "target_temp": 21.0})
+    assert res_zone.status_code == 200
+    assert res_zone.json()["target_temp"] == 21.0
+
+    # 4. Test Comfort Bounds Adjustment
+    res_bounds = client.post("/api/v1/control/set-comfort-bounds", json={
+        "t_min": 19.5,
+        "t_max": 25.0,
+        "max_slew_per_step": 1.0,
+        "min_dwell_steps": 2
+    })
+    assert res_bounds.status_code == 200
+    assert res_bounds.json()["bounds"]["t_min"] == 19.5
+
 

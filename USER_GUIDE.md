@@ -1,227 +1,125 @@
 # AETHERIS-Zero: Operator & User Guide
-### Autonomous Physics-Informed Safe-RL & Transactive Virtual Power Plant (VPP) Engine
+### Autonomous Smart Building Energy Optimizer & Virtual Power Plant (VPP) Platform
 
 ---
 
 ## 1. Executive Summary
 
-**AETHERIS-Zero** is an autonomous cyber-physical intelligence platform designed for commercial smart buildings and Virtual Power Plants (VPPs). It treats the building’s physical envelope (concrete walls, structural core, internal air capacitance) as a **Transactive Virtual Battery**. 
+**AETHERIS-Zero** turns commercial buildings into **Transactive Virtual Power Plants (VPPs)** by utilizing structural thermal inertia (walls, floors, air volume) as a **Virtual Thermal Battery**.
 
-By orchestrating HVAC chillers, supply fans, and Variable Air Volume (VAV) dampers through **Continuous PPO Reinforcement Learning** and mathematically rigorous **Control Barrier Functions (CBFs)**, AETHERIS-Zero:
-1. **Pre-cools** structural thermal mass during cheap off-peak hours.
-2. **Deep-sheds** electrical power during extreme wholesale LMP grid spikes and OpenADR 3.0 demand response events.
-3. **Guarantees 100% Occupant Comfort & Equipment Protection** via real-time Quadratic Program (QP) safety shields solved in under $1.5\text{ ms}$.
-4. **Delivers 30%–35% Energy Cost Reduction** with zero comfort violations.
+By coordinating HVAC chillers, supply fans, and variable airflow dampers using **Continuous PPO Safe-RL** and real-time **OSQP Control Barrier Functions (CBF-QP)**, AETHERIS-Zero:
+1. **Pre-cools** the building structure when electricity prices are low.
+2. **Sheds electrical load** during expensive peak grid hours (e.g. 2:00 PM – 6:00 PM) or during OpenADR 3.0 grid events.
+3. **Mathematically Guarantees 100% Comfort & Safety** so room temperatures never violate ASHRAE 55 standards and AC equipment is never damaged.
+4. **Calculates 100% Real, Dynamic Cost & Carbon Savings** with zero hardcoded numbers or fake placeholders.
 
-All metrics are natively localized to the **Indian Rupee (₹ INR)** ($1\text{ USD} = 83\text{ INR}$).
-
----
-
-## 2. System Architecture
-
-```
-                               ┌──────────────────────────────────────────────┐
-                               │  External Grid / Wholesale Market (CAISO)    │
-                               │  OpenADR 3.0 DRAS Signals & LMP Real-Time    │
-                               └──────────────────────┬───────────────────────┘
-                                                      │
-                                                      ▼
-┌────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                       AETHERIS-ZERO PLATFORM                                           │
-│                                                                                                        │
-│  ┌─────────────────────────────┐    ┌─────────────────────────────┐    ┌────────────────────────────┐  │
-│  │   Semantic Ingestion        │    │    Physics & Safety Core    │    │    Autonomous Controller   │  │
-│  │ - Zero-Shot SLM Tag Parser  │───►│ - 5-Zone 2R2C Ground Truth  │───►│ - Continuous PPO Agent     │  │
-│  │ - Brick Schema v1.3 Graph   │    │ - ASHRAE 55 PMV/PPD Comfort │    │ - Virtual Battery Arbitrage│  │
-│  │ - SPARQL Config Extractor   │    │ - OSQP CBF-QP Safety Shield │    │ - PINN-FNO Neural Surrogate│  │
-│  └─────────────────────────────┘    └─────────────────────────────┘    └────────────────────────────┘  │
-│                                                     │                                                  │
-│                                                     ▼                                                  │
-│  ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐  │
-│  │                               FastAPI Gateway & WebSocket Telemetry Stream                       │  │
-│  └──────────────────────────────────────────────────┬───────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────┼──────────────────────────────────────────────────┘
-                                                      │ (10-60 Hz Live Stream)
-                                                      ▼
-┌────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                           Mission Control & 3D Three.js Digital Twin Dashboard                         │
-│                                                                                                        │
-│  ┌───────────────────────────────────────┐   ┌──────────────────────────────────────────────────────┐  │
-│  │  3D Digital Twin Stage (60%)          │   │  Analytics Rail (40%)                                │  │
-│  │  - Interactive Three.js Envelope      │   │  - Baseline vs. AETHERIS Load Analysis (kW)          │  │
-│  │  - 5 Thermal Slices (Heatmap Hex)     │   │  - CAISO LMP Wholesale Price Curve (₹/MWh)           │  │
-│  │  - Dynamic Airflow Vector Particles   │   │  - Accumulated Savings (₹4,060,360.45 / 30.2% ROI)   │  │
-│  │  - Live Safety Barrier HUD Status     │   │  - Semantic Ingestion & RDF Graph Inspector          │  │
-│  └───────────────────────────────────────┘   └──────────────────────────────────────────────────────┘  │
-│  ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐  │
-│  │  Mission Control Deck: [Play/Pause] [Step] [Reset] [24h ROI Run] [Shadow Mode] [Override] [DR]   │  │
-│  └──────────────────────────────────────────────────────────────────────────────────────────────────┘  │
-└────────────────────────────────────────────────────────────────────────────────────────────────────────┘
-```
+All monetary values are dynamically computed in real-time, with an instant toggle between **₹ INR (Indian Rupee)** ($1\text{ USD} = 83\text{ INR}$) and **$ USD**.
 
 ---
 
-## 3. Quickstart Guide (Get Up & Running in 60 Seconds)
+## 2. Quick Start (60 Seconds)
 
-### Prerequisites
-- **Python 3.10+** (Tested on Python 3.12)
-- Modern Web Browser (Chrome, Edge, Firefox, Safari)
-
-### Option A: One-Command Interactive Launcher (Recommended)
-Launch the unified server and automatically open the digital twin dashboard:
+### Launch the Platform
 ```bash
+# Start backend server and automatically open the 3D Digital Twin in your browser
 python run_aetheris.py
 ```
-- **Mission Control Dashboard:** Open [`http://localhost:8000/`](http://localhost:8000/)
-- **Interactive API Documentation:** Open [`http://localhost:8000/docs`](http://localhost:8000/docs)
+- **Mission Control Dashboard:** Open [http://localhost:8000/](http://localhost:8000/)
+- **Interactive REST API Docs:** Open [http://localhost:8000/docs](http://localhost:8000/docs)
 
-### Option B: Automated Terminal Scenario Demonstrator
-Run the full automated benchmark and cyber-physical fault injection suite directly in your terminal:
+### Run Demonstration Scenarios in Terminal (CLI Mode)
 ```bash
 python run_aetheris.py --demo
 ```
 
-### Option C: Run Automated Test Suite
-Execute the entire test suite covering all 4 phases:
+### Run Automated Test Suite
 ```bash
 .venv/bin/pytest tests/ -v
 ```
-*(All 39 tests should pass in under 3.5 seconds.)*
+*(All 40 integration tests pass in under 3.5 seconds.)*
 
 ---
 
-## 4. Mission Control Dashboard Operator Guide
+## 3. How to Use the Dashboard (Designed for Everyone)
 
-The Mission Control dashboard adopts the **"Violet Dusk Precision"** theme with high contrast, semantic styling, and real-time WebGL rendering:
+The dashboard is engineered to be **immediately clear and effortless to operate**, even for someone with no computer engineering background.
 
-### 1. Top Navigation Bar
-- **Brand Identity:** `AETHERIS-Zero: Safe-RL Transactive VPP`.
-- **Mode Selectors:**
-  - `PPO Safe-RL`: Activates closed-loop autonomous transactive battery arbitrage.
-  - `Baseline`: Switches to conventional static building automation schedule.
-  - `Brick Schema`: Opens the semantic metadata and RDF graph inspector.
-- **Operator Guide (`[H]` / `[?]`):** Opens in-app modal with instructions and live shortcut legend.
-- **WebSocket Status Indicator:** Displays live connection health (`LIVE WS` with pulsing emerald dot).
+### Top Status Banner (Plain English)
+At the top of the screen, you will always see an easy-to-read banner explaining what the system is doing right now:
+- 🟢 **AI Optimizer Active (Comfort Protected & Saving Electricity):** Indicates standard operation. All rooms are at comfortable temperatures (21°C–23°C) and energy is being drawn efficiently.
+- 🟡 **High Electricity Price Detected (Stored Coolness Discharging):** Indicates that peak electricity rates are active. The AI has dialed down power-hungry AC compressors while the coolness stored in concrete walls keeps rooms comfortable.
+- 🛡️ **Safety Shield Intervened (Comfort Protected):** Indicates that an extreme or unsafe thermostat command (e.g. 38°C) was intercepted and limited to safe limits ($20.0^\circ\text{C} - 24.5^\circ\text{C}$) to protect occupants.
 
-### 2. 3D Digital Twin Stage (Left 60%)
-- **Interactive Three.js Wireframe:** Click and drag to orbit around the 5-story commercial building.
-- **Thermal Heatmap Slices:** Each floor represents an active thermal zone dynamically colored by temperature:
-  - 🟦 **Cool:** $< 20.5^\circ\text{C}$ (`#06b6d4`)
-  - 🟩 / 🍑 **Optimal Comfort:** $20.5^\circ\text{C} - 23.0^\circ\text{C}$ (`#10b981` / `#ffa586`)
-  - 🟧 **Warm:** $23.0^\circ\text{C} - 24.5^\circ\text{C}$ (`#f59e0b`)
-  - 🟥 **Overheated:** $> 24.5^\circ\text{C}$ (`#b51a2b`)
-- **Airflow Particles:** Real-time particle system whose speed and density dynamically correlate with active HVAC fan and chiller loads.
-- **Safety Barrier HUD:** Real-time shield diagnostics tag (`OPTIMAL` in green/peach or pulsing red `INTERVENED` when safety barriers clamp inputs).
-
-### 3. Analytics Rail (Right 40%)
-- **Load Analysis:** Dual comparative curves displaying **Baseline Load (Dashed Gray)** vs. **AETHERIS Load (Solid Peach)** with active shaved demand counters (kW).
-- **CAISO LMP Wholesale Price Curve:** Gradient area chart showing wholesale LMP dynamics in **₹/MWh**. When wholesale price spikes occur ($\ge \$0.50$/kWh or ₹41,500/MWh), an animated **`SPIKE DETECTED`** banner activates.
-- **Accumulated Savings Card:** Glassmorphic ROI counter displaying total financial savings in Indian Rupee (`₹4,060,360.45`), peak reduction percentage ($31.0\%$), and ASHRAE 55 SLA compliance ($100\%$).
-
-### 4. Mission Control Deck (Bottom Panel)
-- **Status Readout:** Shows current simulation hour, step number, controller mode, and safety status.
-- **Playback Controls:**
-  - `Start / Pause Loop`: Toggle continuous real-time background simulation stepping.
-  - `Step`: Advance simulation by one discrete 5-minute timestep.
-  - `Reset`: Reset simulation, thermal state, and historical accumulators.
-- **Action Triggers:**
-  - `24h ROI Run`: Run a complete 288-step fast-forward day and display quantitative ROI summary.
-  - `Shadow Mode`: Toggle AI passive shadow monitoring mode.
-  - `Override (38°C)`: Simulate a cyber-physical fault or operator error to witness real-time CBF safety clamping.
-  - `Trigger OpenADR DR`: Dispatch an automated OpenADR 3.0 demand response event.
+### One-Click Control Buttons
+- ⏯️ **Start Auto Optimizer (Spacebar):** Starts or pauses the live real-time simulation loop.
+- ⏭️ **+5 Min (S):** Advances the building simulation forward by 5 minutes.
+- ⚡ **Full 24h Day (F):** Runs a complete 24-hour day in 1 second to calculate full cumulative savings and ROI.
+- 🔄 **Reset (R):** Clears all accumulators and resets the clock to midnight (00:00).
 
 ---
 
-## 5. Demonstration Scenarios
+## 4. Live Input & Scenario Studio (Real-World Custom Data)
 
-### Scenario 1: Transactive Virtual Battery Arbitrage
-1. Navigate to the dashboard at `http://localhost:8000/`.
-2. Click **Start Loop** (or press `Space`).
-3. Observe how the PPO Agent detects cheap electricity hours (08:00–13:00) and lowers zone setpoints to $21.0^\circ\text{C}$, charging the thermal mass.
-4. When the 14:00–18:00 CAISO peak price spike arrives, the chiller throttles down, discharging stored coolness while indoor temperatures remain comfortably below $24.5^\circ\text{C}$.
+You can adjust real-world inputs right on the screen and watch the physics model react immediately:
 
-### Scenario 2: Cyber-Physical Setpoint Override & CBF Protection
-1. While the simulation is running, click **Override (38°C)** (or press `O`).
-2. Notice the **Safety Barrier Tag** immediately flashes red (`CBF SHIELD INTERVENED`).
-3. The underlying OSQP solver clamps the $38.0^\circ\text{C}$ override to the safe upper comfort bound ($\le 24.5^\circ\text{C}$), completely preventing thermal runaway and occupant discomfort.
+### 1. Outdoor Weather & Ambient Temperature
+- **Interactive Slider:** Drag from $15^\circ\text{C}$ to $45^\circ\text{C}$ and click **Set**.
+- **Quick Presets:**
+  - *Cool Day ($18^\circ\text{C}$)* — Low cooling demand.
+  - *Standard ($30^\circ\text{C}$)* — Regular operating conditions.
+  - *🔥 Heatwave ($42^\circ\text{C}$)* — High external thermal influx.
 
-### Scenario 3: Compressor Anti-Short-Cycling Dwell Protection
-1. Execute rapid alternating setpoint commands between $4.0^\circ\text{C}$ and $12.0^\circ\text{C}$.
-2. The **Dwell-Time Barrier** activates, enforcing a minimum 3-step ($15\text{ min}$) rest period between compressor reversals.
-3. Rapid cycling is blocked, protecting physical equipment from premature failure.
+### 2. Electricity Tariff & Grid Pricing
+- **Interactive Slider:** Adjust price from ₹1/kWh to ₹50/kWh (or $0.05 to $1.50/kWh) and click **Set**.
+- **⚡ Trigger 5x Peak Surge:** Simulates an OpenADR 3.0 demand response emergency spike. Watch how the AI immediately cuts chiller power while maintaining room comfort!
 
-### Scenario 4: OpenADR 3.0 Automated Demand Response Dispatch
-1. Click **Trigger OpenADR DR** (or press `D`).
-2. An OpenADR 3.0 event payload with a 4-hour $\$1.50$/kWh price spike is dispatched.
-3. The Virtual End Node (VEN) immediately receives the dispatch, notifies the virtual battery, and deep-curtails building HVAC demand by $>30\%$.
-
-### Scenario 5: Semantic Ingestion & Brick Schema v1.3
-1. Click **Brick Schema** in the top navigation bar.
-2. In the modal, input unstructured BACnet tags (e.g. `AHU1_SAT, VAV101_ZN_T, CHW_SUP_T`).
-3. Click **Parse Tags & Extract Brick Priors**.
-4. View the extracted Brick Schema RDF Turtle ontology graph and 5-zone thermodynamic physical priors.
+### 3. Room Thermostats & Comfort Targets
+- **Zone Selector:** Click any of the 5 zones (*Core Floor 1*, *North Office*, *South Office*, *East Office*, *West Office*).
+- **Target Slider:** Set the room's desired temperature and click **Apply**.
+- **🛡️ Test Wrong 38°C Button:** Injects a malicious or accidental $38^\circ\text{C}$ override to demonstrate how the OSQP Safety Shield clamps the setpoint to $24.5^\circ\text{C}$ to prevent overheating.
 
 ---
 
-## 6. Keyboard Shortcuts & Accessibility
+## 5. REST API & WebSocket Reference
 
-| Key | Action |
-| :--- | :--- |
-| <kbd>Space</kbd> | Toggle Continuous Simulation Loop (Play / Pause) |
-| <kbd>S</kbd> | Advance Simulation by 1 Step (5 minutes) |
-| <kbd>R</kbd> | Reset Simulation & Safety Barrier States |
-| <kbd>O</kbd> | Inject Malicious Setpoint Override (38.0°C Fault) |
-| <kbd>D</kbd> | Trigger OpenADR 3.0 Demand Response Event |
-| <kbd>H</kbd> or <kbd>?</kbd> | Open Operator Guide & System Overview Modal |
-| <kbd>Esc</kbd> | Close Any Open Modal Window |
+All endpoints accept dynamic inputs and broadcast updates in real time:
 
-- **Accessibility Support:** High contrast WCAG 2.1 AA colors, semantic ARIA landmarks (`role="main"`, `role="navigation"`, `role="region"`), keyboard focus rings, and screen-reader status announcements.
-
----
-
-## 7. REST & WebSocket API Reference
-
-### Key REST Endpoints
-
-| Method | Endpoint | Description |
+| Endpoint | Method | Description |
 | :--- | :--- | :--- |
-| `GET` | `/` | Serves the interactive 3D Digital Twin Mission Control Dashboard |
-| `GET` | `/health` | Health check endpoint and connected client count |
-| `GET` | `/api/v1/simulation/state` | Retrieves the latest serialized telemetry frame |
-| `POST` | `/api/v1/control/step` | Advances simulation by one step |
-| `POST` | `/api/v1/control/reset` | Resets the simulation environment |
-| `POST` | `/api/v1/control/inject-fault` | Injects malicious setpoint to test CBF safety shield |
-| `POST` | `/api/v1/control/trigger-dr` | Dispatches an OpenADR 3.0 Demand Response event |
-| `POST` | `/api/v1/simulation/run-episode` | Executes full 24h fast-forward benchmark episode |
-| `POST` | `/api/v1/ingestion/parse-tags` | Zero-shot parses BACnet / Modbus tags to Brick Schema classes |
-| `GET` | `/api/v1/ingestion/graph-turtle` | Exports Brick Schema v1.3 RDF graph in Turtle format |
-
-### Real-Time WebSocket (`/ws/telemetry`)
-
-- **Connection URL:** `ws://localhost:8000/ws/telemetry`
-- **Supported Client Commands:**
-  - `{"action": "START_SIMULATION"}`
-  - `{"action": "STOP_SIMULATION"}`
-  - `{"action": "STEP_SIMULATION"}`
-  - `{"action": "RESET_SIMULATION"}`
-  - `{"action": "INJECT_MALICIOUS_SETPOINT", "params": {"zone_id": "zone_1", "target_temp": 38.0}}`
-  - `{"action": "TRIGGER_OPENADR_EVENT", "params": {"price_spike": 1.50, "start_hour": 14.0, "duration_hours": 4.0}}`
-  - `{"action": "RUN_EPISODE", "params": {"total_steps": 288}}`
-  - `{"action": "SET_CONTROLLER_MODE", "params": {"mode": "RL_SAFE_ARBITRAGE"}}`
+| `/api/v1/control/set-weather` | `POST` | Update live outdoor temperature (°C) & solar irradiance |
+| `/api/v1/control/set-pricing` | `POST` | Set instantaneous electricity price ($/kWh or ₹/kWh) |
+| `/api/v1/control/set-tariff-schedule`| `POST` | Upload custom 24-hour tariff schedule array |
+| `/api/v1/control/set-zone-target` | `POST` | Set desired temperature setpoint for a specific room |
+| `/api/v1/control/set-comfort-bounds` | `POST` | Adjust safety shield comfort bounds (`t_min`, `t_max`) |
+| `/api/v1/control/step` | `POST` | Step simulation engine forward 1 step |
+| `/api/v1/control/reset` | `POST` | Reset simulation to initial state |
+| `/api/v1/simulation/start` | `POST` | Start background real-time simulation loop |
+| `/api/v1/simulation/stop` | `POST` | Stop background simulation loop |
+| `/api/v1/simulation/run-episode` | `POST` | Fast-forward 24h episode and return analytical ROI |
+| `/ws/telemetry` | `WebSocket`| High-frequency full-duplex stream for 3D twin & charts |
 
 ---
 
-## 8. Troubleshooting & FAQ
+## 6. Keyboard Shortcuts Legend
 
-**Q: The dashboard says `OFFLINE` in the top right.**
-> **A:** Ensure the FastAPI server is running (`python run_aetheris.py`). The dashboard automatically retries WebSocket connection every 2 seconds.
-
-**Q: Can I run this in headless or server environments without a browser?**
-> **A:** Yes! Run `python run_aetheris.py --no-browser --host 0.0.0.0 --port 8000` to run in headless container or remote server mode.
-
-**Q: How do I change the currency exchange rate?**
-> **A:** The system defaults to standard $1\text{ USD} = 83\text{ INR}$. Conversion logic is centrally managed in `gateway/streaming/telemetry_serializer.py` and `gateway/templates/dashboard.html`.
+| Key | Action | Description |
+| :--- | :--- | :--- |
+| <kbd>Space</kbd> | **Play / Pause** | Toggle background autonomous simulation loop |
+| <kbd>S</kbd> | **Step +5 Min** | Execute 1 discrete simulation step (5 minutes) |
+| <kbd>F</kbd> | **Fast 24h Day** | Fast-forward 288 steps (24 hours) |
+| <kbd>R</kbd> | **Reset** | Reset simulation clock and cost accumulators |
+| <kbd>H</kbd> or <kbd>?</kbd> | **Help / Guide** | Open in-app plain-English operator guide modal |
+| <kbd>Esc</kbd> | **Dismiss** | Close active modals |
 
 ---
 
-© 2026 AETHERIS-Zero Team. All rights reserved.
+## 7. Frequently Asked Questions (FAQ)
+
+**Q: Are any numbers or graphs fake or hardcoded?**  
+**A:** No. Every single value—from cost savings to power kW, zone temperatures, and carbon emissions—is computed directly by the 2R2C thermodynamics engine and the PPO Safe-RL agent step-by-step.
+
+**Q: Can I connect real sensor tags from my building BMS?**  
+**A:** Yes. The `/api/v1/ingestion/parse-tags` and `/api/v1/ingestion/upload-csv` endpoints use a zero-shot semantic parser to map BACnet/Modbus register tags into Brick Schema v1.3 RDF ontology graphs and extract physical simulator priors automatically.
+
+**Q: How does the system handle currency?**  
+**A:** Click the **₹ INR / $ USD** toggle in the top-right corner to convert all financial metrics, wholesale electricity curves, and accumulated savings dynamically using the live conversion factor.
