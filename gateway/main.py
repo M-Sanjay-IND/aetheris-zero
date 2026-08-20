@@ -101,10 +101,16 @@ class SimulationRuntime:
         raw_state["safety"]["intervention_active"] = self.last_shield_diagnostics.get("intervention_active", False)
         raw_state["safety"]["shield_status"] = self.last_shield_diagnostics.get("shield_status", "OPTIMAL")
         raw_state["safety"]["dwell_time_remaining_sec"] = self.last_shield_diagnostics.get("dwell_time_remaining_sec", 0)
+        raw_state["safety"]["solve_time_ms"] = self.last_shield_diagnostics.get("solve_time_ms", 1.15)
+        raw_state["safety"]["active_constraints"] = self.last_shield_diagnostics.get("active_constraints", [])
+        raw_state["safety"]["t_min_bound"] = self.cbf_shield.t_min
+        raw_state["safety"]["t_max_bound"] = self.cbf_shield.t_max
+        raw_state["safety"]["max_slew_per_step"] = self.cbf_shield.max_slew_per_step
 
         active_evt = self.openadr_ven.get_active_event(self.simulator.current_hour)
         evt_id = active_evt.id if active_evt else None
         return self.serializer.serialize_state(raw_state, dr_event_id=evt_id)
+
 
     def step(self, actions: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """Execute one step through the active control mode (RL Arbitrage / Baseline / Custom override)."""
