@@ -215,9 +215,12 @@ def test_fastapi_rest_simulation_and_controls(client):
     assert res_dr.status_code == 200
     assert res_dr.json()["event"]["price_spike_usd"] == 1.50
 
-    # Inject Fault Action
+    # Inject Fault Action & Verify CBF Safety Shield Active Intervention
     res_fault = client.post("/api/v1/control/inject-fault", json={"zone_id": "zone_1", "target_temp": 38.0})
     assert res_fault.status_code == 200
+    telemetry = res_fault.json()["telemetry"]
+    assert telemetry["safety"]["intervention_active"] is True
+    assert telemetry["safety"]["shield_status"] in ["INTERVENED", "HARD_CLAMP"]
 
     # Toggle Shadow Mode
     res_shad = client.post("/api/v1/control/toggle-shadow", json={"enabled": True})
@@ -228,6 +231,12 @@ def test_fastapi_rest_simulation_and_controls(client):
     res_step = client.post("/api/v1/control/step", json={"actions": None})
     assert res_step.status_code == 200
     assert res_step.json()["telemetry"]["step"] >= 1
+
+    # PINN-FNO Forward Neural Surrogate Horizon Prediction
+    res_pred = client.get("/api/v1/simulation/predict-horizon?horizon_steps=48")
+    assert res_pred.status_code == 200
+    assert res_pred.json()["status"] == "success"
+    assert len(res_pred.json()["prediction_timeline"]) == 48
 
     # Reset Simulation
     res_reset = client.post("/api/v1/control/reset")
@@ -262,3 +271,13 @@ def test_websocket_stream_bidirectional(client):
         })
         dr_resp = websocket.receive_json()
         assert dr_resp["type"] == "TELEMETRY_UPDATE"
+
+        # Send Malicious Setpoint Injection over WebSocket
+        websocket.send_json({
+            "action": "INJECT_MALICIOUS_SETPOINT",
+            "params": {"zone_id": "zone_1", "target_temp": 40.0}
+        })
+        fault_resp = websocket.receive_json()
+        assert fault_resp["type"] == "TELEMETRY_UPDATE"
+        assert fault_resp["telemetry"]["safety"]["intervention_active"] is True
+
