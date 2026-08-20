@@ -26,6 +26,8 @@ class BuildingSimulator:
             "sol_peak": 850.0
         })
         
+        self.tariff_feed = self.config.get("tariff_feed", None)
+        
         self.reset()
 
     def _default_zones_config(self) -> list[dict]:
@@ -193,6 +195,9 @@ class BuildingSimulator:
     def get_dynamic_lmp_price(self, hour: float) -> float:
         if self.dr_price_override is not None:
             return float(self.dr_price_override)
+        
+        if self.tariff_feed is not None:
+            return float(self.tariff_feed.get_price_by_hour(hour))
         
         norm_hour = hour % 24.0
         if 14.0 <= norm_hour < 18.0:
