@@ -23,6 +23,8 @@ from gateway.streaming.telemetry_serializer import TelemetrySerializer
 from gateway.streaming.ws_manager import ws_manager
 from core.simulator.building_etp import BuildingSimulator
 from core.simulator.baseline_scheduler import BaselineScheduler
+from core.safety.cbf_shield import CBFShield
+from core.models.pinn_surrogate import PINNSurrogate
 
 
 # File paths
@@ -33,7 +35,7 @@ TEMPLATE_TTL = DATA_DIR / "building_templates" / "5zone_office.ttl"
 
 
 class SimulationRuntime:
-    """Global singleton maintaining the state of the active simulation and services."""
+    """Global singleton maintaining the state of the active simulation, safety shield, and services."""
     def __init__(self):
         self.parser = SLMTagParser()
         self.builder = SchemaBuilder()
@@ -42,9 +44,18 @@ class SimulationRuntime:
         self.tariff_feed = TariffFeed(json_file_path=SAMPLE_CAISO_JSON)
         self.openadr_ven = OpenADRVEN()
         self.baseline_scheduler = BaselineScheduler()
+        self.cbf_shield = CBFShield(t_min=20.0, t_max=24.5, max_slew_per_step=0.5, min_dwell_steps=3)
+        self.pinn_surrogate = PINNSurrogate(modes=8, width=32, num_layers=2)
         
         self.sim_config: Dict[str, Any] = {}
         self.simulator: Optional[BuildingSimulator] = None
+        self.last_shield_diagnostics: Dict[str, Any] = {
+            "intervention_active": False,
+            "shield_status": "OPTIMAL",
+            "dwell_time_remaining_sec": 0,
+            "solve_time_ms": 0.0,
+            "active_constraints": []
+        }
         self.is_running_auto_loop: bool = False
         self.shadow_mode: bool = False
         self.loop_task: Optional[asyncio.Task] = None
@@ -63,28 +74,48 @@ class SimulationRuntime:
         self.sim_config["tariff_feed"] = self.tariff_feed
         self.simulator = BuildingSimulator(config=self.sim_config)
         self.simulator.reset()
+        self.cbf_shield.reset()
 
     def get_serialized_state(self) -> Dict[str, Any]:
-        """Return serialized state frame."""
+        """Return serialized state frame enriched with safety shield diagnostics."""
         if not self.simulator:
             return {}
         raw_state = self.simulator.get_state()
+        
+        # Inject live CBF shield diagnostics
+        raw_state["safety"]["intervention_active"] = self.last_shield_diagnostics.get("intervention_active", False)
+        raw_state["safety"]["shield_status"] = self.last_shield_diagnostics.get("shield_status", "OPTIMAL")
+        raw_state["safety"]["dwell_time_remaining_sec"] = self.last_shield_diagnostics.get("dwell_time_remaining_sec", 0)
+
         active_evt = self.openadr_ven.get_active_event(self.simulator.current_hour)
         evt_id = active_evt.id if active_evt else None
         return self.serializer.serialize_state(raw_state, dr_event_id=evt_id)
 
     def step(self, actions: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-        """Perform one simulation step and return serialized state."""
+        """Pass actions through CBF safety shield, step simulator, and return serialized state."""
         if not self.simulator:
             raise RuntimeError("Simulator not initialized")
 
+        current_raw_state = self.simulator.get_state()
+
         if actions is None:
-            # Use baseline scheduler actions or default setpoints
-            actions = self.baseline_scheduler.get_actions(
+            # Baseline scheduler nominal actions
+            nominal_actions = self.baseline_scheduler.get_actions(
                 self.simulator.current_hour, self.simulator.zone_ids
             )
+        else:
+            nominal_actions = actions
 
-        raw_state, reward, done, info = self.simulator.step(actions)
+        # Pass through Control Barrier Function (CBF-QP) Safety Shield
+        safe_actions, diagnostics = self.cbf_shield.filter_action(
+            state=current_raw_state,
+            nominal_actions=nominal_actions,
+            dt_sec=self.simulator.dt
+        )
+        self.last_shield_diagnostics = diagnostics
+
+        # Execute safe action in physics environment
+        raw_state, reward, done, info = self.simulator.step(safe_actions)
         
         # Check active OpenADR event sync
         active_evt = self.openadr_ven.get_active_event(self.simulator.current_hour)
@@ -98,11 +129,20 @@ class SimulationRuntime:
         return self.get_serialized_state()
 
     def reset(self) -> Dict[str, Any]:
-        """Reset simulation state."""
+        """Reset simulation and safety barrier states."""
         if self.simulator:
             self.simulator.reset()
+        self.cbf_shield.reset()
         self.tariff_feed.reset()
+        self.last_shield_diagnostics = {
+            "intervention_active": False,
+            "shield_status": "OPTIMAL",
+            "dwell_time_remaining_sec": 0,
+            "solve_time_ms": 0.0,
+            "active_constraints": []
+        }
         return self.get_serialized_state()
+
 
 
 runtime = SimulationRuntime()
@@ -366,6 +406,40 @@ def get_simulation_state():
     return {"status": "success", "telemetry": runtime.get_serialized_state()}
 
 
+@app.get("/api/v1/simulation/predict-horizon")
+def predict_horizon(horizon_steps: int = Query(default=96, ge=1, le=288)):
+    """
+    Use Dev 1's PINN-FNO Neural Surrogate to predict 24h future multi-zone
+    thermal state trajectories in < 5ms.
+    """
+    if not runtime.simulator:
+        raise HTTPException(status_code=500, detail="Simulator not initialized")
+    
+    current_state = runtime.simulator.get_state()
+    pred_trajectory = runtime.pinn_surrogate.predict_horizon(
+        current_state=current_state,
+        horizon_steps=horizon_steps,
+        dt_sec=runtime.simulator.dt
+    )
+    zone_keys = list(current_state.get("zones", {}).keys()) or [f"zone_{i}" for i in range(1, 6)]
+    
+    timeline = []
+    for step_idx in range(horizon_steps):
+        step_hour = current_state["timestamp_hour"] + (step_idx * runtime.simulator.dt / 3600.0)
+        step_entry = {
+            "step": step_idx,
+            "hour": round(step_hour % 24.0, 2),
+            "zones": {zk: round(float(pred_trajectory[step_idx, z_i]), 2) for z_i, zk in enumerate(zone_keys)}
+        }
+        timeline.append(step_entry)
+        
+    return {
+        "status": "success",
+        "horizon_steps": horizon_steps,
+        "prediction_timeline": timeline
+    }
+
+
 # ---------------------------------------------------------------------------
 # WebSocket Telemetry Stream
 # ---------------------------------------------------------------------------
@@ -390,10 +464,16 @@ async def websocket_telemetry_endpoint(websocket: WebSocket):
             "chiller_chw_setpoint": 6.5,
             "vav_damper_positions": {f"zone_{i}": 0.7 for i in range(1, 6)},
         }),
+        "INJECT_DWELL_ATTACK": lambda p: runtime.step({
+            "zone_setpoints": {f"zone_{i}": 22.0 for i in range(1, 6)},
+            "chiller_chw_setpoint": 4.0 if runtime.simulator.current_step % 2 == 0 else 12.0,
+            "vav_damper_positions": {f"zone_{i}": 0.7 for i in range(1, 6)},
+        }),
         "TOGGLE_SHADOW_MODE": lambda p: setattr(runtime, "shadow_mode", bool(p.get("enabled", True))),
         "RESET_SIMULATION": lambda p: runtime.reset(),
         "STEP_SIMULATION": lambda p: runtime.step(p.get("actions")),
     }
+
 
     try:
         # Send initial state immediately
