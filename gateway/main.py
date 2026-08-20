@@ -11,6 +11,7 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect, Query, Body
+from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
@@ -34,6 +35,8 @@ DATA_DIR = Path(__file__).parent.parent / "data"
 RAW_BACNET_CSV = DATA_DIR / "raw_bacnet_dump.csv"
 SAMPLE_CAISO_JSON = DATA_DIR / "sample_caiso_lmp.json"
 TEMPLATE_TTL = DATA_DIR / "building_templates" / "5zone_office.ttl"
+DASHBOARD_HTML_PATH = Path(__file__).parent / "templates" / "dashboard.html"
+
 
 
 class SimulationRuntime:
@@ -234,8 +237,21 @@ app.add_middleware(
 
 
 # ---------------------------------------------------------------------------
-# Health & General Routes
+# Health, Root & Digital Twin Dashboard Routes
 # ---------------------------------------------------------------------------
+
+@app.get("/", response_class=HTMLResponse)
+@app.get("/dashboard", response_class=HTMLResponse)
+def get_dashboard_html():
+    """Serve the interactive AETHERIS-Zero Digital Twin Mission Control Dashboard."""
+    if DASHBOARD_HTML_PATH.exists():
+        with open(DASHBOARD_HTML_PATH, "r", encoding="utf-8") as f:
+            return HTMLResponse(content=f.read())
+    return HTMLResponse(
+        content="<h1>AETHERIS-Zero Digital Twin Dashboard</h1><p>Dashboard template not found.</p>",
+        status_code=200
+    )
+
 
 @app.get("/health")
 def health_check():
@@ -246,6 +262,7 @@ def health_check():
         "connected_ws_clients": ws_manager.client_count,
         "simulator_ready": runtime.simulator is not None,
     }
+
 
 
 # ---------------------------------------------------------------------------

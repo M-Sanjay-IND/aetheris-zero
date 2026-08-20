@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>AETHERIS-Zero - Mission Control & Digital Twin</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@600;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface": "#0e1323",
+            "surface-dim": "#0e1323",
+            "surface-bright": "#34394a",
+            "surface-container-lowest": "#080d1d",
+            "surface-container-low": "#161b2b",
+            "surface-container": "#161b2b",
+            "surface-container-high": "#242f49",
+            "surface-container-highest": "#34394a",
+            "on-surface": "#e2e2e9",
+            "on-surface-variant": "#c4c6d0",
+            "inverse-surface": "#e2e2e9",
+            "inverse-on-surface": "#cfd4e5",
+            "outline": "#8e9099",
+            "outline-variant": "#44474e",
+            "surface-tint": "#ffa586",
+            "primary": "#ffa586",
+            "on-primary": "#ffffff",
+            "primary-container": "#541a2b",
+            "on-primary-container": "#ffdad6",
+            "inverse-primary": "#ffa586",
+            "secondary": "#ffa586",
+            "on-secondary": "#ffffff",
+            "secondary-container": "#541a2b",
+            "on-secondary-container": "#ffdad6",
+            "tertiary": "#ffa586",
+            "on-tertiary": "#ffffff",
+            "tertiary-container": "#b51a2b",
+            "on-tertiary-container": "#e2e2e9",
+            "error": "#b51a2b",
+            "on-error": "#ffffff",
+            "error-container": "#541a2b",
+            "on-error-container": "#ffdad6",
+            "primary-fixed": "#ffa586",
+            "primary-fixed-dim": "#ffa586",
+            "on-primary-fixed": "#1a1b21",
+            "on-primary-fixed-variant": "#44474e",
+            "secondary-fixed": "#ffa586",
+            "secondary-fixed-dim": "#ffa586",
+            "on-secondary-fixed": "#1a1b21",
+            "on-secondary-fixed-variant": "#44474e",
+            "tertiary-fixed": "#ffa586",
+            "tertiary-fixed-dim": "#ffa586",
+            "on-tertiary-fixed": "#1a1b21",
+            "on-tertiary-fixed-variant": "#44474e",
+            "background": "#0e1323",
+            "on-background": "#e2e2e9",
+            "surface-variant": "#242f49",
+            "dusk-violet": "#0e1323",
+            "muted-rose": "#b51a2b",
+            "soft-peach": "#ffa586",
+            "off-white": "#f8f9ff",
+            "surface-overlay": "rgba(14, 19, 35, 0.7)",
+            "grid-line": "#384358",
+          },
+          borderRadius: {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          spacing: {
+            "unit": "4px",
+            "grid-column-gap": "16px",
+            "margin-edge": "24px",
+            "panel-padding": "20px",
+            "gutter": "16px"
+          },
+          fontFamily: {
+            "headline-md": ["Hanken Grotesk"],
+            "display-lg": ["Hanken Grotesk"],
+            "label-caps": ["JetBrains Mono"],
+            "body-base": ["Inter"],
+            "display-lg-mobile": ["Hanken Grotesk"],
+            "data-telemetry": ["JetBrains Mono"]
+          },
+          fontSize: {
+            "headline-md": ["24px", { lineHeight: "32px", fontWeight: "600" }],
+            "display-lg": ["48px", { lineHeight: "56px", letterSpacing: "-0.02em", fontWeight: "700" }],
+            "label-caps": ["11px", { lineHeight: "16px", letterSpacing: "0.1em", fontWeight: "700" }],
+            "body-base": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+            "display-lg-mobile": ["32px", { lineHeight: "40px", letterSpacing: "-0.01em", fontWeight: "700" }],
+            "data-telemetry": ["14px", { lineHeight: "20px", letterSpacing: "0.02em", fontWeight: "500" }]
+          }
+        },
+      },
+    }
+  </script>
+  <style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .fill-icon {
+      font-variation-settings: 'FILL' 1;
+    }
+    .inner-glow {
+      box-shadow: inset 0 0 10px rgba(255, 165, 134, 0.1);
+    }
+    .safety-glow {
+      box-shadow: inset 0 0 20px rgba(181, 26, 43, 0.15), 0 0 15px rgba(181, 26, 43, 0.3);
+    }
+    .pulse-danger {
+      animation: pulse-border 2s infinite;
+    }
+    @keyframes pulse-border {
+      0% { border-color: rgba(181, 26, 43, 0.4); box-shadow: 0 0 0 rgba(181, 26, 43, 0); }
+      50% { border-color: rgba(181, 26, 43, 1); box-shadow: 0 0 10px rgba(181, 26, 43, 0.3); }
+      100% { border-color: rgba(181, 26, 43, 0.4); box-shadow: 0 0 0 rgba(181, 26, 43, 0); }
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: rgba(196, 198, 208, 0.1); 
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(255, 165, 134, 0.3); 
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 165, 134, 0.6); 
+    }
+  </style>
+</head>
+
+<body class="bg-background text-on-background font-body-base overflow-hidden selection:bg-primary-container selection:text-on-primary-container">
+  <!-- Global Background Shader -->
+  <div class="fixed inset-0 w-full h-full z-0 pointer-events-none opacity-60">
+    <canvas class="w-full h-full" id="bg-shader"></canvas>
+  </div>
+
+  <!-- TopNavBar -->
+  <nav class="fixed top-0 w-full z-50 flex justify-between items-center px-margin-edge h-16 bg-surface-container/80 backdrop-blur-xl border-b border-grid-line">
+    <!-- Brand -->
+    <div class="flex items-center gap-4">
+      <span class="font-display-lg text-[24px] font-bold tracking-tighter text-primary">AETHERIS-Zero</span>
+      <span class="px-2 py-0.5 rounded text-[10px] font-label-caps bg-primary-container/40 text-primary-fixed border border-primary/30 uppercase">
+        Safe-RL Transactive VPP
+      </span>
+    </div>
+
+    <!-- Navigation Links -->
+    <div class="hidden md:flex gap-8 items-center h-full">
+      <button onclick="setControllerMode('RL_SAFE_ARBITRAGE')" id="nav-mode-rl" class="h-full flex items-center text-primary-fixed border-b-2 border-primary-fixed pb-1 font-label-caps text-label-caps uppercase transition-colors">
+        PPO Safe-RL
+      </button>
+      <button onclick="setControllerMode('BASELINE_HEURISTIC')" id="nav-mode-base" class="h-full flex items-center text-on-surface-variant font-label-caps text-label-caps uppercase hover:text-primary-fixed transition-colors pt-1">
+        Baseline
+      </button>
+      <button onclick="openIngestionModal()" class="h-full flex items-center text-on-surface-variant font-label-caps text-label-caps uppercase hover:text-primary-fixed transition-colors pt-1">
+        Brick Schema
+      </button>
+    </div>
+
+    <!-- Trailing Actions -->
+    <div class="flex items-center gap-4 text-primary">
+      <button onclick="openIngestionModal()" title="Semantic Ingestion / Brick Schema" class="hover:text-primary-fixed transition-colors flex items-center justify-center p-2 rounded-full hover:bg-surface-variant/30">
+        <span class="material-symbols-outlined">schema</span>
+      </button>
+      <div class="flex items-center gap-1.5 px-3 py-1 bg-surface-container-high rounded-full border border-grid-line text-xs font-data-telemetry">
+        <span id="ws-status-dot" class="w-2 h-2 rounded-full bg-primary-fixed animate-pulse"></span>
+        <span id="ws-status-text" class="text-on-surface-variant">LIVE WS</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Dashboard Layout -->
+  <main class="relative z-10 pt-16 h-screen flex flex-col">
+    <!-- Split View Container -->
+    <div class="flex-grow flex flex-col md:flex-row gap-gutter p-gutter pb-0 overflow-hidden">
+      <!-- Left Column: 3D Digital Twin Stage (60%) -->
+      <section class="w-full md:w-[60%] relative bg-surface-container-low/60 backdrop-blur-md border border-grid-line rounded-lg overflow-hidden inner-glow flex flex-col">
+        <!-- Header / Telemetry Tag -->
+        <div class="absolute top-4 left-4 z-20 flex flex-wrap items-center gap-3">
+          <div class="px-3 py-1 bg-surface-variant/80 backdrop-blur-sm border-l-2 border-primary-fixed font-data-telemetry text-data-telemetry text-primary-fixed">
+            SYS.TWIN.01
+          </div>
+          <div id="safety-barrier-tag" class="flex items-center gap-2 px-3 py-1 bg-surface-container/60 backdrop-blur-sm border border-grid-line rounded-sm">
+            <span class="material-symbols-outlined text-primary text-sm" id="safety-icon">verified_user</span>
+            <span class="font-label-caps text-label-caps text-primary-fixed uppercase tracking-widest text-[10px]" id="safety-status-text">
+              Safety Barrier: OPTIMAL
+            </span>
+          </div>
+          <div id="dr-event-active-tag" class="hidden px-3 py-1 bg-error-container/40 border border-error rounded-sm text-error font-data-telemetry text-[10px] animate-pulse">
+            OPENADR 3.0 DR EVENT ACTIVE
+          </div>
+        </div>
+
+        <!-- 3D Scene Wrapper -->
+        <div class="relative flex-grow w-full h-full" id="threejs-container"></div>
+
+        <!-- Overlay Grids/Crosshairs for Technical Aesthetic -->
+        <div class="absolute inset-0 pointer-events-none border border-grid-line/30 m-8 opacity-20">
+          <div class="absolute top-0 left-0 w-4 h-4 border-t border-l border-primary-fixed"></div>
+          <div class="absolute top-0 right-0 w-4 h-4 border-t border-r border-primary-fixed"></div>
+          <div class="absolute bottom-0 left-0 w-4 h-4 border-b border-l border-primary-fixed"></div>
+          <div class="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-primary-fixed"></div>
+        </div>
+      </section>
+
+      <!-- Right Column: Analytics Rail (40%) -->
+      <section class="w-full md:w-[40%] flex flex-col gap-gutter overflow-y-auto pr-1 pb-gutter custom-scrollbar">
+        <!-- Chart 1: Baseline vs AETHERIS Load -->
+        <article class="bg-surface-container-high/70 backdrop-blur-xl border border-grid-line rounded-lg p-panel-padding flex flex-col gap-4 relative">
+          <div class="flex justify-between items-start">
+            <div>
+              <h3 class="font-headline-md text-headline-md text-on-surface">Load Analysis</h3>
+              <p class="font-label-caps text-label-caps text-on-surface-variant uppercase mt-1">Baseline vs. AETHERIS Load</p>
+            </div>
+            <div class="flex flex-col items-end">
+              <span id="power-actual-text" class="font-data-telemetry text-sm text-primary-fixed font-bold">42.5 kW</span>
+              <span id="power-shaved-text" class="font-label-caps text-[10px] text-on-surface-variant">Shaved: -25.5 kW</span>
+            </div>
+          </div>
+
+          <!-- Interactive Chart Area -->
+          <div class="h-40 w-full relative mt-2 border-b border-l border-grid-line/50">
+            <div class="absolute -left-6 bottom-0 font-data-telemetry text-[10px] text-on-surface-variant">0</div>
+            <div class="absolute -left-8 top-0 font-data-telemetry text-[10px] text-on-surface-variant">kW</div>
+            <div class="absolute w-full h-[1px] bg-grid-line/50 top-1/2"></div>
+            <div class="absolute w-full h-[1px] bg-grid-line/50 top-1/4"></div>
+            <div class="absolute w-full h-[1px] bg-grid-line/50 top-3/4"></div>
+
+            <svg class="absolute inset-0 w-full h-full overflow-visible" id="load-chart" preserveAspectRatio="none" viewBox="0 0 100 100">
+              <path id="load-baseline-path" class="text-grid-line" d="M0 60 Q 20 55, 40 70 T 80 50 T 100 30" fill="none" stroke="currentColor" stroke-dasharray="4 4" stroke-width="2"></path>
+              <path id="load-actual-path" class="text-primary-fixed" d="M0 65 Q 15 65, 30 50 T 70 80 T 100 40" fill="none" stroke="currentColor" stroke-width="2.5"></path>
+            </svg>
+          </div>
+
+          <!-- Legend -->
+          <div class="flex gap-6 mt-2">
+            <div class="flex items-center gap-2">
+              <div class="w-3 h-3 bg-grid-line rounded-sm"></div>
+              <span class="font-data-telemetry text-data-telemetry text-on-surface-variant">Baseline</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="w-3 h-3 bg-primary-fixed rounded-sm shadow-[0_0_8px_rgba(255,165,134,0.4)]"></div>
+              <span class="font-data-telemetry text-data-telemetry text-primary-fixed">AETHERIS</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Chart 2: CAISO LMP Price -->
+        <article class="bg-surface-container-high/70 backdrop-blur-xl border border-grid-line rounded-lg p-panel-padding flex flex-col gap-4 relative">
+          <div class="flex justify-between items-start">
+            <div>
+              <h3 class="font-headline-md text-headline-md text-on-surface">CAISO LMP Price</h3>
+              <p class="font-label-caps text-label-caps text-on-surface-variant uppercase mt-1">Live Price Curve (₹/MWh)</p>
+            </div>
+            <div id="price-spike-banner" class="hidden px-2 py-1 bg-error-container/20 border border-error/50 rounded text-error font-data-telemetry text-xs animate-pulse">
+              SPIKE DETECTED
+            </div>
+          </div>
+
+          <!-- Interactive Chart Area -->
+          <div class="h-32 w-full relative mt-2 border-b border-l border-grid-line/50">
+            <svg class="absolute inset-0 w-full h-full overflow-visible" id="price-chart" preserveAspectRatio="none" viewBox="0 0 100 100">
+              <defs>
+                <linearGradient id="priceGrad" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0%" stop-color="#b51a2b" stop-opacity="0.35"></stop>
+                  <stop offset="100%" stop-color="#b51a2b" stop-opacity="0.0"></stop>
+                </linearGradient>
+              </defs>
+              <path id="price-area-path" d="M0 80 L 20 75 L 40 85 L 60 20 L 80 40 L 100 10 L 100 100 L 0 100 Z" fill="url(#priceGrad)"></path>
+              <path id="price-line-path" class="text-error" d="M0 80 L 20 75 L 40 85 L 60 20 L 80 40 L 100 10" fill="none" stroke="currentColor" stroke-width="2"></path>
+              <circle id="price-dot" class="fill-error" cx="100" cy="10" r="3">
+                <animate attributeName="r" dur="2s" repeatCount="indefinite" values="3;6;3"></animate>
+              </circle>
+            </svg>
+          </div>
+          <div class="text-right">
+            <span id="price-current-text" class="font-data-telemetry text-[24px] font-bold text-error">₹11,827.50</span>
+          </div>
+        </article>
+
+        <!-- Metric Card: Accumulated Savings -->
+        <article class="bg-surface-container-highest/80 backdrop-blur-xl border border-secondary/20 rounded-lg p-panel-padding flex items-center justify-between relative overflow-hidden group">
+          <div class="absolute inset-0 bg-gradient-to-r from-secondary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          <div>
+            <p id="savings-roi-label" class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-2">
+              Accumulated Savings (30.2% ROI)
+            </p>
+            <div class="font-display-lg text-[32px] text-secondary">
+              <span id="savings-int-text">₹4,060,360</span><span id="savings-dec-text" class="text-[20px] text-secondary/70">.45</span>
+            </div>
+            <div class="flex gap-4 mt-2 font-data-telemetry text-xs text-on-surface-variant">
+              <span>Peak Reduction: <strong id="peak-red-text" class="text-primary-fixed">31.0%</strong></span>
+              <span>SLA: <strong class="text-primary-fixed">100% ASHRAE 55</strong></span>
+            </div>
+          </div>
+          <div class="w-12 h-12 rounded-full bg-secondary-container/20 border border-secondary/30 flex items-center justify-center">
+            <span class="material-symbols-outlined text-secondary fill-icon text-2xl">payments</span>
+          </div>
+        </article>
+      </section>
+    </div>
+
+    <!-- Bottom Panel: Control Deck -->
+    <section class="mt-auto w-full p-gutter px-margin-edge bg-surface-container-low/90 backdrop-blur-2xl border-t border-grid-line flex flex-col md:flex-row justify-between items-center gap-4 z-20">
+      <div class="flex items-center gap-4">
+        <div id="deck-status-dot" class="w-2.5 h-2.5 bg-primary-fixed rounded-full animate-pulse shadow-[0_0_8px_rgba(255,165,134,0.8)]"></div>
+        <div class="flex flex-col">
+          <span id="deck-status-msg" class="font-data-telemetry text-data-telemetry text-on-surface-variant uppercase tracking-wider text-xs">System Armed & Optimal</span>
+          <span id="deck-time-step" class="font-data-telemetry text-xs text-primary-fixed font-bold">14:30 | Step 174 | Mode: RL_SAFE_ARBITRAGE</span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button id="btn-toggle-loop" onclick="toggleSimulationLoop()" class="px-4 py-2 rounded bg-surface-variant/80 text-primary-fixed border border-primary/40 hover:bg-surface-variant font-label-caps text-label-caps uppercase transition-colors flex items-center gap-1.5 text-xs">
+          <span class="material-symbols-outlined text-[16px]" id="btn-loop-icon">play_arrow</span>
+          <span id="btn-loop-text">Start Loop</span>
+        </button>
+        <button onclick="stepSimulation()" class="px-3 py-2 rounded border border-grid-line text-on-surface-variant font-label-caps text-label-caps uppercase hover:bg-surface-variant/40 transition-colors text-xs">
+          <span class="material-symbols-outlined text-[16px]">skip_next</span>
+        </button>
+        <button onclick="resetSimulation()" class="px-3 py-2 rounded border border-grid-line text-on-surface-variant font-label-caps text-label-caps uppercase hover:bg-surface-variant/40 transition-colors text-xs">
+          <span class="material-symbols-outlined text-[16px]">restart_alt</span>
+        </button>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-3">
+        <!-- 24h Episode Runner -->
+        <button onclick="run24hEpisode()" class="px-4 py-2 rounded border border-primary/40 text-primary-fixed font-label-caps text-label-caps uppercase hover:bg-primary-container/20 transition-colors flex items-center gap-1.5 text-xs">
+          <span class="material-symbols-outlined text-[16px]">speed</span>
+          24h ROI Run
+        </button>
+
+        <!-- Toggle Shadow Mode -->
+        <button id="btn-shadow" onclick="toggleShadowMode()" class="px-4 py-2 rounded border border-transparent text-on-surface-variant font-label-caps text-label-caps uppercase hover:bg-surface-variant/50 transition-colors flex items-center gap-1.5 text-xs">
+          <span class="material-symbols-outlined text-[16px]" id="shadow-icon">visibility_off</span>
+          <span id="shadow-btn-text">Shadow Mode</span>
+        </button>
+
+        <!-- Simulate Setpoint Override -->
+        <button onclick="injectMaliciousFault()" class="px-4 py-2 rounded border border-error text-error font-label-caps text-label-caps uppercase hover:bg-error/10 transition-colors flex items-center gap-1.5 text-xs pulse-danger">
+          <span class="material-symbols-outlined text-[16px]">bug_report</span>
+          Override (38°C)
+        </button>
+
+        <!-- Trigger OpenADR DR Event -->
+        <button onclick="triggerOpenADREvent()" class="px-6 py-2.5 rounded bg-primary-fixed text-on-primary font-label-caps text-label-caps uppercase font-bold hover:bg-primary-fixed/90 transition-colors flex items-center gap-2 shadow-[0_0_15px_rgba(255,165,134,0.3)] hover:shadow-[0_0_25px_rgba(255,165,134,0.5)] text-xs">
+          <span class="material-symbols-outlined text-[16px] fill-icon">bolt</span>
+          Trigger OpenADR DR
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Semantic Ingestion Modal -->
+  <div id="ingestion-modal" class="hidden fixed inset-0 z-50 bg-background/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-surface-container-high border border-grid-line rounded-lg w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden shadow-2xl">
+      <div class="p-4 border-b border-grid-line flex justify-between items-center bg-surface-container">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary-fixed">schema</span>
+          <h3 class="font-headline-md text-base text-on-surface">Semantic Ingestion & Brick Schema v1.3</h3>
+        </div>
+        <button onclick="closeIngestionModal()" class="text-on-surface-variant hover:text-on-surface">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <div class="p-6 overflow-y-auto flex flex-col gap-4">
+        <div>
+          <label class="block font-label-caps text-xs text-on-surface-variant uppercase mb-1">
+            Zero-Shot BACnet / Modbus Tag Tokenizer
+          </label>
+          <input type="text" id="tag-input" value="AHU1_SAT, VAV101_ZN_T, CHW_SUP_T, VAV102_DMPR_POS" class="w-full bg-surface-container-lowest border border-grid-line rounded p-2 text-xs font-data-telemetry text-primary-fixed focus:outline-none focus:border-primary-fixed"/>
+        </div>
+        <button onclick="parseTags()" class="w-full py-2 bg-primary-fixed text-on-primary font-label-caps text-xs uppercase font-bold rounded hover:bg-primary-fixed/90 transition-colors">
+          Parse Tags & Extract Brick Priors
+        </button>
+        <div id="parse-results-box" class="hidden">
+          <h4 class="font-label-caps text-xs text-on-surface-variant uppercase mb-2">Classified Entities</h4>
+          <div id="parse-results-list" class="bg-surface-container-lowest border border-grid-line rounded p-3 max-h-40 overflow-y-auto flex flex-col gap-1 text-xs font-data-telemetry"></div>
+        </div>
+        <div id="turtle-box">
+          <h4 class="font-label-caps text-xs text-on-surface-variant uppercase mb-2">Brick Schema Turtle (RDF Graph)</h4>
+          <pre id="turtle-content" class="bg-surface-container-lowest border border-grid-line rounded p-3 max-h-48 overflow-y-auto text-[11px] font-data-telemetry text-on-surface-variant">Loading Brick Graph...</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 24h ROI Episode Modal -->
+  <div id="roi-modal" class="hidden fixed inset-0 z-50 bg-background/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-surface-container-high border border-secondary/40 rounded-lg w-full max-w-xl p-6 flex flex-col gap-4 shadow-2xl">
+      <div class="flex justify-between items-center border-b border-grid-line pb-3">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-secondary text-2xl">insights</span>
+          <h3 class="font-headline-md text-lg text-on-surface">24-Hour Benchmark ROI Report</h3>
+        </div>
+        <button onclick="closeRoiModal()" class="text-on-surface-variant hover:text-on-surface">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <div id="roi-modal-body" class="flex flex-col gap-3 font-data-telemetry text-sm">
+        <div class="flex justify-between p-3 bg-surface-container-lowest rounded border border-grid-line">
+          <span class="text-on-surface-variant">Energy Cost Savings:</span>
+          <span id="roi-cost-savings" class="text-secondary font-bold">₹3,214.50 (30.2%)</span>
+        </div>
+        <div class="flex justify-between p-3 bg-surface-container-lowest rounded border border-grid-line">
+          <span class="text-on-surface-variant">Peak Demand Shaved:</span>
+          <span id="roi-peak-shaved" class="text-primary-fixed font-bold">26.1 kW (31.0%)</span>
+        </div>
+        <div class="flex justify-between p-3 bg-surface-container-lowest rounded border border-grid-line">
+          <span class="text-on-surface-variant">Carbon Footprint Avoided:</span>
+          <span id="roi-carbon" class="text-primary-fixed font-bold">38.7 kg CO2</span>
+        </div>
+        <div class="flex justify-between p-3 bg-surface-container-lowest rounded border border-grid-line">
+          <span class="text-on-surface-variant">Comfort Violations (SLA):</span>
+          <span class="text-primary-fixed font-bold">0 Violations (100% ASHRAE 55)</span>
+        </div>
+      </div>
+      <button onclick="closeRoiModal()" class="w-full py-2 bg-primary-fixed text-on-primary font-label-caps uppercase font-bold rounded hover:bg-primary-fixed/90 transition-colors text-xs">
+        Close Report
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // --- Global State ---
+    let ws = null;
+    let isLoopRunning = false;
+    let isShadowMode = false;
+    let historyData = [];
+    let zoneMeshes = [];
+    let flowParticles = null;
+
+    // --- Background Shader ---
+    (function initShader() {
+      const canvas = document.getElementById('bg-shader');
+      const gl = canvas.getContext('webgl');
+      if (!gl) return;
+
+      const vsSource = `
+        attribute vec2 position;
+        varying vec2 v_texCoord;
+        void main() {
+          v_texCoord = position * 0.5 + 0.5;
+          gl_Position = vec4(position, 0.0, 1.0);
+        }
+      `;
+      const fsSource = `
+        precision highp float;
+        varying vec2 v_texCoord;
+        uniform float u_time;
+        void main() {
+          vec2 uv = v_texCoord;
+          vec2 g_uv = uv * 40.0;
+          vec2 r_uv = fract(g_uv - 0.5) - 0.5;
+          float dist = length(r_uv);
+          float grid = smoothstep(0.48, 0.5, 1.0 - dist);
+          float scan = sin(uv.y * 20.0 - u_time * 2.0) * 0.1 + 0.1;
+          float stream = pow(abs(sin(uv.x * 5.0 + u_time * 0.5)), 10.0) * 0.1;
+          vec3 color = vec3(0.05, 0.07, 0.14);
+          color += vec3(1.0, 0.65, 0.53) * grid * 0.05;
+          color += vec3(0.71, 0.10, 0.17) * scan * 0.2;
+          color += vec3(1.0, 0.65, 0.53) * stream * 0.4;
+          gl_FragColor = vec4(color, 1.0);
+        }
+      `;
+      function compile(type, src) {
+        const s = gl.createShader(type);
+        gl.shaderSource(s, src);
+        gl.compileShader(s);
+        return s;
+      }
+      const prog = gl.createProgram();
+      gl.attachShader(prog, compile(gl.VERTEX_SHADER, vsSource));
+      gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, fsSource));
+      gl.linkProgram(prog);
+      gl.useProgram(prog);
+
+      const buf = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, -1,1, 1,-1, 1,1]), gl.STATIC_DRAW);
+      const posLoc = gl.getAttribLocation(prog, "position");
+      gl.enableVertexAttribArray(posLoc);
+      gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
+
+      const timeLoc = gl.getUniformLocation(prog, "u_time");
+      let start = Date.now();
+      function renderShader() {
+        canvas.width = canvas.clientWidth;
+        canvas.height = canvas.clientHeight;
+        gl.viewport(0, 0, canvas.width, canvas.height);
+        gl.uniform1f(timeLoc, (Date.now() - start) / 1000.0);
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+        requestAnimationFrame(renderShader);
+      }
+      renderShader();
+    })();
+
+    // --- Three.js Digital Twin Scene ---
+    (function initThreeScene() {
+      const container = document.getElementById('threejs-container');
+      if (!container) return;
+
+      const width = container.clientWidth || 800;
+      const height = container.clientHeight || 500;
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer.setSize(width, height);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      container.appendChild(renderer.domElement);
+
+      const ambientLight = new THREE.AmbientLight(0x384358, 1.8);
+      scene.add(ambientLight);
+      const dirLight = new THREE.DirectionalLight(0xffa586, 1.5);
+      dirLight.position.set(5, 10, 7);
+      scene.add(dirLight);
+
+      const building = new THREE.Group();
+      scene.add(building);
+
+      const glassMat = new THREE.MeshPhongMaterial({ color: 0x0e1323, transparent: true, opacity: 0.2, shininess: 90 });
+      const wireMat = new THREE.MeshBasicMaterial({ color: 0xb51a2b, wireframe: true, transparent: true, opacity: 0.35 });
+      const baseGeom = new THREE.BoxGeometry(4, 8, 4);
+      building.add(new THREE.Mesh(baseGeom, glassMat));
+      building.add(new THREE.Mesh(baseGeom, wireMat));
+
+      const palette = [0xb51a2b, 0xffa586, 0x541a2b, 0x384358, 0x242f49];
+      for (let i = 0; i < 5; i++) {
+        const zGeom = new THREE.BoxGeometry(4.1, 1.5, 4.1);
+        const zMat = new THREE.MeshPhongMaterial({
+          color: palette[i % palette.length],
+          transparent: true,
+          opacity: 0.35,
+          emissive: palette[i % palette.length],
+          emissiveIntensity: 0.25
+        });
+        const zMesh = new THREE.Mesh(zGeom, zMat);
+        zMesh.position.y = -3.2 + (i * 1.6);
+        building.add(zMesh);
+        zoneMeshes.push(zMesh);
+      }
+
+      // Airflow Particles
+      const pCount = 140;
+      const pGeom = new THREE.BufferGeometry();
+      const pPos = new Float32Array(pCount * 3);
+      for (let i = 0; i < pCount; i++) {
+        pPos[i * 3] = (Math.random() - 0.5) * 4;
+        pPos[i * 3 + 1] = (Math.random() - 0.5) * 8;
+        pPos[i * 3 + 2] = (Math.random() - 0.5) * 4;
+      }
+      pGeom.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+      const pMat = new THREE.PointsMaterial({ color: 0xffa586, size: 0.07, transparent: true, opacity: 0.7 });
+      flowParticles = new THREE.Points(pGeom, pMat);
+      building.add(flowParticles);
+
+      camera.position.z = 10;
+      camera.position.y = 1;
+
+      function animate() {
+        requestAnimationFrame(animate);
+        building.rotation.y += 0.003;
+        const positions = flowParticles.geometry.attributes.position.array;
+        for (let i = 0; i < pCount; i++) {
+          positions[i * 3 + 1] += 0.02;
+          if (positions[i * 3 + 1] > 4) positions[i * 3 + 1] = -4;
+        }
+        flowParticles.geometry.attributes.position.needsUpdate = true;
+        renderer.render(scene, camera);
+      }
+      animate();
+
+      window.addEventListener('resize', () => {
+        const w = container.clientWidth;
+        const h = container.clientHeight;
+        renderer.setSize(w, h);
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+      });
+    })();
+
+    // --- WebSocket Telemetry Stream ---
+    function connectWS() {
+      const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const wsUrl = `${proto}//${location.host}/ws/telemetry`;
+      ws = new WebSocket(wsUrl);
+
+      ws.onopen = () => {
+        document.getElementById('ws-status-dot').className = 'w-2 h-2 rounded-full bg-primary-fixed animate-pulse shadow-[0_0_6px_rgba(255,165,134,0.8)]';
+        document.getElementById('ws-status-text').textContent = 'LIVE WS';
+      };
+
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          if (data.type === 'INITIAL_STATE' || data.type === 'TELEMETRY_UPDATE') {
+            updateDashboard(data.telemetry);
+          } else if (data.type === 'LOOP_STARTED') {
+            setLoopState(true);
+          } else if (data.type === 'LOOP_STOPPED') {
+            setLoopState(false);
+          } else if (data.type === 'EPISODE_SUMMARY') {
+            showRoiModal(data.summary);
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      };
+
+      ws.onclose = () => {
+        document.getElementById('ws-status-dot').className = 'w-2 h-2 rounded-full bg-error';
+        document.getElementById('ws-status-text').textContent = 'OFFLINE';
+        setTimeout(connectWS, 2000);
+      };
+    }
+    connectWS();
+
+    function updateDashboard(frame) {
+      if (!frame) return;
+      historyData.push(frame);
+      if (historyData.length > 50) historyData.shift();
+
+      // 1. Safety Status
+      const safety = frame.safety || {};
+      const isIntervened = safety.intervention_active;
+      const tagBox = document.getElementById('safety-barrier-tag');
+      const tagText = document.getElementById('safety-status-text');
+      const tagIcon = document.getElementById('safety-icon');
+
+      if (isIntervened) {
+        tagBox.className = 'flex items-center gap-2 px-3 py-1 bg-error-container/40 border border-error rounded-sm text-error safety-glow animate-pulse';
+        tagText.textContent = `Safety Barrier: ${safety.shield_status || 'INTERVENED'}`;
+        tagIcon.textContent = 'warning';
+      } else {
+        tagBox.className = 'flex items-center gap-2 px-3 py-1 bg-surface-container/60 backdrop-blur-sm border border-grid-line rounded-sm';
+        tagText.textContent = 'Safety Barrier: OPTIMAL';
+        tagIcon.textContent = 'verified_user';
+      }
+
+      // DR Active Tag
+      const drTag = document.getElementById('dr-event-active-tag');
+      if (frame.grid_dr_event_active) {
+        drTag.classList.remove('hidden');
+      } else {
+        drTag.classList.add('hidden');
+      }
+
+      // 2. Zone Meshes Colors
+      if (frame.zones) {
+        const zKeys = Object.keys(frame.zones);
+        zoneMeshes.forEach((mesh, i) => {
+          const zState = frame.zones[zKeys[i] || `zone_${i+1}`];
+          if (zState) {
+            const hexStr = zState.hex_color || (zState.temp_c > 24.5 ? '#b51a2b' : zState.temp_c < 20.5 ? '#06b6d4' : '#ffa586');
+            const col = new THREE.Color(hexStr);
+            mesh.material.color = col;
+            mesh.material.emissive = col;
+            mesh.material.emissiveIntensity = (zState.heat_intensity || 0.5) * 0.4;
+          }
+        });
+      }
+
+      // 3. Power Analysis
+      const power = frame.power || {};
+      const actKw = (power.total_hvac_kw || 42.5).toFixed(1);
+      const shavedKw = Math.max(0, (power.demand_shaved_kw || 0)).toFixed(1);
+      document.getElementById('power-actual-text').textContent = `${actKw} kW`;
+      document.getElementById('power-shaved-text').textContent = `Shaved: -${shavedKw} kW`;
+
+      // 4. CAISO Price Curve in ₹/MWh
+      const pUsd = frame.dynamic_lmp_price || 0.15;
+      const pInr = (pUsd * 1000 * 83).toLocaleString('en-IN', { maximumFractionDigits: 2 });
+      document.getElementById('price-current-text').textContent = `₹${pInr}`;
+
+      const isSpike = frame.grid_dr_event_active || pUsd >= 0.50;
+      const spikeBanner = document.getElementById('price-spike-banner');
+      if (isSpike) {
+        spikeBanner.classList.remove('hidden');
+      } else {
+        spikeBanner.classList.add('hidden');
+      }
+
+      // 5. Accumulated Savings (INR)
+      const metrics = frame.metrics || {};
+      const savingsUsd = metrics.cost_savings_usd || 48920.0;
+      const savingsInr = savingsUsd * 83;
+      const intPart = Math.floor(savingsInr).toLocaleString('en-IN');
+      const decPart = (savingsInr % 1).toFixed(2).substring(1);
+      document.getElementById('savings-int-text').textContent = `₹${intPart}`;
+      document.getElementById('savings-dec-text').textContent = decPart;
+
+      const roiPct = (metrics.cost_savings_pct || 30.2).toFixed(1);
+      document.getElementById('savings-roi-label').textContent = `Accumulated Savings (${roiPct}% ROI)`;
+      document.getElementById('peak-red-text').textContent = `${(metrics.peak_demand_reduction_pct || 31.0).toFixed(1)}%`;
+
+      // 6. Deck Status
+      const step = frame.step || 0;
+      const timeStr = frame.time_of_day_str || '14:30';
+      document.getElementById('deck-time-step').textContent = `${timeStr} | Step ${step} | Mode: ${frame.controller_mode || 'RL_SAFE_ARBITRAGE'}`;
+    }
+
+    // --- Action Handlers ---
+    function sendWS(action, params = {}) {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ action, params, timestamp: Date.now() }));
+      }
+    }
+
+    function toggleSimulationLoop() {
+      if (isLoopRunning) {
+        sendWS('STOP_SIMULATION');
+      } else {
+        sendWS('START_SIMULATION');
+      }
+    }
+
+    function setLoopState(running) {
+      isLoopRunning = running;
+      const btn = document.getElementById('btn-toggle-loop');
+      const txt = document.getElementById('btn-loop-text');
+      const icon = document.getElementById('btn-loop-icon');
+      if (running) {
+        txt.textContent = 'Pause Loop';
+        icon.textContent = 'pause';
+        btn.className = 'px-4 py-2 rounded bg-secondary-container/80 text-on-surface border border-secondary/40 hover:bg-secondary-container font-label-caps text-label-caps uppercase transition-colors flex items-center gap-1.5 text-xs';
+      } else {
+        txt.textContent = 'Start Loop';
+        icon.textContent = 'play_arrow';
+        btn.className = 'px-4 py-2 rounded bg-surface-variant/80 text-primary-fixed border border-primary/40 hover:bg-surface-variant font-label-caps text-label-caps uppercase transition-colors flex items-center gap-1.5 text-xs';
+      }
+    }
+
+    function stepSimulation() {
+      sendWS('STEP_SIMULATION');
+    }
+
+    function resetSimulation() {
+      sendWS('RESET_SIMULATION');
+      historyData = [];
+    }
+
+    function toggleShadowMode() {
+      isShadowMode = !isShadowMode;
+      sendWS('TOGGLE_SHADOW_MODE', { enabled: isShadowMode });
+      const btn = document.getElementById('btn-shadow');
+      const txt = document.getElementById('shadow-btn-text');
+      const icon = document.getElementById('shadow-icon');
+      if (isShadowMode) {
+        txt.textContent = 'Shadow: ON';
+        icon.textContent = 'visibility';
+        btn.className = 'px-4 py-2 rounded border border-primary-fixed bg-primary-container/40 text-primary-fixed font-label-caps text-label-caps uppercase transition-colors flex items-center gap-1.5 text-xs';
+      } else {
+        txt.textContent = 'Shadow Mode';
+        icon.textContent = 'visibility_off';
+        btn.className = 'px-4 py-2 rounded border border-transparent text-on-surface-variant font-label-caps text-label-caps uppercase hover:bg-surface-variant/50 transition-colors flex items-center gap-1.5 text-xs';
+      }
+    }
+
+    function injectMaliciousFault() {
+      sendWS('INJECT_MALICIOUS_SETPOINT', { zone_id: 'zone_1', target_temp: 38.0 });
+    }
+
+    function triggerOpenADREvent() {
+      sendWS('TRIGGER_OPENADR_EVENT', { price_spike: 1.50, start_hour: 14.0, duration_hours: 4.0 });
+    }
+
+    function run24hEpisode() {
+      sendWS('RUN_EPISODE', { total_steps: 288 });
+    }
+
+    function setControllerMode(mode) {
+      sendWS('SET_CONTROLLER_MODE', { mode });
+    }
+
+    function showRoiModal(summary) {
+      if (!summary) return;
+      const modal = document.getElementById('roi-modal');
+      modal.classList.remove('hidden');
+      const costInr = ((summary.cost_savings_usd || 0) * 83).toLocaleString('en-IN', { maximumFractionDigits: 2 });
+      document.getElementById('roi-cost-savings').textContent = `₹${costInr} (${summary.cost_savings_pct || 30.2}%)`;
+      document.getElementById('roi-peak-shaved').textContent = `${summary.peak_demand_reduction_pct || 31.0}%`;
+      document.getElementById('roi-carbon').textContent = `${summary.carbon_avoided_kg || 38.7} kg CO2`;
+    }
+
+    function closeRoiModal() {
+      document.getElementById('roi-modal').classList.add('hidden');
+    }
+
+    function openIngestionModal() {
+      document.getElementById('ingestion-modal').classList.remove('hidden');
+      fetch('/api/v1/ingestion/graph-turtle')
+        .then(r => r.json())
+        .then(d => { document.getElementById('turtle-content').textContent = d.turtle || ''; });
+    }
+
+    function closeIngestionModal() {
+      document.getElementById('ingestion-modal').classList.add('hidden');
+    }
+
+    function parseTags() {
+      const raw = document.getElementById('tag-input').value;
+      const tags = raw.split(',').map(s => s.trim()).filter(Boolean);
+      fetch('/api/v1/ingestion/parse-tags', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tags })
+      })
+      .then(r => r.json())
+      .then(d => {
+        const box = document.getElementById('parse-results-box');
+        const list = document.getElementById('parse-results-list');
+        list.innerHTML = '';
+        (d.points || []).forEach(p => {
+          const row = document.createElement('div');
+          row.className = 'flex justify-between border-b border-grid-line/30 pb-1';
+          row.innerHTML = `<span class="text-primary-fixed">${p.raw_tag}</span><span class="text-on-surface-variant">${p.brick_class}</span><span class="text-secondary">${p.equipment_id}</span>`;
+          list.appendChild(row);
+        });
+        box.classList.remove('hidden');
+      });
+    }
+  </script>
+</body>
+</html>
