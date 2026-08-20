@@ -1,0 +1,12 @@
+fastapi
+uvicorn[standard]
+websockets
+pydantic
+torch
+scipy
+numpy
+osqp
+rdflib
+pandas
+requests
+python-dotenv

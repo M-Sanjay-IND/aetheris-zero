@@ -1,0 +1,9 @@
+@prefix brick: <https://brickschema.org/schema/Brick#> .
+@prefix ex: <http://example.com/building#> .
+
+ex:Building a brick:Building .
+ex:Zone1 a brick:HVAC_Zone .
+ex:Zone2 a brick:HVAC_Zone .
+ex:Zone3 a brick:HVAC_Zone .
+ex:Zone4 a brick:HVAC_Zone .
+ex:Zone5 a brick:HVAC_Zone .
