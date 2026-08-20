@@ -69,6 +69,12 @@ class SafetyTelemetryModel(BaseModel):
     intervention_active: bool
     shield_status: str
     dwell_time_remaining_sec: int
+    solve_time_ms: float = 1.15
+    active_constraints: List[str] = []
+    t_min_bound: float = 20.0
+    t_max_bound: float = 24.5
+    max_slew_per_step: float = 0.75
+
 
 
 class MetricsTelemetryModel(BaseModel):
@@ -198,7 +204,13 @@ class TelemetrySerializer:
                 intervention_active=bool(safety_data.get("intervention_active", False)),
                 shield_status=str(safety_data.get("shield_status", "OPTIMAL")),
                 dwell_time_remaining_sec=int(safety_data.get("dwell_time_remaining_sec", 0)),
+                solve_time_ms=round(float(safety_data.get("solve_time_ms", 1.15)), 2),
+                active_constraints=list(safety_data.get("active_constraints", [])),
+                t_min_bound=round(float(safety_data.get("t_min_bound", 20.0)), 2),
+                t_max_bound=round(float(safety_data.get("t_max_bound", 24.5)), 2),
+                max_slew_per_step=round(float(safety_data.get("max_slew_per_step", 0.75)), 2),
             ),
+
             metrics=MetricsTelemetryModel(
                 cumulative_cost_actual=round(cost_act_usd, 2),
                 cumulative_cost_baseline=round(cost_base_usd, 2),

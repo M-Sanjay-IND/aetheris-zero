@@ -23,12 +23,15 @@ class CBFShield:
     ):
         self.t_min = t_min
         self.t_max = t_max
+        self.max_slew_per_step = max_slew_per_step
+        self.min_dwell_steps = min_dwell_steps
         self.comfort_barrier = ComfortBarrier(t_min=t_min, t_max=t_max)
         self.slew_barrier = SlewRateBarrier(max_delta_c_per_step=max_slew_per_step)
         self.dwell_barrier = DwellTimeBarrier(min_dwell_steps=min_dwell_steps)
         
         self.chw_min = chw_min
         self.chw_max = chw_max
+
 
         self.prev_zone_setpoints: Dict[str, float] = {}
         self.prev_chw_setpoint: float = 6.5
