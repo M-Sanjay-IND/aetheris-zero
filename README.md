@@ -1,7 +1,7 @@
 # AETHERIS-Zero
 ### Autonomous Physics-Informed Safe-RL & Transactive Virtual Power Plant (VPP) Engine
 
-[![Tests](https://img.shields.io/badge/pytest-39%20passed-brightgreen.svg)](tests/)
+[![Tests](https://img.shields.io/badge/pytest-40%20passed-brightgreen.svg)](tests/)
 [![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue.svg)](https://www.python.org/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Standards](https://img.shields.io/badge/standards-OpenADR%203.0%20%7C%20Brick%20Schema%20v1.3%20%7C%20ASHRAE%2055-orange.svg)](https://brickschema.org/)
@@ -10,14 +10,16 @@ AETHERIS-Zero turns commercial buildings into **Transactive Virtual Power Plants
 
 ---
 
-## ⚡ Key Highlights & Capabilities
+## ⚡ Key Highlights & Real-World Capabilities
 
 - 🏢 **Thermal Battery Arbitrage:** Autonomous pre-cooling before peak tariff windows and deep load-shedding during price spikes ($\ge \$0.50$/kWh).
 - 🛡️ **Mathematical Safety Shield:** Real-time OSQP quadratic program solving Control Barrier Functions in $<1.5\text{ ms}$ to guarantee 100% ASHRAE 55 occupant comfort and prevent equipment short-cycling.
+- 🎛️ **Live Custom Scenario Studio:** Adjust outdoor weather (15°C–45°C), electricity prices (₹1–₹50/kWh), and room thermostats in real time to see physical load curves react instantly.
 - ⚡ **OpenADR 3.0 VEN:** Native OpenADR 3.0 Virtual End Node with dynamic dispatch event registration, telemetry reporting, and automated DR compliance.
 - 🧠 **Fourier Neural Operator Twin:** PINN-FNO neural surrogate model predicting multi-zone thermal horizons in $<5\text{ ms}$.
-- 🌐 **3D Three.js Digital Twin:** High-frequency spatial heatmap, airflow particle dynamics, and analytics charts denominated in Indian Rupee (**₹ INR**).
+- 🌐 **3D Three.js Digital Twin:** High-frequency spatial heatmap, airflow particle dynamics, and analytics charts with live **₹ INR / $ USD** toggle.
 - 🧱 **Semantic Ingestion:** Zero-shot SLM point tag parser generating Brick Schema v1.3 RDF Turtle graphs and extracting physical simulator priors via SPARQL.
+- 💯 **Zero Hardcoding:** All power curves, financial savings, and emissions calculations are 100% dynamically evaluated from ground truth physics.
 
 ---
 
@@ -43,11 +45,12 @@ python run_aetheris.py --demo
 
 ---
 
-## 📖 Complete Documentation & Guides
+## 📖 Complete Documentation & Guidelines
 
-- 📘 [**Full User & Operator Guide (USER_GUIDE.md)**](USER_GUIDE.md) — Comprehensive operator walkthrough, demonstration scenarios, API reference, and keyboard shortcuts.
-- 📐 [**Design System & UI Specification**](stitch_aetheris_zero_digital_twin_dashboard/DESIGN.md) — Violet Dusk design tokens, color palette, and typography.
-- 🧪 [**Test Suite**](tests/) — 39 integration and unit tests covering all system layers.
+- 📘 [**Full User & Operator Guide (USER_GUIDE.md)**](USER_GUIDE.md) — Comprehensive operator walkthrough, live scenario studio, API reference, and keyboard shortcuts.
+- 📋 [**Operational & Deployment Guidelines (OPERATIONAL_GUIDELINES.md)**](OPERATIONAL_GUIDELINES.md) — Safety constraints, ASHRAE 55 comfort rules, tariff configurations, and troubleshooting.
+- 📐 [**Design System & UI Specification**](stitch_aetheris_zero_digital_twin_dashboard/DESIGN.md) — Visual tokens, color palette, and component specs.
+- 🧪 [**Test Suite**](tests/) — 40 integration and unit tests covering all system layers.
 
 ---
 
@@ -68,9 +71,10 @@ aetheris-zero/
 │   ├── templates/                       # Embedded Mission Control HTML dashboard
 │   └── main.py                          # FastAPI unified backend & WebSocket stream
 ├── dashboard/                           # Next.js React Digital Twin Dashboard
-├── tests/                               # 39 Comprehensive automated tests (Phases 1-4)
+├── tests/                               # 40 Comprehensive automated tests (Phases 1-4)
 ├── run_aetheris.py                      # One-command CLI & server launcher
-├── USER_GUIDE.md                        # Operator guide and scenario manual
+├── USER_GUIDE.md                        # Easy operator guide and scenario manual
+├── OPERATIONAL_GUIDELINES.md            # Production deployment and safety guidelines
 └── README.md                            # Main project overview
 ```
 

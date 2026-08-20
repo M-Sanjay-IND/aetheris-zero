@@ -1,7 +1,9 @@
 import math
+from typing import Optional, Dict, List, Any
 import numpy as np
 from core.simulator.comfort import calculate_pmv, calculate_ppd, is_ashrae55_compliant
 from core.simulator.baseline_scheduler import BaselineScheduler
+
 
 class BuildingSimulator:
     def __init__(self, config: dict | None = None):
@@ -28,7 +30,32 @@ class BuildingSimulator:
         
         self.tariff_feed = self.config.get("tariff_feed", None)
         
+        # Real-world dynamic live override parameters
+        self.ambient_temp_override: Optional[float] = None
+        self.solar_override: Optional[float] = None
+        self.price_override: Optional[float] = None
+        self.custom_tariff_schedule: Optional[list[float]] = None
+        self.zone_target_overrides: dict[str, float] = {}
+        
         self.reset()
+
+    def set_weather_override(self, temp_c: Optional[float] = None, solar_wm2: Optional[float] = None) -> None:
+        """Dynamically override outdoor temperature and solar irradiance in real-time."""
+        self.ambient_temp_override = temp_c
+        self.solar_override = solar_wm2
+
+    def set_price_override(self, price_usd: Optional[float] = None) -> None:
+        """Dynamically override instantaneous wholesale electricity price."""
+        self.price_override = price_usd
+
+    def set_custom_tariff_schedule(self, hourly_prices: Optional[list[float]]) -> None:
+        """Set a 24-hour custom electricity pricing array."""
+        self.custom_tariff_schedule = hourly_prices
+
+    def set_zone_target(self, zone_id: str, target_temp_c: float) -> None:
+        """Directly set a desired room temperature setpoint for a specific zone."""
+        self.zone_target_overrides[zone_id] = target_temp_c
+
 
     def _default_zones_config(self) -> list[dict]:
         return [
@@ -168,17 +195,23 @@ class BuildingSimulator:
         return self.get_state()
 
     def get_weather(self, hour: float) -> tuple[float, float]:
-        norm_hour = hour % 24.0
-        t_mean = self.weather_cfg.get("t_mean", 28.0)
-        t_amp = self.weather_cfg.get("t_amp", 8.0)
-        sol_peak = self.weather_cfg.get("sol_peak", 850.0)
-
-        t_ext = t_mean + t_amp * math.sin(2.0 * math.pi * (norm_hour - 9.0) / 24.0)
-        
-        if 6.0 <= norm_hour <= 18.0:
-            solar_irradiance = sol_peak * math.sin(math.pi * (norm_hour - 6.0) / 12.0)
+        if self.ambient_temp_override is not None:
+            t_ext = float(self.ambient_temp_override)
         else:
-            solar_irradiance = 0.0
+            norm_hour = hour % 24.0
+            t_mean = self.weather_cfg.get("t_mean", 28.0)
+            t_amp = self.weather_cfg.get("t_amp", 8.0)
+            t_ext = t_mean + t_amp * math.sin(2.0 * math.pi * (norm_hour - 9.0) / 24.0)
+        
+        if self.solar_override is not None:
+            solar_irradiance = float(self.solar_override)
+        else:
+            norm_hour = hour % 24.0
+            sol_peak = self.weather_cfg.get("sol_peak", 850.0)
+            if 6.0 <= norm_hour <= 18.0:
+                solar_irradiance = sol_peak * math.sin(math.pi * (norm_hour - 6.0) / 12.0)
+            else:
+                solar_irradiance = 0.0
 
         return t_ext, max(0.0, solar_irradiance)
 
@@ -195,6 +228,12 @@ class BuildingSimulator:
     def get_dynamic_lmp_price(self, hour: float) -> float:
         if self.dr_price_override is not None:
             return float(self.dr_price_override)
+        if self.price_override is not None:
+            return float(self.price_override)
+        
+        norm_hour_int = int(hour) % 24
+        if self.custom_tariff_schedule is not None and len(self.custom_tariff_schedule) > norm_hour_int:
+            return float(self.custom_tariff_schedule[norm_hour_int])
         
         if self.tariff_feed is not None:
             return float(self.tariff_feed.get_price_by_hour(hour))
@@ -207,6 +246,7 @@ class BuildingSimulator:
         elif 0.0 <= norm_hour < 6.0:
             return 0.08
         return 0.18
+
 
     def _compute_interzone_flux(self, zone_id: str, t_dict: dict) -> float:
         flux = 0.0

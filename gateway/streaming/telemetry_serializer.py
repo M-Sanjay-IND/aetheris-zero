@@ -75,6 +75,12 @@ class MetricsTelemetryModel(BaseModel):
     cumulative_cost_actual: float
     cumulative_cost_baseline: float
     cumulative_savings_usd: float
+    cumulative_cost_actual_inr: float = 0.0
+    cumulative_cost_baseline_inr: float = 0.0
+    cumulative_savings_inr: float = 0.0
+    cost_savings_pct: float = 0.0
+    carbon_avoided_kg: float = 0.0
+    comfort_compliance_pct: float = 100.0
     cumulative_energy_actual_kwh: float = 0.0
     cumulative_energy_baseline_kwh: float = 0.0
     peak_demand_reduction_pct: float
@@ -122,10 +128,20 @@ class TelemetrySerializer:
         # Enrich zone metrics with 3D color codes and intensities
         zones_enriched: Dict[str, Dict[str, Any]] = {}
         raw_zones = raw_state.get("zones", {})
+        compliant_zones_count = 0
+        total_occupied_zones = 0
+
         for zid, zval in raw_zones.items():
             t_c = float(zval.get("temp_c", 22.0))
             color_hex = temp_to_hex_color(t_c)
             intensity = max(0.0, min(1.0, (t_c - 20.0) / 6.0))
+            is_comp = bool(zval.get("comfort_compliant", True))
+            occ = int(zval.get("occupancy", 0))
+            if occ > 0:
+                total_occupied_zones += 1
+                if is_comp:
+                    compliant_zones_count += 1
+
             zones_enriched[zid] = {
                 "name": zval.get("name", zid),
                 "temp_c": round(t_c, 2),
@@ -133,8 +149,8 @@ class TelemetrySerializer:
                 "setpoint_c": round(float(zval.get("setpoint_c", 22.0)), 2),
                 "pmv": round(float(zval.get("pmv", 0.0)), 3),
                 "ppd": round(float(zval.get("ppd", 5.0)), 2),
-                "comfort_compliant": bool(zval.get("comfort_compliant", True)),
-                "occupancy": int(zval.get("occupancy", 0)),
+                "comfort_compliant": is_comp,
+                "occupancy": occ,
                 "cooling_load_kw": round(float(zval.get("cooling_load_kw", 0.0)), 2),
                 "thermal_color": color_hex,
                 "hex_color": color_hex,
@@ -145,6 +161,18 @@ class TelemetrySerializer:
         safety_data = raw_state.get("safety", {})
         metrics_data = raw_state.get("metrics", {})
         fans_kw_val = round(float(power_data.get("fans_kw", 0.0)), 2)
+
+        cost_act_usd = float(metrics_data.get("cumulative_cost_actual", 0.0))
+        cost_base_usd = float(metrics_data.get("cumulative_cost_baseline", 0.0))
+        savings_usd = max(0.0, cost_base_usd - cost_act_usd)
+        savings_pct = (savings_usd / cost_base_usd * 100.0) if cost_base_usd > 0 else 0.0
+
+        energy_act_kwh = float(metrics_data.get("cumulative_energy_actual_kwh", 0.0))
+        energy_base_kwh = float(metrics_data.get("cumulative_energy_baseline_kwh", 0.0))
+        energy_saved_kwh = max(0.0, energy_base_kwh - energy_act_kwh)
+        carbon_avoided_kg = round(energy_saved_kwh * 0.385, 2)
+
+        compliance_rate = (compliant_zones_count / max(1, total_occupied_zones) * 100.0) if total_occupied_zones > 0 else 100.0
 
         frame = TelemetryFrame(
             step=int(raw_state.get("step", 0)),
@@ -172,14 +200,21 @@ class TelemetrySerializer:
                 dwell_time_remaining_sec=int(safety_data.get("dwell_time_remaining_sec", 0)),
             ),
             metrics=MetricsTelemetryModel(
-                cumulative_cost_actual=round(float(metrics_data.get("cumulative_cost_actual", 0.0)), 2),
-                cumulative_cost_baseline=round(float(metrics_data.get("cumulative_cost_baseline", 0.0)), 2),
-                cumulative_savings_usd=round(float(metrics_data.get("cumulative_savings_usd", 0.0)), 2),
-                cumulative_energy_actual_kwh=round(float(metrics_data.get("cumulative_energy_actual_kwh", 0.0)), 2),
-                cumulative_energy_baseline_kwh=round(float(metrics_data.get("cumulative_energy_baseline_kwh", 0.0)), 2),
+                cumulative_cost_actual=round(cost_act_usd, 2),
+                cumulative_cost_baseline=round(cost_base_usd, 2),
+                cumulative_savings_usd=round(savings_usd, 2),
+                cumulative_cost_actual_inr=round(cost_act_usd * 83.0, 2),
+                cumulative_cost_baseline_inr=round(cost_base_usd * 83.0, 2),
+                cumulative_savings_inr=round(savings_usd * 83.0, 2),
+                cost_savings_pct=round(savings_pct, 1),
+                carbon_avoided_kg=carbon_avoided_kg,
+                comfort_compliance_pct=round(compliance_rate, 1),
+                cumulative_energy_actual_kwh=round(energy_act_kwh, 2),
+                cumulative_energy_baseline_kwh=round(energy_base_kwh, 2),
                 peak_demand_reduction_pct=round(float(metrics_data.get("peak_demand_reduction_pct", 0.0)), 1),
             ),
         )
+
 
         return frame.model_dump()
 
