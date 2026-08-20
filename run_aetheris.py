@@ -4,11 +4,23 @@ AETHERIS-Zero: One-Command Mission Control & Demonstration Launcher.
 Starts the unified FastAPI backend and serves the real-time Digital Twin Dashboard.
 """
 
-import argparse
+import os
 import sys
+from pathlib import Path
+
+# Auto-detect and switch to local .venv Python if available and not already in use
+ROOT_DIR = Path(__file__).resolve().parent
+VENV_PYTHON = ROOT_DIR / ".venv" / "bin" / "python"
+if VENV_PYTHON.exists() and sys.executable != str(VENV_PYTHON):
+    try:
+        os.execv(str(VENV_PYTHON), [str(VENV_PYTHON)] + sys.argv)
+    except Exception:
+        pass
+
+import argparse
 import webbrowser
 import time
-from pathlib import Path
+
 
 
 BANNER = r"""
