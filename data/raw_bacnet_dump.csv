@@ -1,4 +1,71 @@
-point_name,value,unit
-AHU1_Z01_VAV_DAT_SP,55,F
-CHLR_CHW_STPT,42,F
-BLDG_PWR_TOT_KW,150,kW
+point_name,value,unit,description
+BLDG_PWR_TOT_KW,150.0,kW,Total building active electrical power
+OAT_WEATHER_TEMP,28.5,deg_C,Outdoor ambient air temperature
+SOL_IRRAD_WM2,650.0,W/m2,Global horizontal solar irradiance
+CHLR_CHW_STPT,6.5,deg_C,Central chiller supply water temperature setpoint
+CHLR_PWR_KW,42.5,kW,Chiller electrical power draw
+CHLR_CHW_SUP_TEMP,6.8,deg_C,Chilled water supply temperature
+CHLR_CHW_RET_TEMP,12.2,deg_C,Chilled water return temperature
+AHU1_FAN_PWR_KW,6.8,kW,AHU supply fan electrical power
+AHU1_SUP_AIR_TEMP,14.5,deg_C,AHU supply air temperature sensor
+AHU1_SUP_AIR_TEMP_SP,14.0,deg_C,AHU supply air temperature setpoint
+AHU1_AIR_FLOW_M3S,6.2,m3/s,AHU total supply air volume flow rate
+Z01_CORE_AIR_TEMP,22.1,deg_C,Zone 1 Core room air temperature
+Z01_CORE_TEMP_SP,22.0,deg_C,Zone 1 Core temperature setpoint
+AHU1_Z01_VAV_DAT_SP,22.0,deg_C,Zone 1 VAV discharge air temperature setpoint
+AHU1_Z01_VAV_DMPR_POS,0.70,ratio,Zone 1 VAV damper position command
+Z01_CORE_OCC_COUNT,18,count,Zone 1 Core occupant count
+Z01_CORE_CZ_PARAM,15000.0,kJ/K,Zone 1 air thermal capacitance Cz
+Z01_CORE_CM_PARAM,85000.0,kJ/K,Zone 1 structural mass capacitance Cm
+Z01_CORE_REXT_PARAM,2.5,K/kW,Zone 1 envelope thermal resistance Rext
+Z01_CORE_RM_PARAM,0.5,K/kW,Zone 1 air-to-mass thermal resistance Rm
+Z01_CORE_AREA_SQM,250.0,m2,Zone 1 Core floor area
+Z01_CORE_SOLAR_FRAC,0.05,ratio,Zone 1 direct solar gain penetration factor
+Z02_NORTH_AIR_TEMP,21.8,deg_C,Zone 2 Perimeter North room air temperature
+Z02_NORTH_TEMP_SP,22.0,deg_C,Zone 2 Perimeter North temperature setpoint
+AHU1_Z02_VAV_DAT_SP,22.0,deg_C,Zone 2 VAV discharge air temperature setpoint
+AHU1_Z02_VAV_DMPR_POS,0.50,ratio,Zone 2 VAV damper position command
+Z02_NORTH_OCC_COUNT,12,count,Zone 2 Perimeter North occupant count
+Z02_NORTH_CZ_PARAM,12000.0,kJ/K,Zone 2 air thermal capacitance Cz
+Z02_NORTH_CM_PARAM,70000.0,kJ/K,Zone 2 structural mass capacitance Cm
+Z02_NORTH_REXT_PARAM,1.8,K/kW,Zone 2 envelope thermal resistance Rext
+Z02_NORTH_RM_PARAM,0.6,K/kW,Zone 2 air-to-mass thermal resistance Rm
+Z02_NORTH_AREA_SQM,180.0,m2,Zone 2 North floor area
+Z02_NORTH_SOLAR_FRAC,0.15,ratio,Zone 2 North solar gain penetration factor
+Z03_SOUTH_AIR_TEMP,22.4,deg_C,Zone 3 Perimeter South room air temperature
+Z03_SOUTH_TEMP_SP,21.5,deg_C,Zone 3 Perimeter South temperature setpoint
+AHU1_Z03_VAV_DAT_SP,21.5,deg_C,Zone 3 VAV discharge air temperature setpoint
+AHU1_Z03_VAV_DMPR_POS,0.65,ratio,Zone 3 VAV damper position command
+Z03_SOUTH_OCC_COUNT,15,count,Zone 3 Perimeter South occupant count
+Z03_SOUTH_CZ_PARAM,12000.0,kJ/K,Zone 3 air thermal capacitance Cz
+Z03_SOUTH_CM_PARAM,70000.0,kJ/K,Zone 3 structural mass capacitance Cm
+Z03_SOUTH_REXT_PARAM,1.6,K/kW,Zone 3 envelope thermal resistance Rext
+Z03_SOUTH_RM_PARAM,0.6,K/kW,Zone 3 air-to-mass thermal resistance Rm
+Z03_SOUTH_AREA_SQM,180.0,m2,Zone 3 South floor area
+Z03_SOUTH_SOLAR_FRAC,0.35,ratio,Zone 3 South solar gain penetration factor
+Z04_EAST_AIR_TEMP,22.2,deg_C,Zone 4 Perimeter East room air temperature
+Z04_EAST_TEMP_SP,22.5,deg_C,Zone 4 Perimeter East temperature setpoint
+AHU1_Z04_VAV_DAT_SP,22.5,deg_C,Zone 4 VAV discharge air temperature setpoint
+AHU1_Z04_VAV_DMPR_POS,0.80,ratio,Zone 4 VAV damper position command
+Z04_EAST_OCC_COUNT,10,count,Zone 4 Perimeter East occupant count
+Z04_EAST_CZ_PARAM,11000.0,kJ/K,Zone 4 air thermal capacitance Cz
+Z04_EAST_CM_PARAM,65000.0,kJ/K,Zone 4 structural mass capacitance Cm
+Z04_EAST_REXT_PARAM,1.7,K/kW,Zone 4 envelope thermal resistance Rext
+Z04_EAST_RM_PARAM,0.6,K/kW,Zone 4 air-to-mass thermal resistance Rm
+Z04_EAST_AREA_SQM,160.0,m2,Zone 4 East floor area
+Z04_EAST_SOLAR_FRAC,0.25,ratio,Zone 4 East solar gain penetration factor
+Z05_WEST_AIR_TEMP,22.6,deg_C,Zone 5 Perimeter West room air temperature
+Z05_WEST_TEMP_SP,22.0,deg_C,Zone 5 Perimeter West temperature setpoint
+AHU1_Z05_VAV_DAT_SP,22.0,deg_C,Zone 5 VAV discharge air temperature setpoint
+AHU1_Z05_VAV_DMPR_POS,0.55,ratio,Zone 5 VAV damper position command
+Z05_WEST_OCC_COUNT,14,count,Zone 5 Perimeter West occupant count
+Z05_WEST_CZ_PARAM,11000.0,kJ/K,Zone 5 air thermal capacitance Cz
+Z05_WEST_CM_PARAM,65000.0,kJ/K,Zone 5 structural mass capacitance Cm
+Z05_WEST_REXT_PARAM,1.7,K/kW,Zone 5 envelope thermal resistance Rext
+Z05_WEST_RM_PARAM,0.6,K/kW,Zone 5 air-to-mass thermal resistance Rm
+Z05_WEST_AREA_SQM,160.0,m2,Zone 5 West floor area
+Z05_WEST_SOLAR_FRAC,0.25,ratio,Zone 5 West solar gain penetration factor
+Z01_Z02_RADJ_PARAM,1.2,K/kW,Inter-zone thermal resistance between Zone 1 and Zone 2
+Z01_Z03_RADJ_PARAM,1.2,K/kW,Inter-zone thermal resistance between Zone 1 and Zone 3
+Z01_Z04_RADJ_PARAM,1.2,K/kW,Inter-zone thermal resistance between Zone 1 and Zone 4
+Z01_Z05_RADJ_PARAM,1.2,K/kW,Inter-zone thermal resistance between Zone 1 and Zone 5
