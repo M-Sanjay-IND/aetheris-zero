@@ -1,9 +1,220 @@
 @prefix brick: <https://brickschema.org/schema/Brick#> .
 @prefix ex: <http://example.com/building#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-ex:Building a brick:Building .
-ex:Zone1 a brick:HVAC_Zone .
-ex:Zone2 a brick:HVAC_Zone .
-ex:Zone3 a brick:HVAC_Zone .
-ex:Zone4 a brick:HVAC_Zone .
-ex:Zone5 a brick:HVAC_Zone .
+# Building Definition
+ex:CommercialOffice_5Zone a brick:Building ;
+    rdfs:label "5-Zone Commercial Office Building" ;
+    brick:hasPart ex:Floor1 ;
+    brick:hasPoint ex:BLDG_PWR_TOT_KW, ex:OAT_WEATHER_TEMP, ex:SOL_IRRAD_WM2 .
+
+ex:BLDG_PWR_TOT_KW a brick:Electric_Power_Sensor ;
+    rdfs:label "Total Building Power Sensor" .
+
+ex:OAT_WEATHER_TEMP a brick:Outside_Air_Temperature_Sensor ;
+    rdfs:label "Outdoor Ambient Air Temperature" .
+
+ex:SOL_IRRAD_WM2 a brick:Solar_Radiance_Sensor ;
+    rdfs:label "Global Horizontal Solar Irradiance" .
+
+# Central HVAC Plant
+ex:Chiller1 a brick:Chiller ;
+    rdfs:label "Central Water-Cooled Chiller Plant" ;
+    brick:feeds ex:AHU1 ;
+    ex:coolingCapacityKw "120.0"^^xsd:float ;
+    ex:copBase "3.8"^^xsd:float ;
+    ex:chwTempMin "4.0"^^xsd:float ;
+    ex:chwTempMax "12.0"^^xsd:float ;
+    brick:hasPoint ex:CHLR_CHW_STPT, ex:CHLR_PWR_KW, ex:CHLR_CHW_SUP_TEMP, ex:CHLR_CHW_RET_TEMP .
+
+ex:CHLR_CHW_STPT a brick:Chilled_Water_Supply_Temperature_Setpoint ;
+    rdfs:label "Chilled Water Supply Temperature Setpoint" .
+
+ex:CHLR_PWR_KW a brick:Electric_Power_Sensor ;
+    rdfs:label "Chiller Electrical Power Sensor" .
+
+ex:CHLR_CHW_SUP_TEMP a brick:Chilled_Water_Supply_Temperature_Sensor ;
+    rdfs:label "Chilled Water Supply Temperature Sensor" .
+
+ex:CHLR_CHW_RET_TEMP a brick:Chilled_Water_Return_Temperature_Sensor ;
+    rdfs:label "Chilled Water Return Temperature Sensor" .
+
+# Air Handling Unit
+ex:AHU1 a brick:Air_Handling_Unit ;
+    rdfs:label "Main Variable Air Volume AHU" ;
+    brick:feeds ex:VAV_Z01, ex:VAV_Z02, ex:VAV_Z03, ex:VAV_Z04, ex:VAV_Z05 ;
+    ex:maxAirflowM3s "8.5"^^xsd:float ;
+    ex:fanPowerMaxKw "15.0"^^xsd:float ;
+    ex:supplyAirTempMin "12.0"^^xsd:float ;
+    ex:supplyAirTempMax "24.0"^^xsd:float ;
+    brick:hasPoint ex:AHU1_FAN_PWR_KW, ex:AHU1_SUP_AIR_TEMP, ex:AHU1_SUP_AIR_TEMP_SP, ex:AHU1_AIR_FLOW_M3S .
+
+ex:AHU1_FAN_PWR_KW a brick:Electric_Power_Sensor ;
+    rdfs:label "AHU Fan Power Draw" .
+
+ex:AHU1_SUP_AIR_TEMP a brick:Supply_Air_Temperature_Sensor ;
+    rdfs:label "AHU Discharge Air Temperature Sensor" .
+
+ex:AHU1_SUP_AIR_TEMP_SP a brick:Supply_Air_Temperature_Setpoint ;
+    rdfs:label "AHU Discharge Air Temperature Setpoint" .
+
+ex:AHU1_AIR_FLOW_M3S a brick:Air_Flow_Sensor ;
+    rdfs:label "AHU Supply Air Flow Rate" .
+
+# Zone 1: Core
+ex:Zone_1 a brick:HVAC_Zone ;
+    rdfs:label "Core Zone" ;
+    ex:zoneId "zone_1" ;
+    ex:thermalCapacitanceAir "15000.0"^^xsd:float ;
+    ex:thermalCapacitanceMass "85000.0"^^xsd:float ;
+    ex:envelopeResistance "2.5"^^xsd:float ;
+    ex:internalMassResistance "0.5"^^xsd:float ;
+    ex:floorAreaSqm "250.0"^^xsd:float ;
+    ex:solarFactor "0.05"^^xsd:float ;
+    ex:occupancyMax "20"^^xsd:integer ;
+    ex:initialTemp "22.5"^^xsd:float ;
+    ex:initialMassTemp "22.0"^^xsd:float ;
+    brick:hasAdjacentZone ex:Zone_2, ex:Zone_3, ex:Zone_4, ex:Zone_5 ;
+    brick:hasPoint ex:Z01_CORE_AIR_TEMP, ex:Z01_CORE_TEMP_SP, ex:Z01_CORE_OCC_COUNT .
+
+ex:VAV_Z01 a brick:Variable_Air_Volume_Box ;
+    rdfs:label "VAV Box Core Zone" ;
+    brick:feeds ex:Zone_1 ;
+    brick:hasPoint ex:AHU1_Z01_VAV_DAT_SP, ex:AHU1_Z01_VAV_DMPR_POS .
+
+ex:Z01_CORE_AIR_TEMP a brick:Zone_Air_Temperature_Sensor .
+ex:Z01_CORE_TEMP_SP a brick:Zone_Air_Temperature_Setpoint .
+ex:AHU1_Z01_VAV_DAT_SP a brick:Discharge_Air_Temperature_Setpoint .
+ex:AHU1_Z01_VAV_DMPR_POS a brick:Damper_Position_Command .
+ex:Z01_CORE_OCC_COUNT a brick:Occupancy_Sensor .
+
+# Zone 2: Perimeter North
+ex:Zone_2 a brick:HVAC_Zone ;
+    rdfs:label "Perimeter North Zone" ;
+    ex:zoneId "zone_2" ;
+    ex:thermalCapacitanceAir "12000.0"^^xsd:float ;
+    ex:thermalCapacitanceMass "70000.0"^^xsd:float ;
+    ex:envelopeResistance "1.8"^^xsd:float ;
+    ex:internalMassResistance "0.6"^^xsd:float ;
+    ex:floorAreaSqm "180.0"^^xsd:float ;
+    ex:solarFactor "0.15"^^xsd:float ;
+    ex:occupancyMax "12"^^xsd:integer ;
+    ex:initialTemp "22.0"^^xsd:float ;
+    ex:initialMassTemp "21.8"^^xsd:float ;
+    brick:hasAdjacentZone ex:Zone_1 ;
+    brick:hasPoint ex:Z02_NORTH_AIR_TEMP, ex:Z02_NORTH_TEMP_SP, ex:Z02_NORTH_OCC_COUNT .
+
+ex:VAV_Z02 a brick:Variable_Air_Volume_Box ;
+    rdfs:label "VAV Box North Zone" ;
+    brick:feeds ex:Zone_2 ;
+    brick:hasPoint ex:AHU1_Z02_VAV_DAT_SP, ex:AHU1_Z02_VAV_DMPR_POS .
+
+ex:Z02_NORTH_AIR_TEMP a brick:Zone_Air_Temperature_Sensor .
+ex:Z02_NORTH_TEMP_SP a brick:Zone_Air_Temperature_Setpoint .
+ex:AHU1_Z02_VAV_DAT_SP a brick:Discharge_Air_Temperature_Setpoint .
+ex:AHU1_Z02_VAV_DMPR_POS a brick:Damper_Position_Command .
+ex:Z02_NORTH_OCC_COUNT a brick:Occupancy_Sensor .
+
+# Zone 3: Perimeter South
+ex:Zone_3 a brick:HVAC_Zone ;
+    rdfs:label "Perimeter South Zone" ;
+    ex:zoneId "zone_3" ;
+    ex:thermalCapacitanceAir "12000.0"^^xsd:float ;
+    ex:thermalCapacitanceMass "70000.0"^^xsd:float ;
+    ex:envelopeResistance "1.6"^^xsd:float ;
+    ex:internalMassResistance "0.6"^^xsd:float ;
+    ex:floorAreaSqm "180.0"^^xsd:float ;
+    ex:solarFactor "0.35"^^xsd:float ;
+    ex:occupancyMax "15"^^xsd:integer ;
+    ex:initialTemp "22.5"^^xsd:float ;
+    ex:initialMassTemp "22.2"^^xsd:float ;
+    brick:hasAdjacentZone ex:Zone_1 ;
+    brick:hasPoint ex:Z03_SOUTH_AIR_TEMP, ex:Z03_SOUTH_TEMP_SP, ex:Z03_SOUTH_OCC_COUNT .
+
+ex:VAV_Z03 a brick:Variable_Air_Volume_Box ;
+    rdfs:label "VAV Box South Zone" ;
+    brick:feeds ex:Zone_3 ;
+    brick:hasPoint ex:AHU1_Z03_VAV_DAT_SP, ex:AHU1_Z03_VAV_DMPR_POS .
+
+ex:Z03_SOUTH_AIR_TEMP a brick:Zone_Air_Temperature_Sensor .
+ex:Z03_SOUTH_TEMP_SP a brick:Zone_Air_Temperature_Setpoint .
+ex:AHU1_Z03_VAV_DAT_SP a brick:Discharge_Air_Temperature_Setpoint .
+ex:AHU1_Z03_VAV_DMPR_POS a brick:Damper_Position_Command .
+ex:Z03_SOUTH_OCC_COUNT a brick:Occupancy_Sensor .
+
+# Zone 4: Perimeter East
+ex:Zone_4 a brick:HVAC_Zone ;
+    rdfs:label "Perimeter East Zone" ;
+    ex:zoneId "zone_4" ;
+    ex:thermalCapacitanceAir "11000.0"^^xsd:float ;
+    ex:thermalCapacitanceMass "65000.0"^^xsd:float ;
+    ex:envelopeResistance "1.7"^^xsd:float ;
+    ex:internalMassResistance "0.6"^^xsd:float ;
+    ex:floorAreaSqm "160.0"^^xsd:float ;
+    ex:solarFactor "0.25"^^xsd:float ;
+    ex:occupancyMax "10"^^xsd:integer ;
+    ex:initialTemp "22.0"^^xsd:float ;
+    ex:initialMassTemp "21.9"^^xsd:float ;
+    brick:hasAdjacentZone ex:Zone_1 ;
+    brick:hasPoint ex:Z04_EAST_AIR_TEMP, ex:Z04_EAST_TEMP_SP, ex:Z04_EAST_OCC_COUNT .
+
+ex:VAV_Z04 a brick:Variable_Air_Volume_Box ;
+    rdfs:label "VAV Box East Zone" ;
+    brick:feeds ex:Zone_4 ;
+    brick:hasPoint ex:AHU1_Z04_VAV_DAT_SP, ex:AHU1_Z04_VAV_DMPR_POS .
+
+ex:Z04_EAST_AIR_TEMP a brick:Zone_Air_Temperature_Sensor .
+ex:Z04_EAST_TEMP_SP a brick:Zone_Air_Temperature_Setpoint .
+ex:AHU1_Z04_VAV_DAT_SP a brick:Discharge_Air_Temperature_Setpoint .
+ex:AHU1_Z04_VAV_DMPR_POS a brick:Damper_Position_Command .
+ex:Z04_EAST_OCC_COUNT a brick:Occupancy_Sensor .
+
+# Zone 5: Perimeter West
+ex:Zone_5 a brick:HVAC_Zone ;
+    rdfs:label "Perimeter West Zone" ;
+    ex:zoneId "zone_5" ;
+    ex:thermalCapacitanceAir "11000.0"^^xsd:float ;
+    ex:thermalCapacitanceMass "65000.0"^^xsd:float ;
+    ex:envelopeResistance "1.7"^^xsd:float ;
+    ex:internalMassResistance "0.6"^^xsd:float ;
+    ex:floorAreaSqm "160.0"^^xsd:float ;
+    ex:solarFactor "0.25"^^xsd:float ;
+    ex:occupancyMax "14"^^xsd:integer ;
+    ex:initialTemp "22.2"^^xsd:float ;
+    ex:initialMassTemp "22.0"^^xsd:float ;
+    brick:hasAdjacentZone ex:Zone_1 ;
+    brick:hasPoint ex:Z05_WEST_AIR_TEMP, ex:Z05_WEST_TEMP_SP, ex:Z05_WEST_OCC_COUNT .
+
+ex:VAV_Z05 a brick:Variable_Air_Volume_Box ;
+    rdfs:label "VAV Box West Zone" ;
+    brick:feeds ex:Zone_5 ;
+    brick:hasPoint ex:AHU1_Z05_VAV_DAT_SP, ex:AHU1_Z05_VAV_DMPR_POS .
+
+ex:Z05_WEST_AIR_TEMP a brick:Zone_Air_Temperature_Sensor .
+ex:Z05_WEST_TEMP_SP a brick:Zone_Air_Temperature_Setpoint .
+ex:AHU1_Z05_VAV_DAT_SP a brick:Discharge_Air_Temperature_Setpoint .
+ex:AHU1_Z05_VAV_DMPR_POS a brick:Damper_Position_Command .
+ex:Z05_WEST_OCC_COUNT a brick:Occupancy_Sensor .
+
+# Spatial Adjacencies & Inter-Zone Thermal Resistances
+ex:Adj_Z01_Z02 a ex:ZoneAdjacency ;
+    ex:fromZone ex:Zone_1 ;
+    ex:toZone ex:Zone_2 ;
+    ex:resistanceAdj "1.2"^^xsd:float .
+
+ex:Adj_Z01_Z03 a ex:ZoneAdjacency ;
+    ex:fromZone ex:Zone_1 ;
+    ex:toZone ex:Zone_3 ;
+    ex:resistanceAdj "1.2"^^xsd:float .
+
+ex:Adj_Z01_Z04 a ex:ZoneAdjacency ;
+    ex:fromZone ex:Zone_1 ;
+    ex:toZone ex:Zone_4 ;
+    ex:resistanceAdj "1.2"^^xsd:float .
+
+ex:Adj_Z01_Z05 a ex:ZoneAdjacency ;
+    ex:fromZone ex:Zone_1 ;
+    ex:toZone ex:Zone_5 ;
+    ex:resistanceAdj "1.2"^^xsd:float .

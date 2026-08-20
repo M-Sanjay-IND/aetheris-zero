@@ -1,26 +1,26 @@
 [
-  {
-    "hour": 13,
-    "price": 0.05
-  },
-  {
-    "hour": 14,
-    "price": 1.5
-  },
-  {
-    "hour": 15,
-    "price": 1.5
-  },
-  {
-    "hour": 16,
-    "price": 1.5
-  },
-  {
-    "hour": 17,
-    "price": 1.5
-  },
-  {
-    "hour": 18,
-    "price": 0.1
-  }
+  {"hour": 0, "price": 0.085, "regime": "OFF_PEAK"},
+  {"hour": 1, "price": 0.080, "regime": "OFF_PEAK"},
+  {"hour": 2, "price": 0.075, "regime": "OFF_PEAK"},
+  {"hour": 3, "price": 0.072, "regime": "OFF_PEAK"},
+  {"hour": 4, "price": 0.075, "regime": "OFF_PEAK"},
+  {"hour": 5, "price": 0.090, "regime": "OFF_PEAK"},
+  {"hour": 6, "price": 0.145, "regime": "MORNING_RAMP"},
+  {"hour": 7, "price": 0.195, "regime": "MORNING_PEAK"},
+  {"hour": 8, "price": 0.220, "regime": "MORNING_PEAK"},
+  {"hour": 9, "price": 0.120, "regime": "SOLAR_RAMP"},
+  {"hour": 10, "price": 0.065, "regime": "SOLAR_SURPLUS"},
+  {"hour": 11, "price": 0.045, "regime": "SOLAR_SURPLUS"},
+  {"hour": 12, "price": 0.040, "regime": "SOLAR_SURPLUS"},
+  {"hour": 13, "price": 0.050, "regime": "PRE_COOLING_WINDOW"},
+  {"hour": 14, "price": 1.500, "regime": "CRITICAL_DR_EVENT"},
+  {"hour": 15, "price": 1.500, "regime": "CRITICAL_DR_EVENT"},
+  {"hour": 16, "price": 1.500, "regime": "CRITICAL_DR_EVENT"},
+  {"hour": 17, "price": 1.500, "regime": "CRITICAL_DR_EVENT"},
+  {"hour": 18, "price": 0.420, "regime": "EVENING_PEAK"},
+  {"hour": 19, "price": 0.380, "regime": "EVENING_PEAK"},
+  {"hour": 20, "price": 0.290, "regime": "EVENING_SHOULDER"},
+  {"hour": 21, "price": 0.180, "regime": "NIGHT_SHOULDER"},
+  {"hour": 22, "price": 0.125, "regime": "OFF_PEAK"},
+  {"hour": 23, "price": 0.095, "regime": "OFF_PEAK"}
 ]
