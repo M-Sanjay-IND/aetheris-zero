@@ -205,11 +205,26 @@ def test_end_to_end_phase1_pipeline():
     extractor = SPARQLExtractor()
     sim_config = extractor.extract_building_config(graph)
 
-    # 4. Dev 1 Simulator Initialization Check
+    # 4. Dev 1 Simulator Initialization & Stepping Check
     sim = BuildingSimulator(config=sim_config)
     assert sim.config == sim_config
+    initial_state = sim.reset()
+    assert initial_state["step"] == 0
+    assert len(initial_state["zones"]) == 5
+
+    # Step simulation through 12 steps (1 hour)
+    for step_i in range(12):
+        actions = {
+            "zone_setpoints": {f"zone_{i}": 22.0 for i in range(1, 6)},
+            "chiller_chw_setpoint": 6.5,
+            "vav_damper_positions": {f"zone_{i}": 0.7 for i in range(1, 6)}
+        }
+        state, reward, done, info = sim.step(actions)
+        assert state["step"] == step_i + 1
+        assert "total_hvac_kw" in state["power"]
 
     # 5. Tariff Feed Horizon Check for RL
     tariff = TariffFeed(json_file_path=SAMPLE_CAISO_JSON)
     forecast_24h = tariff.get_forecast_horizon(0, 96, 300)
     assert len(forecast_24h) == 96
+
