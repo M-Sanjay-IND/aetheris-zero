@@ -59,6 +59,7 @@ class PowerTelemetryModel(BaseModel):
     chiller_kw: float
     fans_kw: float
     supply_fan_kw: Optional[float] = None
+    base_load_kw: float = 0.0
     total_hvac_kw: float
     baseline_hvac_kw: float
     demand_shaved_kw: float
@@ -67,13 +68,17 @@ class PowerTelemetryModel(BaseModel):
 
 class SafetyTelemetryModel(BaseModel):
     intervention_active: bool
+    cbf_qp_active: bool = False
     shield_status: str
     dwell_time_remaining_sec: int
     solve_time_ms: float = 1.15
     active_constraints: List[str] = []
     t_min_bound: float = 20.0
     t_max_bound: float = 24.5
+    min_comfort_limit_c: float = 20.0
+    max_comfort_limit_c: float = 24.5
     max_slew_per_step: float = 0.75
+    max_slew_rate_c_per_step: float = 0.75
 
 
 
@@ -81,12 +86,15 @@ class MetricsTelemetryModel(BaseModel):
     cumulative_cost_actual: float
     cumulative_cost_baseline: float
     cumulative_savings_usd: float
+    cost_savings_usd: float = 0.0
     cumulative_cost_actual_inr: float = 0.0
     cumulative_cost_baseline_inr: float = 0.0
     cumulative_savings_inr: float = 0.0
+    cost_savings_inr: float = 0.0
     cost_savings_pct: float = 0.0
     carbon_avoided_kg: float = 0.0
     comfort_compliance_pct: float = 100.0
+    ashrae55_comfort_violation_count: int = 0
     cumulative_energy_actual_kwh: float = 0.0
     cumulative_energy_baseline_kwh: float = 0.0
     peak_demand_reduction_pct: float
@@ -96,10 +104,12 @@ class TelemetryFrame(BaseModel):
     step: int
     timestamp_hour: float
     time_display: str
+    time_of_day_str: str = ""
     ambient_temp_c: float
     solar_irradiance_wm2: float
     dynamic_lmp_price: float
     dynamic_lmp_price_mwh: float
+    dynamic_lmp_price_inr_mwh: float = 0.0
     grid_dr_event_active: bool
     dr_event_id: Optional[str] = None
     zones: Dict[str, ZoneTelemetryModel]
@@ -184,10 +194,12 @@ class TelemetrySerializer:
             step=int(raw_state.get("step", 0)),
             timestamp_hour=round(hr, 3),
             time_display=time_display,
+            time_of_day_str=time_display,
             ambient_temp_c=round(float(raw_state.get("ambient_temp_c", 25.0)), 2),
             solar_irradiance_wm2=round(float(raw_state.get("solar_irradiance_wm2", 0.0)), 1),
             dynamic_lmp_price=round(price_kwh, 4),
             dynamic_lmp_price_mwh=price_mwh,
+            dynamic_lmp_price_inr_mwh=round(price_mwh * 83.0, 2),
             grid_dr_event_active=bool(raw_state.get("grid_dr_event_active", False)),
             dr_event_id=dr_event_id,
             zones={k: ZoneTelemetryModel(**v) for k, v in zones_enriched.items()},
@@ -195,6 +207,7 @@ class TelemetrySerializer:
                 chiller_kw=round(float(power_data.get("chiller_kw", 0.0)), 2),
                 fans_kw=fans_kw_val,
                 supply_fan_kw=fans_kw_val,
+                base_load_kw=round(float(power_data.get("base_load_kw", 4.0)), 2),
                 total_hvac_kw=round(float(power_data.get("total_hvac_kw", 0.0)), 2),
                 baseline_hvac_kw=round(float(power_data.get("baseline_hvac_kw", 0.0)), 2),
                 demand_shaved_kw=round(float(power_data.get("demand_shaved_kw", 0.0)), 2),
@@ -202,25 +215,32 @@ class TelemetrySerializer:
 
             safety=SafetyTelemetryModel(
                 intervention_active=bool(safety_data.get("intervention_active", False)),
+                cbf_qp_active=bool(safety_data.get("intervention_active", False)),
                 shield_status=str(safety_data.get("shield_status", "OPTIMAL")),
                 dwell_time_remaining_sec=int(safety_data.get("dwell_time_remaining_sec", 0)),
                 solve_time_ms=round(float(safety_data.get("solve_time_ms", 1.15)), 2),
                 active_constraints=list(safety_data.get("active_constraints", [])),
                 t_min_bound=round(float(safety_data.get("t_min_bound", 20.0)), 2),
                 t_max_bound=round(float(safety_data.get("t_max_bound", 24.5)), 2),
+                min_comfort_limit_c=round(float(safety_data.get("t_min_bound", 20.0)), 2),
+                max_comfort_limit_c=round(float(safety_data.get("t_max_bound", 24.5)), 2),
                 max_slew_per_step=round(float(safety_data.get("max_slew_per_step", 0.75)), 2),
+                max_slew_rate_c_per_step=round(float(safety_data.get("max_slew_per_step", 0.75)), 2),
             ),
 
             metrics=MetricsTelemetryModel(
                 cumulative_cost_actual=round(cost_act_usd, 2),
                 cumulative_cost_baseline=round(cost_base_usd, 2),
                 cumulative_savings_usd=round(savings_usd, 2),
+                cost_savings_usd=round(savings_usd, 2),
                 cumulative_cost_actual_inr=round(cost_act_usd * 83.0, 2),
                 cumulative_cost_baseline_inr=round(cost_base_usd * 83.0, 2),
                 cumulative_savings_inr=round(savings_usd * 83.0, 2),
+                cost_savings_inr=round(savings_usd * 83.0, 2),
                 cost_savings_pct=round(savings_pct, 1),
                 carbon_avoided_kg=carbon_avoided_kg,
                 comfort_compliance_pct=round(compliance_rate, 1),
+                ashrae55_comfort_violation_count=int(metrics_data.get("ashrae55_comfort_violation_count", 0)),
                 cumulative_energy_actual_kwh=round(energy_act_kwh, 2),
                 cumulative_energy_baseline_kwh=round(energy_base_kwh, 2),
                 peak_demand_reduction_pct=round(float(metrics_data.get("peak_demand_reduction_pct", 0.0)), 1),

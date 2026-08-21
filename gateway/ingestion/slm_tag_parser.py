@@ -109,9 +109,29 @@ class SLMTagParser:
         (r"SOLAR.*FRAC|SOLAR.*FACTOR", "Solar_Factor_Parameter", "parameter", "thermal_model", "ratio"),
     ]
 
-    def __init__(self, use_slm_llm: bool = False, model_name: Optional[str] = None):
+    def __init__(
+        self,
+        use_slm_llm: bool = True,
+        model_name: Optional[str] = None,
+        checkpoint_path: Optional[Union[str, Path]] = None,
+    ):
         self.use_slm_llm = use_slm_llm
-        self.model_name = model_name
+        self.model_name = model_name or "AetherisBrickSLM"
+        self.neural_model: Optional[Any] = None
+        
+        # Attempt to load pretrained Neural Brick-SLM Transformer
+        ckpt = checkpoint_path
+        if ckpt is None:
+            default_ckpt = Path(__file__).resolve().parent.parent.parent / "models" / "checkpoints" / "slm_brick_best.pt"
+            if default_ckpt.exists():
+                ckpt = default_ckpt
+        
+        if ckpt and Path(ckpt).exists():
+            try:
+                from gateway.ingestion.neural_slm_model import AetherisBrickSLM
+                self.neural_model = AetherisBrickSLM.load_checkpoint(ckpt, device="cpu")
+            except Exception:
+                self.neural_model = None
 
     def tokenize_tag(self, tag: str) -> List[str]:
         """Split a raw point tag by common delimiters and camelCase boundaries."""
@@ -217,6 +237,26 @@ class SLMTagParser:
             metadata["param_key"] = "floor_area_sqm"
         elif "SOLAR_FRAC" in tag_clean.upper():
             metadata["param_key"] = "solar_factor"
+
+        # If unclassified or low confidence and neural model is available, perform Neural Brick-SLM inference
+        if self.neural_model and (brick_class == "Point" or confidence < 0.90):
+            try:
+                preds = self.neural_model.predict_tags([tag_clean])
+                if preds and len(preds) > 0:
+                    p = preds[0]
+                    if p.get("confidence", 0.0) >= 0.50:
+                        brick_class = p.get("brick_class", brick_class)
+                        if not eq_type:
+                            eq_type = p.get("equipment_type")
+                        if not zone_id and p.get("zone_id"):
+                            zone_id = p.get("zone_id")
+                        point_role = p.get("point_role", point_role)
+                        subsystem = p.get("subsystem", subsystem)
+                        if inferred_unit == "unknown" and p.get("unit") != "unknown":
+                            inferred_unit = p.get("unit", inferred_unit)
+                        confidence = max(confidence, float(p.get("confidence", confidence)))
+            except Exception:
+                pass
 
         if description:
             metadata["description"] = description

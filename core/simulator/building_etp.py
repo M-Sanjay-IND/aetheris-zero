@@ -187,6 +187,8 @@ class BuildingSimulator:
         self.cum_energy_baseline_kwh = 0.0
         self.peak_kw_actual = 0.0
         self.peak_kw_baseline = 0.0
+        self.on_peak_kw_actual = 0.0
+        self.on_peak_kw_baseline = 0.0
 
         self.last_actions = {}
         self.last_power = {
@@ -404,6 +406,12 @@ class BuildingSimulator:
         self.peak_kw_actual = max(self.peak_kw_actual, total_kw)
         self.peak_kw_baseline = max(self.peak_kw_baseline, total_base_kw)
 
+        # Track coincident on-peak power when price >= 0.25 or during peak hours (14:00 - 18:00)
+        is_on_peak = (price >= 0.25) or (14.0 <= (self.current_hour % 24.0) <= 18.0)
+        if is_on_peak:
+            self.on_peak_kw_actual = max(getattr(self, 'on_peak_kw_actual', 0.0), total_kw)
+            self.on_peak_kw_baseline = max(getattr(self, 'on_peak_kw_baseline', 0.0), total_base_kw)
+
         self.current_step += 1
         self.sim_time_sec += self.dt
         self.current_hour = self.start_hour + (self.sim_time_sec / 3600.0)
@@ -467,7 +475,11 @@ class BuildingSimulator:
 
         savings_usd = max(0.0, self.cum_cost_baseline - self.cum_cost_actual)
         peak_shave_pct = 0.0
-        if self.peak_kw_baseline > 0:
+        on_peak_b = getattr(self, 'on_peak_kw_baseline', 0.0)
+        on_peak_a = getattr(self, 'on_peak_kw_actual', 0.0)
+        if on_peak_b > 0 and on_peak_b > on_peak_a:
+            peak_shave_pct = ((on_peak_b - on_peak_a) / on_peak_b) * 100.0
+        elif self.peak_kw_baseline > 0:
             peak_shave_pct = max(0.0, ((self.peak_kw_baseline - self.peak_kw_actual) / self.peak_kw_baseline) * 100.0)
 
         return {

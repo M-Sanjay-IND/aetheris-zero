@@ -83,6 +83,13 @@ class SimulationRuntime:
         self.simulator = BuildingSimulator(config=self.sim_config)
         self.simulator.reset()
         self.cbf_shield.reset()
+
+        pinn_ckpt = Path(__file__).resolve().parent.parent / "models" / "checkpoints" / "pinn_surrogate_best.pt"
+        if pinn_ckpt.exists():
+            try:
+                self.pinn_surrogate = PINNSurrogate.load_checkpoint(pinn_ckpt)
+            except Exception:
+                pass
         
         self.arbitrage_engine = ArbitrageEngine(
             simulator=self.simulator,
@@ -691,6 +698,8 @@ def get_simulation_status():
 
 
 @app.get("/api/v1/simulation/state")
+@app.get("/api/v1/telemetry/latest")
+@app.get("/api/v1/telemetry/state")
 def get_simulation_state():
     """Get latest serialized telemetry state."""
     return {"status": "success", "telemetry": runtime.get_serialized_state()}
