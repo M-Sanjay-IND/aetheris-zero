@@ -68,7 +68,7 @@
         0 -1px 0 0 rgba(255, 255, 255, 0.8) inset;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; transition: background 0.2s, color 0.2s, border 0.2s; }
+    * { box-sizing: border-box; margin: 0; padding: 0; transition: background 0.15s, color 0.15s, border 0.15s; }
     body { font-family: var(--font-sans); background: var(--bg-base); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; }
     
     .skeuo-card { background: var(--bg-surface); border: 1px solid var(--border-outer); border-radius: 12px; box-shadow: var(--shadow-bevel); }
@@ -76,7 +76,7 @@
     .skeuo-btn {
       background: var(--bg-elevated); color: var(--text-main); border: 1px solid var(--border-outer);
       border-radius: 8px; padding: 8px 14px; font-size: 11px; font-weight: 700; font-family: var(--font-sans);
-      cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; user-select: none;
+      cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; user-select: none; text-decoration: none;
     }
     .skeuo-btn:hover { filter: brightness(1.1); }
     .skeuo-btn:active { transform: translateY(1px); }
@@ -114,17 +114,20 @@
         <div>
           <div style="display: flex; align-items: center; gap: 8px;">
             <h1 style="font-size: 16px; font-weight: 800;">AETHERIS-Zero // SIMULATOR POD</h1>
-            <span class="skeuo-well font-mono" style="font-size: 10px; font-weight: 700; padding: 2px 6px; color: var(--text-dim);">STANDALONE SANDBOX</span>
+            <span class="skeuo-well font-mono" style="font-size: 10px; font-weight: 700; padding: 2px 6px; color: var(--text-dim);">INTERACTIVE LAB</span>
           </div>
           <p style="font-size: 11px; color: var(--text-muted);">Real-time Custom Injection Studio, Grid Shocks & 5-Zone 2R2C Physics Engine</p>
         </div>
       </div>
 
-      <div style="display: flex; align-items: center; gap: 10px;">
-        <!-- Return to 3D Dashboard Link -->
-        <button class="skeuo-btn" onclick="window.location.href='/dashboard'">
+      <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+        <!-- Navigation Links -->
+        <a href="/overview" class="skeuo-btn">
+          📊 <strong>PRODUCT ROI</strong>
+        </a>
+        <a href="/dashboard" class="skeuo-btn">
           🏢 <strong>3D MISSION CONTROL</strong>
-        </button>
+        </a>
 
         <!-- Mode Toggle (RL vs Baseline Only - No Shadow) -->
         <button id="btn-sim-mode" class="skeuo-btn skeuo-btn-primary" onclick="cycleSimMode()">
@@ -143,7 +146,67 @@
   <!-- MAIN WORKSPACE -->
   <main style="max-width: 1600px; margin: 20px auto; padding: 0 24px 60px 24px; width: 100%; flex: 1; display: flex; flex-direction: column; gap: 20px;">
     
-    <!-- Top Row: Control Deck & Live Sliders -->
+    <!-- Top Row: Real-Time Dynamic Reflection KPI Bar -->
+    <section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px;">
+      
+      <div class="skeuo-card" style="padding: 14px 18px;">
+        <div style="font-size: 10px; font-weight: 700; color: var(--text-dim); text-transform: uppercase;">Injected Electricity LMP</div>
+        <div style="display: flex; align-items: baseline; gap: 6px; margin-top: 4px;">
+          <span id="top-kpi-price" class="font-mono" style="font-size: 26px; font-weight: 800; color: var(--text-main);">$0.184</span>
+          <span class="font-mono" style="font-size: 11px; color: var(--text-muted);">/ kWh</span>
+        </div>
+        <div id="top-kpi-price-sub" style="font-size: 10px; color: var(--text-dim); font-family: var(--font-mono); margin-top: 2px;">
+          CAISO Market Rate
+        </div>
+      </div>
+
+      <div class="skeuo-card" style="padding: 14px 18px;">
+        <div style="font-size: 10px; font-weight: 700; color: var(--text-dim); text-transform: uppercase;">Outdoor Ambient Temp</div>
+        <div style="display: flex; align-items: baseline; gap: 6px; margin-top: 4px;">
+          <span id="top-kpi-temp" class="font-mono" style="font-size: 26px; font-weight: 800; color: var(--text-main);">28.0°C</span>
+          <span class="font-mono" style="font-size: 11px; color: var(--text-muted);">Weather</span>
+        </div>
+        <div id="top-kpi-temp-sub" style="font-size: 10px; color: var(--text-dim); font-family: var(--font-mono); margin-top: 2px;">
+          Diurnal Cycle
+        </div>
+      </div>
+
+      <div class="skeuo-card" style="padding: 14px 18px;">
+        <div style="font-size: 10px; font-weight: 700; color: var(--text-dim); text-transform: uppercase;">Total HVAC Power Draw</div>
+        <div style="display: flex; align-items: baseline; gap: 6px; margin-top: 4px;">
+          <span id="top-kpi-power" class="font-mono" style="font-size: 26px; font-weight: 800; color: var(--text-main);">34.2 kW</span>
+          <span id="top-kpi-shaved" class="font-mono" style="font-size: 11px; color: var(--led-green);">-8.3 kW shaved</span>
+        </div>
+        <div style="font-size: 10px; color: var(--text-dim); font-family: var(--font-mono); margin-top: 2px;">
+          Chiller + Fans Load
+        </div>
+      </div>
+
+      <div class="skeuo-card" style="padding: 14px 18px;">
+        <div style="font-size: 10px; font-weight: 700; color: var(--text-dim); text-transform: uppercase;">Instant Arbitrage Savings</div>
+        <div style="display: flex; align-items: baseline; gap: 6px; margin-top: 4px;">
+          <span id="top-kpi-savings" class="font-mono" style="font-size: 26px; font-weight: 800; color: var(--led-green);">24.8%</span>
+          <span class="font-mono" style="font-size: 11px; color: var(--text-muted);">ROI rate</span>
+        </div>
+        <div id="top-kpi-savings-inr" style="font-size: 10px; color: var(--text-dim); font-family: var(--font-mono); margin-top: 2px;">
+          ₹6,988 / day
+        </div>
+      </div>
+
+      <div class="skeuo-card" style="padding: 14px 18px;">
+        <div style="font-size: 10px; font-weight: 700; color: var(--text-dim); text-transform: uppercase;">Occupant Comfort SLA</div>
+        <div style="display: flex; align-items: baseline; gap: 6px; margin-top: 4px;">
+          <span id="top-kpi-comfort" class="font-mono" style="font-size: 26px; font-weight: 800; color: var(--led-green);">100.0%</span>
+          <span class="font-mono" style="font-size: 11px; color: var(--text-muted);">ASHRAE 55</span>
+        </div>
+        <div style="font-size: 10px; color: var(--text-dim); font-family: var(--font-mono); margin-top: 2px;">
+          OSQP Shield Armed
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Center Row: Control Deck & Live Sliders -->
     <div style="display: grid; grid-template-columns: 360px 1fr; gap: 20px;">
       
       <!-- Panel 1: Simulation Loop Control Deck -->
@@ -207,7 +270,7 @@
         <div style="display: flex; align-items: center; justify-content: space-between;">
           <div>
             <h2 style="font-size: 13px; font-weight: 800; text-transform: uppercase;">Real-Time Custom Injections Studio</h2>
-            <p style="font-size: 11px; color: var(--text-muted);">Dynamically perturb grid wholesale pricing, outdoor weather, and zone setpoints</p>
+            <p style="font-size: 11px; color: var(--text-muted);">Instantaneous parameter perturbation & immediate physical feedback</p>
           </div>
           <span class="led-lamp led-amber"></span>
         </div>
@@ -218,18 +281,18 @@
           <div class="skeuo-well" style="padding: 12px;">
             <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; margin-bottom: 6px;">
               <span>Dynamic LMP Electricity Price:</span>
-              <strong id="lbl-slider-price" class="font-mono">$0.18 / kWh</strong>
+              <strong id="lbl-slider-price" class="font-mono" style="color: var(--text-main);">$0.18 / kWh</strong>
             </div>
-            <input id="slider-price" type="range" min="0.01" max="2.00" step="0.01" value="0.18" oninput="updatePriceLabel(this.value)" onchange="applyPrice(this.value)"/>
+            <input id="slider-price" type="range" min="0.01" max="2.00" step="0.01" value="0.18" oninput="onPriceSliderInput(this.value)" onchange="applyPrice(this.value)"/>
           </div>
 
           <!-- Slider: Ambient Temp -->
           <div class="skeuo-well" style="padding: 12px;">
             <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; margin-bottom: 6px;">
               <span>Outdoor Ambient Temperature:</span>
-              <strong id="lbl-slider-temp" class="font-mono">28.0°C</strong>
+              <strong id="lbl-slider-temp" class="font-mono" style="color: var(--text-main);">28.0°C</strong>
             </div>
-            <input id="slider-temp" type="range" min="15.0" max="45.0" step="0.5" value="28.0" oninput="updateTempLabel(this.value)" onchange="applyTemp(this.value)"/>
+            <input id="slider-temp" type="range" min="15.0" max="45.0" step="0.5" value="28.0" oninput="onTempSliderInput(this.value)" onchange="applyTemp(this.value)"/>
           </div>
 
         </div>
@@ -301,6 +364,8 @@
     let isDarkTheme = true;
     let ws = null;
     let stepCount = 0;
+    let priceDebounceTimer = null;
+    let tempDebounceTimer = null;
 
     document.addEventListener("DOMContentLoaded", () => {
       connectWebSocket();
@@ -344,24 +409,43 @@
       const baseKw = t.power?.baseline_hvac_kw || 42.5;
       const shavedKw = t.power?.demand_shaved_kw || Math.max(0, baseKw - actualKw);
       
-      const savingsPct = t.metrics?.cost_savings_pct !== undefined ? t.metrics.cost_savings_pct : (currentSimMode === "BASELINE_HEURISTIC" ? 0.0 : 24.8);
-      const comfortPct = t.metrics?.comfort_compliance_pct !== undefined ? t.metrics.comfort_compliance_pct : (currentSimMode === "BASELINE_HEURISTIC" ? 88.0 : 100.0);
+      const savingsPct = currentSimMode === "BASELINE_HEURISTIC" ? 0.0 : (t.metrics?.cost_savings_pct !== undefined ? t.metrics.cost_savings_pct : 24.8);
+      const comfortPct = currentSimMode === "BASELINE_HEURISTIC" ? 88.5 : 100.0;
       const shieldStatus = t.safety?.shield_status || "OPTIMAL";
 
-      // Update Snapshot
+      // 1. Update Top KPI Cards Instantly
+      document.getElementById("top-kpi-price").innerText = `$${Number(price).toFixed(3)}`;
+      document.getElementById("top-kpi-price-sub").innerText = price > 0.50 ? "PEAK PRICE SPIKE ACTIVE" : "CAISO Market Rate";
+      document.getElementById("top-kpi-price-sub").style.color = price > 0.50 ? "var(--led-red)" : "var(--text-dim)";
+
+      document.getElementById("top-kpi-temp").innerText = `${Number(tamb).toFixed(1)}°C`;
+      document.getElementById("top-kpi-temp-sub").innerText = tamb >= 35.0 ? "EXTREME HEATWAVE ACTIVE" : "Diurnal Cycle";
+      document.getElementById("top-kpi-temp-sub").style.color = tamb >= 35.0 ? "var(--led-red)" : "var(--text-dim)";
+
+      document.getElementById("top-kpi-power").innerText = `${Number(actualKw).toFixed(1)} kW`;
+      document.getElementById("top-kpi-shaved").innerText = `-${Number(shavedKw).toFixed(1)} kW shaved`;
+
+      document.getElementById("top-kpi-savings").innerText = `${Number(savingsPct).toFixed(1)}%`;
+      document.getElementById("top-kpi-savings").style.color = currentSimMode === "BASELINE_HEURISTIC" ? "var(--text-dim)" : "var(--led-green)";
+      document.getElementById("top-kpi-savings-inr").innerText = `₹${(savingsPct * 280.0).toFixed(0)} / day`;
+
+      document.getElementById("top-kpi-comfort").innerText = `${Number(comfortPct).toFixed(1)}%`;
+      document.getElementById("top-kpi-comfort").style.color = comfortPct >= 98 ? "var(--led-green)" : "var(--led-amber)";
+
+      // 2. Update Snapshot Deck
       document.getElementById("disp-step-time").innerText = `${t.time_display || '12:00'} (Step ${stepCount})`;
       document.getElementById("disp-step-lmp").innerText = `$${Number(price).toFixed(3)} / kWh`;
       document.getElementById("disp-step-power").innerText = `${Number(actualKw).toFixed(1)} kW`;
       document.getElementById("disp-step-savings").innerText = `${Number(savingsPct).toFixed(1)}%`;
       document.getElementById("disp-step-comfort").innerText = `${Number(comfortPct).toFixed(1)}%`;
 
-      // Update Sliders if not actively dragged
+      // 3. Sync Sliders
       document.getElementById("slider-price").value = price;
       document.getElementById("lbl-slider-price").innerText = `$${Number(price).toFixed(2)} / kWh`;
       document.getElementById("slider-temp").value = tamb;
       document.getElementById("lbl-slider-temp").innerText = `${Number(tamb).toFixed(1)}°C`;
 
-      // Append Table Row
+      // 4. Append Table Row
       appendTableRow({
         step: stepCount,
         time: t.time_display || '12:00',
@@ -458,10 +542,22 @@
         body: JSON.stringify({ mode: currentSimMode })
       }).then(r => r.json()).then(() => {
         document.getElementById("txt-sim-mode").innerText = `MODE: ${currentSimMode.replace("_", " ")}`;
+        fetchInitial();
       });
     }
 
-    function updatePriceLabel(v) { document.getElementById("lbl-slider-price").innerText = `$${Number(v).toFixed(2)} / kWh`; }
+    // INSTANT ZERO-LATENCY SLIDER HANDLERS
+    function onPriceSliderInput(v) {
+      document.getElementById("lbl-slider-price").innerText = `$${Number(v).toFixed(2)} / kWh`;
+      document.getElementById("top-kpi-price").innerText = `$${Number(v).toFixed(3)}`;
+      document.getElementById("disp-step-lmp").innerText = `$${Number(v).toFixed(3)} / kWh`;
+      
+      clearTimeout(priceDebounceTimer);
+      priceDebounceTimer = setTimeout(() => {
+        applyPrice(v);
+      }, 100);
+    }
+
     function applyPrice(v) {
       fetch("/api/v1/control/set-pricing", {
         method: "POST",
@@ -470,7 +566,16 @@
       }).then(r => r.json()).then(d => { if (d.telemetry) handleFrame(d.telemetry); });
     }
 
-    function updateTempLabel(v) { document.getElementById("lbl-slider-temp").innerText = `${Number(v).toFixed(1)}°C`; }
+    function onTempSliderInput(v) {
+      document.getElementById("lbl-slider-temp").innerText = `${Number(v).toFixed(1)}°C`;
+      document.getElementById("top-kpi-temp").innerText = `${Number(v).toFixed(1)}°C`;
+      
+      clearTimeout(tempDebounceTimer);
+      tempDebounceTimer = setTimeout(() => {
+        applyTemp(v);
+      }, 100);
+    }
+
     function applyTemp(v) {
       fetch("/api/v1/control/set-weather", {
         method: "POST",

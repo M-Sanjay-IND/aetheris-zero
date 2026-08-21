@@ -35,6 +35,16 @@ def test_dashboard_html_endpoints(client):
     assert "SIMULATOR POD" in res_sim.text
     assert "Real-Time Custom Injections Studio" in res_sim.text
 
+    # 4. Test /overview and /product commercial portal
+    res_ov = client.get("/overview")
+    assert res_ov.status_code == 200
+    assert "COMMERCIAL PRODUCT OVERVIEW & EXECUTIVE ROI" in res_ov.text
+    assert "Interactive Commercial Building ROI Calculator" in res_ov.text
+
+    res_prod = client.get("/product")
+    assert res_prod.status_code == 200
+    assert "COMMERCIAL PRODUCT OVERVIEW & EXECUTIVE ROI" in res_prod.text
+
 
 
 def test_dashboard_websocket_realtime_interactions(client):
