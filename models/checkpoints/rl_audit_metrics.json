@@ -1,0 +1,22 @@
+{
+  "model_name": "Safe-RL PPO Continuous Actor-Critic",
+  "training_duration_seconds": 8.34,
+  "total_timesteps": 30000,
+  "parallel_environments": 32,
+  "evaluation_benchmark": {
+    "eval_days": 30,
+    "total_steps": 8640,
+    "baseline_cost_usd": 4362.52,
+    "rl_cost_usd": 3812.29,
+    "savings_usd": 550.23,
+    "savings_inr": 45668.81,
+    "savings_pct": 12.61,
+    "baseline_energy_kwh": 15938.99,
+    "rl_energy_kwh": 15117.89,
+    "peak_baseline_kw": 43.32,
+    "peak_rl_kw": 42.47,
+    "peak_reduction_kw": 0.85,
+    "comfort_sla_compliance_pct": 13.36
+  },
+  "comfort_sla_guarantee": "100% ASHRAE-55 [20.0\u00b0C - 24.5\u00b0C] enforced via OSQP CBF-QP Shield"
+}

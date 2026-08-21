@@ -210,6 +210,8 @@ class VectorizedBuildingEnv:
         obs = self.get_observations()
         info = {
             "total_hvac_kw": total_hvac_kw.detach().cpu().numpy(),
+            "total_kw": total_hvac_kw.detach().cpu().numpy(),
+            "energy_kwh": energy_kwh.detach().cpu().numpy(),
             "step_cost_usd": step_cost_usd.detach().cpu().numpy(),
             "comfort_penalty": comfort_penalty.detach().cpu().numpy(),
         }

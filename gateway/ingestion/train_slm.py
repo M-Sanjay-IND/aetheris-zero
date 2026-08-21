@@ -4,7 +4,7 @@ import os
 import sys
 from pathlib import Path
 import time
-from typing import Dict, List, Tuple, Union
+from typing import Any, Dict, List, Tuple, Union
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -12,6 +12,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 import numpy as np
 import torch
+import torch.nn as nn
 from torch.utils.data import DataLoader, Dataset
 
 from gateway.ingestion.neural_slm_model import (
@@ -24,6 +25,7 @@ from gateway.ingestion.neural_slm_model import (
     AetherisBrickSLM,
     BMSTokenizer,
 )
+from core.device_utils import get_optimal_device
 
 
 class BMSTagDataset(Dataset):
@@ -64,200 +66,233 @@ class BMSTagDataset(Dataset):
         }
 
 
-from core.device_utils import get_optimal_device
+def evaluate_slm_split(model: AetherisBrickSLM, dataloader: DataLoader, device: torch.device) -> Dict[str, float]:
+    model.eval()
+    total_samples = 0
+    correct_class = 0
+    correct_eq = 0
+    correct_role = 0
+    correct_sub = 0
+    correct_zone = 0
+    correct_unit = 0
+    all_correct_exact = 0
+
+    with torch.no_grad():
+        for batch in dataloader:
+            input_ids = batch["input_ids"].to(device)
+            bs = input_ids.size(0)
+            total_samples += bs
+
+            preds = model(input_ids)
+            p_class = preds["brick_class"].argmax(dim=-1).cpu()
+            p_eq = preds["equipment_type"].argmax(dim=-1).cpu()
+            p_role = preds["point_role"].argmax(dim=-1).cpu()
+            p_sub = preds["subsystem"].argmax(dim=-1).cpu()
+            p_zone = preds["zone_id"].argmax(dim=-1).cpu()
+            p_unit = preds["unit"].argmax(dim=-1).cpu()
+
+            t_class = batch["brick_class"]
+            t_eq = batch["equipment_type"]
+            t_role = batch["point_role"]
+            t_sub = batch["subsystem"]
+            t_zone = batch["zone_id"]
+            t_unit = batch["unit"]
+
+            m_class = (p_class == t_class)
+            m_eq = (p_eq == t_eq)
+            m_role = (p_role == t_role)
+            m_sub = (p_sub == t_sub)
+            m_zone = (p_zone == t_zone)
+            m_unit = (p_unit == t_unit)
+
+            correct_class += m_class.sum().item()
+            correct_eq += m_eq.sum().item()
+            correct_role += m_role.sum().item()
+            correct_sub += m_sub.sum().item()
+            correct_zone += m_zone.sum().item()
+            correct_unit += m_unit.sum().item()
+
+            exact_match = m_class & m_eq & m_role & m_sub & m_zone & m_unit
+            all_correct_exact += exact_match.sum().item()
+
+    return {
+        "exact_match_acc": all_correct_exact / max(1, total_samples),
+        "class_acc": correct_class / max(1, total_samples),
+        "eq_acc": correct_eq / max(1, total_samples),
+        "role_acc": correct_role / max(1, total_samples),
+        "sub_acc": correct_sub / max(1, total_samples),
+        "zone_acc": correct_zone / max(1, total_samples),
+        "unit_acc": correct_unit / max(1, total_samples),
+        "total_samples": total_samples,
+    }
 
 
 def train_neural_slm(
-    data_path: Union[str, Path],
+    data_path: Union[str, Path] = "data/datasets/slm_train.jsonl",
+    val_data_path: Union[str, Path] = "data/datasets/slm_val.jsonl",
+    test_ood_path: Union[str, Path] = "data/datasets/slm_test_ood.jsonl",
     save_checkpoint_path: Union[str, Path] = "models/checkpoints/slm_brick_best.pt",
     epochs: int = 15,
     batch_size: int = 64,
     lr: float = 2e-3,
     force_cpu: bool = False,
-) -> Tuple[AetherisBrickSLM, Dict[str, float]]:
+) -> Tuple[AetherisBrickSLM, Dict[str, Any]]:
     os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
     device = get_optimal_device(force_cpu)
-    print(f"[Aetheris Brick-SLM] Initializing training on device: {device}")
+    print(f"[Aetheris Brick-SLM] Initializing leak-free training on device: {device}")
 
-    # Load dataset
-    data_file = Path(data_path)
-    if not data_file.exists():
+    # Ensure datasets exist
+    train_file = Path(data_path)
+    val_file = Path(val_data_path)
+    test_file = Path(test_ood_path)
+
+    if not train_file.exists() or not val_file.exists() or not test_file.exists():
         from data.datasets.dataset_generator import build_and_save_all_datasets
         build_and_save_all_datasets()
 
-    records = []
-    with open(data_file, "r", encoding="utf-8") as f:
-        for line in f:
-            if line.strip():
-                records.append(json.loads(line.strip()))
+    def _load_jsonl(p: Path) -> List[dict]:
+        items = []
+        with open(p, "r", encoding="utf-8") as f:
+            for line in f:
+                if line.strip():
+                    items.append(json.loads(line.strip()))
+        return items
 
-    print(f"[Aetheris Brick-SLM] Loaded {len(records)} training samples from {data_file}")
+    train_records = _load_jsonl(train_file)
+    val_records = _load_jsonl(val_file)
+    test_ood_records = _load_jsonl(test_file)
 
-    # Train / Val Split (85% / 15%)
-    rng = np.random.default_rng(42)
-    indices = np.arange(len(records))
-    rng.shuffle(indices)
-    split_idx = int(0.85 * len(records))
+    print(f"[Aetheris Brick-SLM] Dataset Splits (Strict Disjoint Facilities):")
+    print(f" -> Train Samples (In-Distribution Facilities): {len(train_records)}")
+    print(f" -> Val Samples (Disjoint Facilities):           {len(val_records)}")
+    print(f" -> Test OOD Samples (Unseen Facilities/Vendors):{len(test_ood_records)}")
 
-    train_records = [records[i] for i in indices[:split_idx]]
-    val_records = [records[i] for i in indices[split_idx:]]
+    tokenizer = BMSTokenizer()
+    train_ds = BMSTagDataset(train_records, tokenizer)
+    val_ds = BMSTagDataset(val_records, tokenizer)
+    test_ood_ds = BMSTagDataset(test_ood_records, tokenizer)
 
-    model = AetherisBrickSLM().to(device)
-    train_dataset = BMSTagDataset(train_records, model.tokenizer)
-    val_dataset = BMSTagDataset(val_records, model.tokenizer)
+    train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True)
+    val_loader = DataLoader(val_ds, batch_size=batch_size, shuffle=False)
+    test_ood_loader = DataLoader(test_ood_ds, batch_size=batch_size, shuffle=False)
 
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
-    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
+    model = AetherisBrickSLM(
+        vocab_size=len(tokenizer.vocab),
+        d_model=128,
+        n_layers=3,
+        n_heads=4,
+        d_ff=256,
+        max_seq_len=48,
+        dropout=0.15,
+    ).to(device)
 
-    optimizer = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=0.01)
+    # Multi-task criterion with label smoothing
+    criterion = nn.CrossEntropyLoss(label_smoothing=0.05)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=1e-4)
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs, eta_min=1e-5)
 
-    best_val_acc = 0.0
-    best_metrics = {}
-
     start_time = time.time()
+    best_val_acc = 0.0
+    history = []
+
+    print(f"\n[Aetheris Brick-SLM] Commencing training across {epochs} epochs...")
     for epoch in range(1, epochs + 1):
         model.train()
-        train_loss_acc = 0.0
+        total_loss = 0.0
+        batches = 0
 
         for batch in train_loader:
-            input_ids = batch["input_ids"].to(device)
-            targets = {k: v.to(device) for k, v in batch.items() if k != "input_ids"}
-
             optimizer.zero_grad()
-            logits = model(input_ids)
-            total_loss, _ = model.compute_loss(logits, targets)
-            total_loss.backward()
+            input_ids = batch["input_ids"].to(device)
+            preds = model(input_ids)
+
+            l_class = criterion(preds["brick_class"], batch["brick_class"].to(device))
+            l_eq = criterion(preds["equipment_type"], batch["equipment_type"].to(device))
+            l_role = criterion(preds["point_role"], batch["point_role"].to(device))
+            l_sub = criterion(preds["subsystem"], batch["subsystem"].to(device))
+            l_zone = criterion(preds["zone_id"], batch["zone_id"].to(device))
+            l_unit = criterion(preds["unit"], batch["unit"].to(device))
+
+            loss = 1.8 * l_class + 1.2 * l_eq + 1.0 * l_role + 0.8 * l_sub + 1.0 * l_zone + 0.8 * l_unit
+            loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
             optimizer.step()
 
-            train_loss_acc += total_loss.item()
+            total_loss += loss.item()
+            batches += 1
 
         scheduler.step()
-        train_loss_avg = train_loss_acc / len(train_loader)
+        avg_train_loss = total_loss / max(1, batches)
 
-        # Validation evaluation
-        model.eval()
-        correct_class = 0
-        correct_eq = 0
-        correct_role = 0
-        total_val = 0
-        val_loss_acc = 0.0
+        # Evaluate on Val and OOD Test
+        val_metrics = evaluate_slm_split(model, val_loader, device)
+        ood_metrics = evaluate_slm_split(model, test_ood_loader, device)
 
-        with torch.no_grad():
-            for batch in val_loader:
-                input_ids = batch["input_ids"].to(device)
-                targets = {k: v.to(device) for k, v in batch.items() if k != "input_ids"}
-                logits = model(input_ids)
-                v_loss, _ = model.compute_loss(logits, targets)
-                val_loss_acc += v_loss.item()
+        history.append({
+            "epoch": epoch,
+            "train_loss": avg_train_loss,
+            "val_exact_acc": val_metrics["exact_match_acc"],
+            "val_class_acc": val_metrics["class_acc"],
+            "val_role_acc": val_metrics["role_acc"],
+            "ood_exact_acc": ood_metrics["exact_match_acc"],
+            "ood_class_acc": ood_metrics["class_acc"],
+            "ood_role_acc": ood_metrics["role_acc"],
+        })
 
-                pred_c = torch.argmax(logits["brick_class"], dim=-1)
-                pred_eq = torch.argmax(logits["equipment_type"], dim=-1)
-                pred_role = torch.argmax(logits["point_role"], dim=-1)
-
-                correct_class += (pred_c == targets["brick_class"]).sum().item()
-                correct_eq += (pred_eq == targets["equipment_type"]).sum().item()
-                correct_role += (pred_role == targets["point_role"]).sum().item()
-                total_val += len(input_ids)
-
-        val_loss_avg = val_loss_acc / len(val_loader)
-        acc_class = correct_class / total_val
-        acc_eq = correct_eq / total_val
-        acc_role = correct_role / total_val
-        composite_acc = (acc_class + acc_eq + acc_role) / 3.0
-
-        if composite_acc > best_val_acc:
-            best_val_acc = composite_acc
-            model.save_checkpoint(save_checkpoint_path)
-            best_metrics = {
-                "epoch": epoch,
-                "val_loss": round(val_loss_avg, 4),
-                "accuracy_class": round(acc_class, 4),
-                "accuracy_equipment": round(acc_eq, 4),
-                "accuracy_role": round(acc_role, 4),
-                "composite_accuracy": round(composite_acc, 4),
-            }
-
-        if epoch % max(1, epochs // 5) == 0 or epoch == epochs:
+        if epoch % 2 == 0 or epoch == epochs:
             print(
-                f"Epoch {epoch:2d}/{epochs:2d} | Train Loss: {train_loss_avg:.4f} | "
-                f"Val Loss: {val_loss_avg:.4f} | Class Acc: {acc_class*100:.1f}% | "
-                f"Eq Acc: {acc_eq*100:.1f}% | Role Acc: {acc_role*100:.1f}%"
+                f"Epoch {epoch:2d}/{epochs:2d} | Train Loss: {avg_train_loss:.4f} | "
+                f"Val Exact: {val_metrics['exact_match_acc']*100:.1f}% (Class: {val_metrics['class_acc']*100:.1f}%) | "
+                f"OOD Test Exact: {ood_metrics['exact_match_acc']*100:.1f}% (Class: {ood_metrics['class_acc']*100:.1f}%)"
             )
 
-    duration = round(time.time() - start_time, 2)
-    print(f"[Aetheris Brick-SLM] Completed in {duration}s. Best Val Accuracy: {best_val_acc*100:.2f}%")
-    print(f"[Aetheris Brick-SLM] Checkpoint saved to: {save_checkpoint_path}")
+        if val_metrics["exact_match_acc"] > best_val_acc:
+            best_val_acc = val_metrics["exact_match_acc"]
+            ckpt_path = Path(save_checkpoint_path)
+            ckpt_path.parent.mkdir(parents=True, exist_ok=True)
+            torch.save({
+                "state_dict": model.state_dict(),
+                "vocab": tokenizer.vocab,
+                "val_metrics": val_metrics,
+                "ood_metrics": ood_metrics,
+                "epoch": epoch,
+            }, str(ckpt_path))
 
-    return model, best_metrics
+    duration = time.time() - start_time
+    final_val_metrics = evaluate_slm_split(model, val_loader, device)
+    final_ood_metrics = evaluate_slm_split(model, test_ood_loader, device)
 
+    audit_summary = {
+        "model_name": "AetherisBrickSLM (Multi-Task Transformer)",
+        "training_duration_seconds": duration,
+        "epochs": epochs,
+        "parameters_count": sum(p.numel() for p in model.parameters()),
+        "in_distribution_val": final_val_metrics,
+        "out_of_distribution_test_zero_shot": final_ood_metrics,
+        "leak_free_guarantee": "Strict Disjoint Facilities & Domains across Train, Val, and OOD Test",
+        "history": history,
+    }
 
-def export_generative_slm_instruction_dataset(
-    jsonl_input: Union[str, Path] = "data/datasets/slm_bacnet_brick_corpus.jsonl",
-    output_path: Union[str, Path] = "data/datasets/slm_instruction_tuning.json",
-):
-    """Export formatted instruction-tuning JSON for generative SLMs (Phi-3.5, Qwen2.5, Llama-3.2)."""
-    input_file = Path(jsonl_input)
-    if not input_file.exists():
-        from data.datasets.dataset_generator import build_and_save_all_datasets
-        build_and_save_all_datasets()
+    # Save metrics report JSON
+    audit_json_path = Path("models/checkpoints/slm_audit_metrics.json")
+    audit_json_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(audit_json_path, "w", encoding="utf-8") as f:
+        json.dump(audit_summary, f, indent=2)
 
-    dataset = []
-    with open(input_file, "r", encoding="utf-8") as f:
-        for line in f:
-            if not line.strip():
-                continue
-            item = json.loads(line.strip())
-            instruction = (
-                "You are an expert building ontology and Brick Schema v1.3 normalization engine. "
-                "Analyze the provided raw building automation point tag string and extract the standardized "
-                "Brick class, equipment type, point role, subsystem, zone assignment, and engineering unit."
-            )
-            input_text = f"Point Tag: {item['raw_tag']}"
-            output_data = {
-                "brick_class": item["brick_class"],
-                "equipment_type": item["equipment_type"],
-                "equipment_id": item["equipment_id"],
-                "point_role": item["point_role"],
-                "subsystem": item["subsystem"],
-                "zone_id": item["zone_id"],
-                "unit": item["unit"],
-                "param_key": item.get("param_key", "none"),
-            }
-            dataset.append({
-                "instruction": instruction,
-                "input": input_text,
-                "output": json.dumps(output_data, indent=2)
-            })
+    print(f"\n[Aetheris Brick-SLM] Training complete in {duration:.2f}s!")
+    print(f" -> Best Disjoint Val Exact Match:     {best_val_acc*100:.2f}%")
+    print(f" -> Final Out-of-Distribution (OOD):  {final_ood_metrics['exact_match_acc']*100:.2f}% Exact Match | {final_ood_metrics['class_acc']*100:.2f}% Brick Class Acc")
+    print(f" -> Checkpoint saved to:               {save_checkpoint_path}")
+    print(f" -> Audit metrics saved to:            {audit_json_path}")
 
-    out_file = Path(output_path)
-    out_file.parent.mkdir(parents=True, exist_ok=True)
-    with open(out_file, "w", encoding="utf-8") as f:
-        json.dump(dataset, f, indent=2)
-    print(f"[Instruction Fine-Tuning] Exported {len(dataset)} instruction pairs to {out_file}")
+    return model, audit_summary
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Train Aetheris Brick-SLM Model")
-    parser.add_argument("--epochs", type=int, default=10, help="Number of training epochs")
-    parser.add_argument("--batch-size", type=int, default=64, help="Batch size")
-    parser.add_argument("--lr", type=float, default=2e-3, help="Learning rate")
-    parser.add_argument("--cpu", action="store_true", help="Force CPU training")
-    parser.add_argument("--export-instructions", action="store_true", help="Export generative instruction JSON")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--epochs", type=int, default=12)
+    parser.add_argument("--batch-size", type=int, default=64)
+    parser.add_argument("--cpu", action="store_true")
     args = parser.parse_args()
 
-    data_path = Path("data/datasets/slm_bacnet_brick_corpus.jsonl")
-    checkpoint_path = Path("models/checkpoints/slm_brick_best.pt")
-
-    train_neural_slm(
-        data_path=data_path,
-        save_checkpoint_path=checkpoint_path,
-        epochs=args.epochs,
-        batch_size=args.batch_size,
-        lr=args.lr,
-        force_cpu=args.cpu
-    )
-
-    if args.export_instructions:
-        export_generative_slm_instruction_dataset()
+    train_neural_slm(epochs=args.epochs, batch_size=args.batch_size, force_cpu=args.cpu)
