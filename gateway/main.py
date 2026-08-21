@@ -36,6 +36,7 @@ RAW_BACNET_CSV = DATA_DIR / "raw_bacnet_dump.csv"
 SAMPLE_CAISO_JSON = DATA_DIR / "sample_caiso_lmp.json"
 TEMPLATE_TTL = DATA_DIR / "building_templates" / "5zone_office.ttl"
 DASHBOARD_HTML_PATH = Path(__file__).parent / "templates" / "dashboard.html"
+SIMULATOR_HTML_PATH = Path(__file__).parent / "templates" / "simulator.html"
 
 
 
@@ -287,14 +288,25 @@ app.add_middleware(
 
 @app.get("/", response_class=HTMLResponse)
 @app.get("/dashboard", response_class=HTMLResponse)
-@app.get("/simulator", response_class=HTMLResponse)
 def get_dashboard_html():
-    """Serve the interactive AETHERIS-Zero Digital Twin Mission Control Dashboard."""
+    """Serve the interactive AETHERIS-Zero 3D Digital Twin Mission Control Dashboard."""
     if DASHBOARD_HTML_PATH.exists():
         with open(DASHBOARD_HTML_PATH, "r", encoding="utf-8") as f:
             return HTMLResponse(content=f.read())
     return HTMLResponse(
         content="<h1>AETHERIS-Zero Digital Twin Dashboard</h1><p>Dashboard template not found.</p>",
+        status_code=200
+    )
+
+
+@app.get("/simulator", response_class=HTMLResponse)
+def get_simulator_html():
+    """Serve the dedicated AETHERIS-Zero Scenario & Injection Simulator Pod."""
+    if SIMULATOR_HTML_PATH.exists():
+        with open(SIMULATOR_HTML_PATH, "r", encoding="utf-8") as f:
+            return HTMLResponse(content=f.read())
+    return HTMLResponse(
+        content="<h1>AETHERIS-Zero Simulator Pod</h1><p>Simulator template not found.</p>",
         status_code=200
     )
 
@@ -506,31 +518,19 @@ async def inject_malicious_setpoint(payload: InjectFaultRequest):
 
 
 class SetModeRequest(BaseModel):
-    mode: str = Field(..., description="'RL_SAFE_ARBITRAGE' | 'BASELINE_HEURISTIC' | 'SHADOW_MODE'")
+    mode: str = Field(..., description="'RL_SAFE_ARBITRAGE' | 'BASELINE_HEURISTIC'")
 
 
 @app.post("/api/v1/control/set-mode")
 @app.post("/api/v1/control/mode")
 async def set_controller_mode(payload: SetModeRequest):
-    """Set active control mode: RL_SAFE_ARBITRAGE, BASELINE_HEURISTIC, or SHADOW_MODE."""
+    """Set active control mode: RL_SAFE_ARBITRAGE or BASELINE_HEURISTIC."""
     mode = payload.mode.upper()
-    if mode not in ["RL_SAFE_ARBITRAGE", "BASELINE_HEURISTIC", "SHADOW_MODE"]:
-        raise HTTPException(status_code=400, detail=f"Invalid controller mode: {payload.mode}")
+    if mode not in ["RL_SAFE_ARBITRAGE", "BASELINE_HEURISTIC"]:
+        raise HTTPException(status_code=400, detail=f"Invalid controller mode: {payload.mode}. Must be RL_SAFE_ARBITRAGE or BASELINE_HEURISTIC")
     runtime.controller_mode = mode
     await ws_manager.broadcast({"type": "MODE_CHANGED", "controller_mode": runtime.controller_mode})
     return {"status": "success", "controller_mode": runtime.controller_mode}
-
-
-class ToggleShadowRequest(BaseModel):
-    enabled: bool
-
-
-@app.post("/api/v1/control/toggle-shadow")
-async def toggle_shadow_mode(payload: ToggleShadowRequest):
-    """Dashboard Action: Toggle AI Shadow Mode."""
-    runtime.controller_mode = "SHADOW_MODE" if payload.enabled else "RL_SAFE_ARBITRAGE"
-    await ws_manager.broadcast({"type": "SHADOW_MODE_TOGGLED", "shadow_mode": payload.enabled, "controller_mode": runtime.controller_mode})
-    return {"status": "success", "shadow_mode": payload.enabled, "controller_mode": runtime.controller_mode}
 
 
 class WeatherOverrideRequest(BaseModel):

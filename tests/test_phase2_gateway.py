@@ -222,10 +222,14 @@ def test_fastapi_rest_simulation_and_controls(client):
     assert telemetry["safety"]["intervention_active"] is True
     assert telemetry["safety"]["shield_status"] in ["INTERVENED", "HARD_CLAMP"]
 
-    # Toggle Shadow Mode
-    res_shad = client.post("/api/v1/control/toggle-shadow", json={"enabled": True})
-    assert res_shad.status_code == 200
-    assert res_shad.json()["shadow_mode"] is True
+    # Switch Control Mode to Baseline and RL
+    res_mode = client.post("/api/v1/control/set-mode", json={"mode": "BASELINE_HEURISTIC"})
+    assert res_mode.status_code == 200
+    assert res_mode.json()["controller_mode"] == "BASELINE_HEURISTIC"
+
+    res_mode2 = client.post("/api/v1/control/set-mode", json={"mode": "RL_SAFE_ARBITRAGE"})
+    assert res_mode2.status_code == 200
+    assert res_mode2.json()["controller_mode"] == "RL_SAFE_ARBITRAGE"
 
     # Step Simulation
     res_step = client.post("/api/v1/control/step", json={"actions": None})
