@@ -37,6 +37,7 @@ SAMPLE_CAISO_JSON = DATA_DIR / "sample_caiso_lmp.json"
 TEMPLATE_TTL = DATA_DIR / "building_templates" / "5zone_office.ttl"
 DASHBOARD_HTML_PATH = Path(__file__).parent / "templates" / "dashboard.html"
 SIMULATOR_HTML_PATH = Path(__file__).parent / "templates" / "simulator.html"
+OVERVIEW_HTML_PATH = Path(__file__).parent / "templates" / "overview.html"
 
 
 
@@ -307,6 +308,19 @@ def get_simulator_html():
             return HTMLResponse(content=f.read())
     return HTMLResponse(
         content="<h1>AETHERIS-Zero Simulator Pod</h1><p>Simulator template not found.</p>",
+        status_code=200
+    )
+
+
+@app.get("/overview", response_class=HTMLResponse)
+@app.get("/product", response_class=HTMLResponse)
+def get_overview_html():
+    """Serve the dedicated AETHERIS-Zero Commercial Product Overview & ROI Business Portal."""
+    if OVERVIEW_HTML_PATH.exists():
+        with open(OVERVIEW_HTML_PATH, "r", encoding="utf-8") as f:
+            return HTMLResponse(content=f.read())
+    return HTMLResponse(
+        content="<h1>AETHERIS-Zero Business Overview</h1><p>Overview template not found.</p>",
         status_code=200
     )
 
