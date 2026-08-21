@@ -323,6 +323,17 @@ class ParseTagsRequest(BaseModel):
     tags: List[str]
 
 
+class ParseSingleTagRequest(BaseModel):
+    tag: str
+
+
+@app.post("/api/v1/ingestion/parse-tag")
+def parse_single_tag(payload: ParseSingleTagRequest):
+    """Parse a single unstructured point tag into canonical Brick Schema entity."""
+    parsed = runtime.parser.parse_point_name(tag=payload.tag)
+    return {"status": "success", "parsed": parsed.to_dict()}
+
+
 @app.post("/api/v1/ingestion/parse-tags")
 def parse_tags(payload: ParseTagsRequest):
     """Parse unstructured point tag strings into canonical Brick Schema entities."""
@@ -498,6 +509,7 @@ class SetModeRequest(BaseModel):
 
 
 @app.post("/api/v1/control/set-mode")
+@app.post("/api/v1/control/mode")
 async def set_controller_mode(payload: SetModeRequest):
     """Set active control mode: RL_SAFE_ARBITRAGE, BASELINE_HEURISTIC, or SHADOW_MODE."""
     mode = payload.mode.upper()
@@ -520,19 +532,44 @@ async def toggle_shadow_mode(payload: ToggleShadowRequest):
     return {"status": "success", "shadow_mode": payload.enabled, "controller_mode": runtime.controller_mode}
 
 
-
 class WeatherOverrideRequest(BaseModel):
     ambient_temp_c: Optional[float] = Field(default=None, description="Outdoor temperature in °C")
     solar_irradiance_wm2: Optional[float] = Field(default=None, description="Solar irradiance in W/m²")
 
 
 @app.post("/api/v1/control/set-weather")
+@app.post("/api/v1/control/weather")
 async def set_weather(payload: WeatherOverrideRequest):
     """Dynamically update real-world outdoor weather / ambient temperature."""
     runtime.set_weather_override(payload.ambient_temp_c, payload.solar_irradiance_wm2)
     state = runtime.step()
     await ws_manager.broadcast({"type": "TELEMETRY_UPDATE", "telemetry": state})
     return {"status": "success", "ambient_temp_c": payload.ambient_temp_c, "solar_irradiance_wm2": payload.solar_irradiance_wm2, "telemetry": state}
+
+
+class SimSpeedRequest(BaseModel):
+    step_delay_sec: float = Field(default=0.25, ge=0.01, le=5.0)
+
+
+@app.post("/api/v1/control/speed")
+def set_sim_speed(payload: SimSpeedRequest):
+    """Adjust simulation streaming loop delay speed."""
+    runtime.step_delay_sec = payload.step_delay_sec
+    return {"status": "success", "step_delay_sec": runtime.step_delay_sec}
+
+
+@app.post("/api/v1/control/loop/start")
+async def control_loop_start():
+    """Start continuous simulation loop."""
+    await runtime.start_simulation_loop()
+    return {"status": "success", "running": runtime.is_running_auto_loop}
+
+
+@app.post("/api/v1/control/loop/stop")
+async def control_loop_stop():
+    """Stop continuous simulation loop."""
+    await runtime.stop_simulation_loop()
+    return {"status": "success", "running": runtime.is_running_auto_loop}
 
 
 class PriceOverrideRequest(BaseModel):
