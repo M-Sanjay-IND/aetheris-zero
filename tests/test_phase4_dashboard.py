@@ -23,12 +23,17 @@ def test_dashboard_html_endpoints(client):
     assert "text/html" in res_root.headers.get("content-type", "")
     assert "AETHERIS-Zero" in res_root.text
     assert "three-canvas-container" in res_root.text
-    assert "CUSTOM INJECTION STUDIO" in res_root.text
 
     # 2. Test /dashboard alias
     res_dash = client.get("/dashboard")
     assert res_dash.status_code == 200
     assert "AETHERIS-Zero" in res_dash.text
+
+    # 3. Test /simulator separate endpoint
+    res_sim = client.get("/simulator")
+    assert res_sim.status_code == 200
+    assert "SIMULATOR POD" in res_sim.text
+    assert "Real-Time Custom Injections Studio" in res_sim.text
 
 
 

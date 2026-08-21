@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html class="dark" lang="en" id="root-html">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <meta name="description" content="AETHERIS-Zero: Dedicated Scenario & Custom Injection Simulator Pod"/>
+  <title>AETHERIS-Zero // Scenario & Injection Simulator Pod</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎛️</text></svg>"/>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+
+  <style>
+    :root {
+      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+
+      /* Dark Theme */
+      --bg-base: #0a0b0d;
+      --bg-surface: #131418;
+      --bg-elevated: #1c1d22;
+      --bg-well: #07080a;
+      
+      --border-outer: #282a32;
+      --border-inner: #191b20;
+
+      --text-main: #f0f2f5;
+      --text-muted: #9ba1ad;
+      --text-dim: #5c6270;
+
+      --shadow-bevel: 
+        0 2px 0 0 rgba(255, 255, 255, 0.07) inset,
+        0 -2px 0 0 rgba(0, 0, 0, 0.6) inset,
+        0 8px 24px rgba(0, 0, 0, 0.45);
+
+      --shadow-well: 
+        0 2px 4px 0 rgba(0, 0, 0, 0.8) inset,
+        0 -1px 0 0 rgba(255, 255, 255, 0.04) inset;
+
+      --led-green: #22c55e;
+      --led-amber: #f59e0b;
+      --led-red: #ef4444;
+      --led-blue: #38bdf8;
+    }
+
+    html.light {
+      --bg-base: #e6e8ec;
+      --bg-surface: #f0f2f5;
+      --bg-elevated: #ffffff;
+      --bg-well: #dcdfe4;
+      
+      --border-outer: #c0c4cc;
+      --border-inner: #d0d4dc;
+
+      --text-main: #111317;
+      --text-muted: #555b68;
+      --text-dim: #8890a0;
+
+      --shadow-bevel: 
+        0 2px 0 0 rgba(255, 255, 255, 0.9) inset,
+        0 -2px 0 0 rgba(0, 0, 0, 0.1) inset,
+        0 8px 20px rgba(0, 0, 0, 0.08);
+
+      --shadow-well: 
+        0 2px 4px 0 rgba(0, 0, 0, 0.15) inset,
+        0 -1px 0 0 rgba(255, 255, 255, 0.8) inset;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; transition: background 0.2s, color 0.2s, border 0.2s; }
+    body { font-family: var(--font-sans); background: var(--bg-base); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; }
+    
+    .skeuo-card { background: var(--bg-surface); border: 1px solid var(--border-outer); border-radius: 12px; box-shadow: var(--shadow-bevel); }
+    .skeuo-well { background: var(--bg-well); border: 1px solid var(--border-inner); border-radius: 8px; box-shadow: var(--shadow-well); }
+    .skeuo-btn {
+      background: var(--bg-elevated); color: var(--text-main); border: 1px solid var(--border-outer);
+      border-radius: 8px; padding: 8px 14px; font-size: 11px; font-weight: 700; font-family: var(--font-sans);
+      cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; user-select: none;
+    }
+    .skeuo-btn:hover { filter: brightness(1.1); }
+    .skeuo-btn:active { transform: translateY(1px); }
+    .skeuo-btn-primary { background: #1e293b; color: #fff; border-color: #334155; }
+    .skeuo-btn-danger { background: #450a0a; color: #fca5a5; border-color: #7f1d1d; }
+
+    .led-lamp { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+    .led-green { background: var(--led-green); box-shadow: 0 0 8px rgba(34,197,94,0.6); }
+    .led-amber { background: var(--led-amber); box-shadow: 0 0 8px rgba(245,158,11,0.6); }
+    .led-red { background: var(--led-red); box-shadow: 0 0 8px rgba(239,68,68,0.6); }
+    .led-blue { background: var(--led-blue); box-shadow: 0 0 8px rgba(56,189,248,0.6); }
+
+    .font-mono { font-family: var(--font-mono); }
+
+    input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
+    input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; cursor: pointer; background: var(--bg-well); border-radius: 3px; border: 1px solid var(--border-inner); }
+    input[type=range]::-webkit-slider-thumb { height: 16px; width: 16px; border-radius: 50%; background: var(--text-main); cursor: pointer; -webkit-appearance: none; margin-top: -5px; border: 1px solid var(--border-outer); }
+
+    table { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: 11px; }
+    th { text-align: left; padding: 8px 10px; background: var(--bg-well); color: var(--text-dim); border-bottom: 1px solid var(--border-inner); font-weight: 700; }
+    td { padding: 6px 10px; border-bottom: 1px solid var(--border-inner); color: var(--text-main); }
+    tr:hover td { background: var(--bg-elevated); }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header style="background: var(--bg-surface); border-bottom: 1px solid var(--border-outer); position: sticky; top: 0; z-index: 100;">
+    <div style="max-width: 1600px; margin: 0 auto; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+      
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div class="skeuo-well" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-size: 18px;">
+          🎛️
+        </div>
+        <div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <h1 style="font-size: 16px; font-weight: 800;">AETHERIS-Zero // SIMULATOR POD</h1>
+            <span class="skeuo-well font-mono" style="font-size: 10px; font-weight: 700; padding: 2px 6px; color: var(--text-dim);">STANDALONE SANDBOX</span>
+          </div>
+          <p style="font-size: 11px; color: var(--text-muted);">Real-time Custom Injection Studio, Grid Shocks & 5-Zone 2R2C Physics Engine</p>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <!-- Return to 3D Dashboard Link -->
+        <button class="skeuo-btn" onclick="window.location.href='/dashboard'">
+          🏢 <strong>3D MISSION CONTROL</strong>
+        </button>
+
+        <!-- Mode Toggle (RL vs Baseline Only - No Shadow) -->
+        <button id="btn-sim-mode" class="skeuo-btn skeuo-btn-primary" onclick="cycleSimMode()">
+          <span>⚙️</span> <span id="txt-sim-mode">MODE: RL ARBITRAGE</span>
+        </button>
+
+        <!-- Theme Toggle -->
+        <button class="skeuo-btn" onclick="toggleTheme()">
+          <span id="theme-icon">☀️</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- MAIN WORKSPACE -->
+  <main style="max-width: 1600px; margin: 20px auto; padding: 0 24px 60px 24px; width: 100%; flex: 1; display: flex; flex-direction: column; gap: 20px;">
+    
+    <!-- Top Row: Control Deck & Live Sliders -->
+    <div style="display: grid; grid-template-columns: 360px 1fr; gap: 20px;">
+      
+      <!-- Panel 1: Simulation Loop Control Deck -->
+      <div class="skeuo-card" style="padding: 20px; display: flex; flex-direction: column; gap: 16px;">
+        <div>
+          <h2 style="font-size: 13px; font-weight: 800; text-transform: uppercase;">Simulation Control Deck</h2>
+          <p style="font-size: 11px; color: var(--text-muted);">Execute step-by-step or stream continuous 24h cycle</p>
+        </div>
+
+        <!-- Loop Playback Buttons -->
+        <div style="display: flex; gap: 8px;">
+          <button id="btn-loop" class="skeuo-btn skeuo-btn-primary" style="flex: 1;" onclick="toggleLoop()">
+            <span id="ico-loop">▶</span> <span id="txt-loop">START LOOP</span>
+          </button>
+          <button class="skeuo-btn" onclick="triggerStep()">
+            ⏭ STEP
+          </button>
+          <button class="skeuo-btn" onclick="triggerReset()">
+            🔄 RESET
+          </button>
+        </div>
+
+        <!-- Speed Selector -->
+        <div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; margin-bottom: 6px;">Simulation Loop Speed:</div>
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;">
+            <button class="skeuo-btn" onclick="setSpeed(1.0)">1x (1.0s)</button>
+            <button class="skeuo-btn skeuo-btn-primary" onclick="setSpeed(0.25)">5x (0.25s)</button>
+            <button class="skeuo-btn" onclick="setSpeed(0.05)">20x (0.05s)</button>
+          </div>
+        </div>
+
+        <!-- Live Step Telemetry Snapshot -->
+        <div class="skeuo-well font-mono" style="padding: 12px; font-size: 11px; display: flex; flex-direction: column; gap: 6px;">
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: var(--text-dim);">Sim Time / Step:</span>
+            <strong id="disp-step-time">Hour 12.00 (Step 144)</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: var(--text-dim);">Current Dynamic LMP:</span>
+            <strong id="disp-step-lmp" style="color: var(--text-main);">$0.184 / kWh</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: var(--text-dim);">Total HVAC Power:</span>
+            <strong id="disp-step-power">34.2 kW</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: var(--text-dim);">Instant Savings %:</span>
+            <strong id="disp-step-savings" style="color: var(--led-green);">24.8%</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: var(--text-dim);">Occupant Comfort:</span>
+            <strong id="disp-step-comfort" style="color: var(--led-green);">100.0%</strong>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Panel 2: Live Injections Studio -->
+      <div class="skeuo-card" style="padding: 20px; display: flex; flex-direction: column; gap: 16px;">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <div>
+            <h2 style="font-size: 13px; font-weight: 800; text-transform: uppercase;">Real-Time Custom Injections Studio</h2>
+            <p style="font-size: 11px; color: var(--text-muted);">Dynamically perturb grid wholesale pricing, outdoor weather, and zone setpoints</p>
+          </div>
+          <span class="led-lamp led-amber"></span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          
+          <!-- Slider: Price -->
+          <div class="skeuo-well" style="padding: 12px;">
+            <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; margin-bottom: 6px;">
+              <span>Dynamic LMP Electricity Price:</span>
+              <strong id="lbl-slider-price" class="font-mono">$0.18 / kWh</strong>
+            </div>
+            <input id="slider-price" type="range" min="0.01" max="2.00" step="0.01" value="0.18" oninput="updatePriceLabel(this.value)" onchange="applyPrice(this.value)"/>
+          </div>
+
+          <!-- Slider: Ambient Temp -->
+          <div class="skeuo-well" style="padding: 12px;">
+            <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; margin-bottom: 6px;">
+              <span>Outdoor Ambient Temperature:</span>
+              <strong id="lbl-slider-temp" class="font-mono">28.0°C</strong>
+            </div>
+            <input id="slider-temp" type="range" min="15.0" max="45.0" step="0.5" value="28.0" oninput="updateTempLabel(this.value)" onchange="applyTemp(this.value)"/>
+          </div>
+
+        </div>
+
+        <!-- Zone Manual Override -->
+        <div class="skeuo-well" style="padding: 12px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+          <span style="font-size: 11px; font-weight: 700; color: var(--text-dim);">ZONE SETPOINT OVERRIDE:</span>
+          <select id="sel-zone" class="skeuo-btn font-mono" style="padding: 4px 8px;">
+            <option value="zone_1">Zone 1 (Core Office)</option>
+            <option value="zone_2">Zone 2 (North Floor)</option>
+            <option value="zone_3">Zone 3 (South Floor)</option>
+            <option value="zone_4">Zone 4 (East Floor)</option>
+            <option value="zone_5">Zone 5 (West Floor)</option>
+          </select>
+          <input id="inp-zone-sp" type="number" class="skeuo-well font-mono" style="width: 70px; padding: 4px 8px; font-size: 11px; color: var(--text-main);" value="22.0" step="0.5" min="18.0" max="38.0"/>
+          <button class="skeuo-btn skeuo-btn-primary" onclick="applyZoneOverride()">APPLY SETPOINT</button>
+        </div>
+
+        <!-- Quick One-Click Presets -->
+        <div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; margin-bottom: 8px;">One-Click Injected Scenarios:</div>
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
+            <button class="skeuo-btn" onclick="applyPrice(1.50)">⚡ $1.50 Price Spike</button>
+            <button class="skeuo-btn" onclick="applyTemp(38.0)">☀️ +10°C Heatwave</button>
+            <button class="skeuo-btn skeuo-btn-danger" onclick="injectCyberAttack()">🛡️ 38°C Attack</button>
+            <button class="skeuo-btn" onclick="triggerOpenADR()">📡 OpenADR DR</button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Bottom Row: Real-Time Simulation Step Telemetry Ledger -->
+    <div class="skeuo-card" style="padding: 20px;">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+        <h2 style="font-size: 13px; font-weight: 800; text-transform: uppercase;">Real-Time Step Telemetry Ledger</h2>
+        <button class="skeuo-btn" style="padding: 3px 8px; font-size: 10px;" onclick="clearTable()">CLEAR TABLE</button>
+      </div>
+
+      <div class="skeuo-well" style="max-height: 320px; overflow-y: auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Step #</th>
+              <th>Sim Time</th>
+              <th>LMP Price</th>
+              <th>Outdoor Temp</th>
+              <th>Actual Power</th>
+              <th>Baseline Power</th>
+              <th>Shaved kW</th>
+              <th>Savings %</th>
+              <th>Comfort SLA</th>
+              <th>Shield Status</th>
+            </tr>
+          </thead>
+          <tbody id="tbl-telemetry-body">
+            <!-- Dynamic Telemetry Rows -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    let isAutoLoopRunning = false;
+    let currentSimMode = "RL_SAFE_ARBITRAGE";
+    let isDarkTheme = true;
+    let ws = null;
+    let stepCount = 0;
+
+    document.addEventListener("DOMContentLoaded", () => {
+      connectWebSocket();
+      fetchInitial();
+    });
+
+    function connectWebSocket() {
+      const loc = window.location;
+      const wsUrl = (loc.protocol === "https:" ? "wss://" : "ws://") + loc.host + "/ws/telemetry";
+      ws = new WebSocket(wsUrl);
+
+      ws.onmessage = (evt) => {
+        try {
+          const msg = JSON.parse(evt.data);
+          if (msg.type === "INITIAL_STATE" || msg.type === "TELEMETRY_UPDATE") {
+            handleFrame(msg.telemetry);
+          } else if (msg.type === "LOOP_STARTED") {
+            setLoopState(true);
+          } else if (msg.type === "LOOP_STOPPED") {
+            setLoopState(false);
+          }
+        } catch(e) {}
+      };
+
+      ws.onclose = () => { setTimeout(connectWebSocket, 2000); };
+    }
+
+    function fetchInitial() {
+      fetch("/api/v1/simulation/state")
+        .then(r => r.json())
+        .then(d => { if (d.telemetry) handleFrame(d.telemetry); });
+    }
+
+    function handleFrame(t) {
+      if (!t) return;
+      stepCount = t.step || (stepCount + 1);
+
+      const price = t.dynamic_lmp_price !== undefined ? t.dynamic_lmp_price : 0.18;
+      const tamb = t.ambient_temp_c !== undefined ? t.ambient_temp_c : 28.0;
+      const actualKw = t.power?.total_hvac_kw || 34.2;
+      const baseKw = t.power?.baseline_hvac_kw || 42.5;
+      const shavedKw = t.power?.demand_shaved_kw || Math.max(0, baseKw - actualKw);
+      
+      const savingsPct = t.metrics?.cost_savings_pct !== undefined ? t.metrics.cost_savings_pct : (currentSimMode === "BASELINE_HEURISTIC" ? 0.0 : 24.8);
+      const comfortPct = t.metrics?.comfort_compliance_pct !== undefined ? t.metrics.comfort_compliance_pct : (currentSimMode === "BASELINE_HEURISTIC" ? 88.0 : 100.0);
+      const shieldStatus = t.safety?.shield_status || "OPTIMAL";
+
+      // Update Snapshot
+      document.getElementById("disp-step-time").innerText = `${t.time_display || '12:00'} (Step ${stepCount})`;
+      document.getElementById("disp-step-lmp").innerText = `$${Number(price).toFixed(3)} / kWh`;
+      document.getElementById("disp-step-power").innerText = `${Number(actualKw).toFixed(1)} kW`;
+      document.getElementById("disp-step-savings").innerText = `${Number(savingsPct).toFixed(1)}%`;
+      document.getElementById("disp-step-comfort").innerText = `${Number(comfortPct).toFixed(1)}%`;
+
+      // Update Sliders if not actively dragged
+      document.getElementById("slider-price").value = price;
+      document.getElementById("lbl-slider-price").innerText = `$${Number(price).toFixed(2)} / kWh`;
+      document.getElementById("slider-temp").value = tamb;
+      document.getElementById("lbl-slider-temp").innerText = `${Number(tamb).toFixed(1)}°C`;
+
+      // Append Table Row
+      appendTableRow({
+        step: stepCount,
+        time: t.time_display || '12:00',
+        price: `$${Number(price).toFixed(3)}`,
+        tamb: `${Number(tamb).toFixed(1)}°C`,
+        actualKw: `${Number(actualKw).toFixed(1)} kW`,
+        baseKw: `${Number(baseKw).toFixed(1)} kW`,
+        shavedKw: `${Number(shavedKw).toFixed(1)} kW`,
+        savings: `${Number(savingsPct).toFixed(1)}%`,
+        comfort: `${Number(comfortPct).toFixed(1)}%`,
+        shield: shieldStatus
+      });
+    }
+
+    function appendTableRow(row) {
+      const tbody = document.getElementById("tbl-telemetry-body");
+      if (!tbody) return;
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td><strong>#${row.step}</strong></td>
+        <td>${row.time}</td>
+        <td><strong style="color: var(--text-main);">${row.price}</strong></td>
+        <td>${row.tamb}</td>
+        <td>${row.actualKw}</td>
+        <td style="color: var(--text-muted);">${row.baseKw}</td>
+        <td style="color: var(--led-green);">${row.shavedKw}</td>
+        <td><span style="color: var(--led-green); font-weight: 700;">${row.savings}</span></td>
+        <td><strong style="color: ${parseFloat(row.comfort) >= 98 ? 'var(--led-green)' : 'var(--led-amber)'}">${row.comfort}</strong></td>
+        <td><span class="font-mono" style="font-size: 10px; color: ${row.shield === 'OPTIMAL' ? 'var(--led-green)' : 'var(--led-red)'}">${row.shield}</span></td>
+      `;
+
+      tbody.insertBefore(tr, tbody.firstChild);
+      if (tbody.children.length > 50) tbody.removeChild(tbody.lastChild);
+    }
+
+    function clearTable() {
+      const tbody = document.getElementById("tbl-telemetry-body");
+      if (tbody) tbody.innerHTML = "";
+    }
+
+    // ACTIONS
+    function toggleLoop() {
+      const url = isAutoLoopRunning ? "/api/v1/control/loop/stop" : "/api/v1/control/loop/start";
+      fetch(url, { method: "POST" }).then(r => r.json()).then(d => setLoopState(d.running));
+    }
+
+    function setLoopState(running) {
+      isAutoLoopRunning = running;
+      const btn = document.getElementById("btn-loop");
+      const ico = document.getElementById("ico-loop");
+      const txt = document.getElementById("txt-loop");
+      if (btn && ico && txt) {
+        if (running) {
+          ico.innerText = "⏸";
+          txt.innerText = "PAUSE LOOP";
+          btn.classList.add("skeuo-btn-danger");
+        } else {
+          ico.innerText = "▶";
+          txt.innerText = "START LOOP";
+          btn.classList.remove("skeuo-btn-danger");
+        }
+      }
+    }
+
+    function triggerStep() {
+      fetch("/api/v1/control/step", { method: "POST" })
+        .then(r => r.json())
+        .then(d => { if (d.telemetry) handleFrame(d.telemetry); });
+    }
+
+    function triggerReset() {
+      fetch("/api/v1/control/reset", { method: "POST" })
+        .then(r => r.json())
+        .then(d => {
+          clearTable();
+          if (d.telemetry) handleFrame(d.telemetry);
+        });
+    }
+
+    function setSpeed(delaySec) {
+      fetch("/api/v1/control/speed", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ step_delay_sec: delaySec })
+      });
+    }
+
+    function cycleSimMode() {
+      currentSimMode = currentSimMode === "RL_SAFE_ARBITRAGE" ? "BASELINE_HEURISTIC" : "RL_SAFE_ARBITRAGE";
+      fetch("/api/v1/control/mode", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mode: currentSimMode })
+      }).then(r => r.json()).then(() => {
+        document.getElementById("txt-sim-mode").innerText = `MODE: ${currentSimMode.replace("_", " ")}`;
+      });
+    }
+
+    function updatePriceLabel(v) { document.getElementById("lbl-slider-price").innerText = `$${Number(v).toFixed(2)} / kWh`; }
+    function applyPrice(v) {
+      fetch("/api/v1/control/set-pricing", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ price_usd_per_kwh: parseFloat(v) })
+      }).then(r => r.json()).then(d => { if (d.telemetry) handleFrame(d.telemetry); });
+    }
+
+    function updateTempLabel(v) { document.getElementById("lbl-slider-temp").innerText = `${Number(v).toFixed(1)}°C`; }
+    function applyTemp(v) {
+      fetch("/api/v1/control/set-weather", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ambient_temp_c: parseFloat(v) })
+      }).then(r => r.json()).then(d => { if (d.telemetry) handleFrame(d.telemetry); });
+    }
+
+    function applyZoneOverride() {
+      const zid = document.getElementById("sel-zone").value;
+      const sp = parseFloat(document.getElementById("inp-zone-sp").value);
+      fetch("/api/v1/control/set-zone-target", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ zone_id: zid, target_temp: sp })
+      }).then(r => r.json()).then(d => { if (d.telemetry) handleFrame(d.telemetry); });
+    }
+
+    function injectCyberAttack() {
+      fetch("/api/v1/control/inject-fault", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ zone_id: "zone_1", target_temp: 38.0 })
+      }).then(r => r.json()).then(d => { if (d.telemetry) handleFrame(d.telemetry); });
+    }
+
+    function triggerOpenADR() {
+      fetch("/api/v1/control/trigger-dr", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ start_hour: 14.0, duration_hours: 4.0, price_spike: 1.50 })
+      }).then(r => r.json()).then(d => { if (d.telemetry) handleFrame(d.telemetry); });
+    }
+
+    function toggleTheme() {
+      isDarkTheme = !isDarkTheme;
+      document.getElementById("root-html").className = isDarkTheme ? "dark" : "light";
+      document.getElementById("theme-icon").innerText = isDarkTheme ? "☀️" : "🌙";
+    }
+  </script>
+</body>
+</html>
