@@ -38,12 +38,18 @@ def test_dashboard_html_endpoints(client):
     # 4. Test /overview and /product commercial portal
     res_ov = client.get("/overview")
     assert res_ov.status_code == 200
-    assert "COMMERCIAL PRODUCT OVERVIEW & EXECUTIVE ROI" in res_ov.text
-    assert "Interactive Commercial Building ROI Calculator" in res_ov.text
+    assert "Product Details" in res_ov.text
+    assert "Commercial Real Estate ROI" in res_ov.text
 
     res_prod = client.get("/product")
     assert res_prod.status_code == 200
-    assert "COMMERCIAL PRODUCT OVERVIEW & EXECUTIVE ROI" in res_prod.text
+    assert "Product Details" in res_prod.text
+
+    # 5. Test /terminal BMS output endpoint
+    res_term = client.get("/terminal")
+    assert res_term.status_code == 200
+    assert "BMS Integration & Live Output Terminal" in res_term.text
+    assert "term-feed" in res_term.text
 
 
 

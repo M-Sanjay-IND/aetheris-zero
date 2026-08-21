@@ -38,6 +38,7 @@ TEMPLATE_TTL = DATA_DIR / "building_templates" / "5zone_office.ttl"
 DASHBOARD_HTML_PATH = Path(__file__).parent / "templates" / "dashboard.html"
 SIMULATOR_HTML_PATH = Path(__file__).parent / "templates" / "simulator.html"
 OVERVIEW_HTML_PATH = Path(__file__).parent / "templates" / "overview.html"
+TERMINAL_HTML_PATH = Path(__file__).parent / "templates" / "terminal.html"
 
 
 
@@ -111,7 +112,10 @@ class SimulationRuntime:
 
         active_evt = self.openadr_ven.get_active_event(self.simulator.current_hour)
         evt_id = active_evt.id if active_evt else None
-        return self.serializer.serialize_state(raw_state, dr_event_id=evt_id)
+        frame = self.serializer.serialize_state(raw_state, dr_event_id=evt_id)
+        if isinstance(frame, dict):
+            frame["controller_mode"] = self.controller_mode
+        return frame
 
 
     def step(self, actions: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
@@ -325,6 +329,19 @@ def get_overview_html():
     )
 
 
+@app.get("/terminal", response_class=HTMLResponse)
+@app.get("/bms-terminal", response_class=HTMLResponse)
+def get_terminal_html():
+    """Serve the dedicated AETHERIS-Zero BMS Hardware Integration Terminal."""
+    if TERMINAL_HTML_PATH.exists():
+        with open(TERMINAL_HTML_PATH, "r", encoding="utf-8") as f:
+            return HTMLResponse(content=f.read())
+    return HTMLResponse(
+        content="<h1>AETHERIS-Zero BMS Terminal</h1><p>Terminal template not found.</p>",
+        status_code=200
+    )
+
+
 @app.get("/favicon.ico", include_in_schema=False)
 def get_favicon():
     return Response(status_code=204)
@@ -533,6 +550,12 @@ async def inject_malicious_setpoint(payload: InjectFaultRequest):
 
 class SetModeRequest(BaseModel):
     mode: str = Field(..., description="'RL_SAFE_ARBITRAGE' | 'BASELINE_HEURISTIC'")
+
+
+@app.get("/api/v1/control/mode")
+def get_controller_mode():
+    """Get active control mode: RL_SAFE_ARBITRAGE or BASELINE_HEURISTIC."""
+    return {"status": "success", "controller_mode": runtime.controller_mode}
 
 
 @app.post("/api/v1/control/set-mode")

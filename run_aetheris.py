@@ -105,6 +105,7 @@ def start_server(host: str = "0.0.0.0", port: int = 8000, open_browser: bool = T
     print(f"  * Commercial Product & ROI Portal: {base_url}/overview")
     print(f"  * 3D Mission Control Digital Twin: {base_url}/")
     print(f"  * Scenario & Injection Simulator:  {base_url}/simulator")
+    print(f"  * BMS Integration Output Terminal: {base_url}/terminal")
     print(f"  * Interactive API Docs (Swagger):  {base_url}/docs")
     print(f"  * Technical Spec (ReDoc):          {base_url}/redoc")
     print(f"  * Real-Time Telemetry Stream:      ws://{display_host}:{port}/ws/telemetry")

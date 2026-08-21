@@ -178,7 +178,8 @@ class TelemetrySerializer:
         energy_saved_kwh = max(0.0, energy_base_kwh - energy_act_kwh)
         carbon_avoided_kg = round(energy_saved_kwh * 0.385, 2)
 
-        compliance_rate = (compliant_zones_count / max(1, total_occupied_zones) * 100.0) if total_occupied_zones > 0 else 100.0
+        avg_ppd = sum(float(z.get("ppd", 5.0)) for z in raw_zones.values()) / max(1, len(raw_zones))
+        compliance_rate = round(max(0.0, min(100.0, 100.0 - avg_ppd)), 1)
 
         frame = TelemetryFrame(
             step=int(raw_state.get("step", 0)),
