@@ -39,6 +39,8 @@ class ActorCritic(nn.Module):
         value = self.critic(features)
         return dist, value
 
+from pathlib import Path
+
 class PPOAgent:
     """
     Continuous Proximal Policy Optimization (PPO) Safe-RL Agent.
@@ -52,7 +54,8 @@ class PPOAgent:
         gamma: float = 0.99,
         clip_ratio: float = 0.2,
         value_coef: float = 0.5,
-        entropy_coef: float = 0.01
+        entropy_coef: float = 0.01,
+        checkpoint_path: str | Path | None = "models/checkpoints/ppo_safe_rl_best.pt"
     ):
         self.state_dim = state_dim
         self.action_dim = action_dim
@@ -63,6 +66,17 @@ class PPOAgent:
 
         self.ac = ActorCritic(state_dim, action_dim)
         self.optimizer = torch.optim.Adam(self.ac.parameters(), lr=lr)
+
+        if checkpoint_path is not None:
+            ckpt_file = Path(checkpoint_path)
+            if ckpt_file.exists():
+                try:
+                    data = torch.load(str(ckpt_file), map_location="cpu")
+                    ckpt_state_dim = data.get("state_dim", state_dim)
+                    if ckpt_state_dim == self.state_dim:
+                        self.ac.load_state_dict(data["state_dict"])
+                except Exception:
+                    pass
 
     def extract_observation(
         self,
@@ -111,10 +125,18 @@ class PPOAgent:
         sin_hr = np.sin(2.0 * np.pi * hour / 24.0)
         cos_hr = np.cos(2.0 * np.pi * hour / 24.0)
 
-        obs = np.array(
-            tz + tm + [t_ext, sol, curr_price, p_2h, p_4h, p_6h] + occ + [pwr_norm, sin_hr, cos_hr],
-            dtype=np.float32
-        )
+        if self.state_dim == 32:
+            p_diff = float(p_2h - curr_price)
+            day_enc = [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0]  # Default weekday
+            obs = np.array(
+                tz + tm + [t_ext, sol, curr_price, p_2h, p_4h, p_6h] + occ + [pwr_norm, p_diff, sin_hr, cos_hr] + day_enc,
+                dtype=np.float32
+            )
+        else:
+            obs = np.array(
+                tz + tm + [t_ext, sol, curr_price, p_2h, p_4h, p_6h] + occ + [pwr_norm, sin_hr, cos_hr],
+                dtype=np.float32
+            )
         return obs
 
     def select_action(
