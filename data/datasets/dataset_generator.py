@@ -2,12 +2,16 @@ import csv
 import json
 import os
 from pathlib import Path
+from typing import Dict, List, Tuple
 import numpy as np
 import pandas as pd
 
 DATASET_DIR = Path(__file__).parent.resolve()
 SLM_JSONL_PATH = DATASET_DIR / "slm_bacnet_brick_corpus.jsonl"
 SLM_CSV_PATH = DATASET_DIR / "slm_bacnet_brick_corpus.csv"
+SLM_TRAIN_PATH = DATASET_DIR / "slm_train.jsonl"
+SLM_VAL_PATH = DATASET_DIR / "slm_val.jsonl"
+SLM_TEST_OOD_PATH = DATASET_DIR / "slm_test_ood.jsonl"
 GRID_CSV_PATH = DATASET_DIR / "grid_weather_thermal_timeseries.csv"
 GRID_PARQUET_PATH = DATASET_DIR / "grid_weather_thermal_timeseries.parquet"
 
@@ -57,149 +61,243 @@ SUBSYSTEMS = ["hvac", "thermal_model", "electrical", "environment"]
 UNITS = ["deg_C", "kW", "m3/s", "ratio", "count", "K/kW", "kJ/K", "m2", "W/m2", "ppm", "%", "kPa", "unknown"]
 
 
-def generate_slm_tag_corpus(num_samples: int = 6000, seed: int = 42) -> list[dict]:
+def generate_slm_tag_corpus_leak_free(seed: int = 42) -> Tuple[List[dict], List[dict], List[dict]]:
+    """
+    Generates a realistic, multi-vendor building tag corpus with strict Disjoint Facility/Domain splitting
+    to guarantee zero data leakage between Train, Validation, and Out-of-Distribution (OOD) Test sets.
+    """
     rng = np.random.default_rng(seed)
-    records = []
+
+    # Disjoint Facility Domains (Zero overlap across splits)
+    train_facilities = ["CAMPUS_ENG", "BLDG1", "FACILITY_A", "TOWER_NORTH", "PLANT_EAST"]
+    val_facilities = ["HQ_CAMPUS", "HOSPITAL_MAIN"]
+    test_ood_facilities = ["DATACENTER_WEST", "AUTOMATED_LOGIC_SITE7", "METASYS_UNSEEN_FACILITY", "SIEMENS_DESIGO_LAB"]
+
+    # Point Archetype definitions with realistic abbreviation variants
+    archetypes = [
+        # (Templates, brick_class, equipment_type, point_role, subsystem, unit, param_key)
+        (
+            ["{fac}_{zone}_RAT", "{fac}_{zone}_ZN_T", "{fac}_{zone}_ROOM_TEMP", "{fac}_{zone}_TEMP_SENS", "{fac}_{zone}_AIR_TEMP"],
+            "Zone_Air_Temperature_Sensor", "Variable_Air_Volume_Box", "sensor", "hvac", "deg_C", None
+        ),
+        (
+            ["{fac}_{zone}_TEMP_SP", "{fac}_{zone}_STPT", "{fac}_{zone}_ZN_STPT", "{fac}_{zone}_AIR_TEMP_SP", "{fac}_{zone}_SETPT"],
+            "Zone_Air_Temperature_Setpoint", "Variable_Air_Volume_Box", "setpoint", "hvac", "deg_C", None
+        ),
+        (
+            ["{fac}_{zone}_OCC", "{fac}_{zone}_OCCUPANCY", "{fac}_{zone}_OCC_COUNT", "{fac}_{zone}_OCC_SENS"],
+            "Occupancy_Sensor", "Variable_Air_Volume_Box", "sensor", "environment", "count", None
+        ),
+        (
+            ["{fac}_{zone}_CO2", "{fac}_{zone}_CO2_PPM", "{fac}_{zone}_CARBON_DIOXIDE"],
+            "CO2_Level_Sensor", "Variable_Air_Volume_Box", "sensor", "environment", "ppm", None
+        ),
+        (
+            ["{fac}_{zone}_RH", "{fac}_{zone}_RH_SENS", "{fac}_{zone}_HUMIDITY_PCT"],
+            "Relative_Humidity_Sensor", "Variable_Air_Volume_Box", "sensor", "environment", "%", None
+        ),
+        (
+            ["{fac}_VAV_{zone}_DMPR_POS", "{fac}_VAV_{zone}_DMP_CMD", "{fac}_VAV_{zone}_DAMPER_POS", "{fac}_VAV_{zone}_DMPR"],
+            "Damper_Position_Command", "Variable_Air_Volume_Box", "command", "hvac", "ratio", None
+        ),
+        (
+            ["{fac}_VAV_{zone}_FLOW", "{fac}_VAV_{zone}_AIR_FLOW", "{fac}_VAV_{zone}_CFM", "{fac}_VAV_{zone}_M3S"],
+            "Air_Flow_Sensor", "Variable_Air_Volume_Box", "sensor", "hvac", "m3/s", None
+        ),
+        (
+            ["{fac}_VAV_{zone}_DAT_SP", "{fac}_VAV_{zone}_DISCH_TEMP_SP", "{fac}_VAV_{zone}_DAT_SETPT"],
+            "Discharge_Air_Temperature_Setpoint", "Variable_Air_Volume_Box", "setpoint", "hvac", "deg_C", None
+        ),
+        (
+            ["{fac}_AHU{ahu}_SAT", "{fac}_AHU{ahu}_SUPPLY_TEMP", "{fac}_AHU{ahu}_SA_TEMP", "{fac}_AHU{ahu}_SUP_AIR_T"],
+            "Supply_Air_Temperature_Sensor", "Air_Handling_Unit", "sensor", "hvac", "deg_C", None
+        ),
+        (
+            ["{fac}_AHU{ahu}_SAT_SP", "{fac}_AHU{ahu}_SUP_TEMP_SP", "{fac}_AHU{ahu}_SA_STPT", "{fac}_AHU{ahu}_SUPPLY_AIR_STPT"],
+            "Supply_Air_Temperature_Setpoint", "Air_Handling_Unit", "setpoint", "hvac", "deg_C", None
+        ),
+        (
+            ["{fac}_AHU{ahu}_FAN_KW", "{fac}_AHU{ahu}_FAN_PWR", "{fac}_AHU{ahu}_SUP_FAN_KW", "{fac}_AHU{ahu}_ELEC_KW"],
+            "Electric_Power_Sensor", "Air_Handling_Unit", "meter", "electrical", "kW", None
+        ),
+        (
+            ["{fac}_AHU{ahu}_FAN_STAT", "{fac}_AHU{ahu}_FAN_STATUS", "{fac}_AHU{ahu}_RUN_STAT"],
+            "Fan_Status", "Air_Handling_Unit", "status", "hvac", "unknown", None
+        ),
+        (
+            ["{fac}_AHU{ahu}_FLTR_DP", "{fac}_AHU{ahu}_FILTER_DIFF_P", "{fac}_AHU{ahu}_DP_SENS"],
+            "Filter_Differential_Pressure_Sensor", "Air_Handling_Unit", "sensor", "hvac", "kPa", None
+        ),
+        (
+            ["{fac}_CHLR{chlr}_CHW_SUP_T", "{fac}_CHLR{chlr}_CHW_SUP", "{fac}_CHLR{chlr}_SUPPLY_TEMP", "{fac}_CHLR{chlr}_CHW_ST"],
+            "Chilled_Water_Supply_Temperature_Sensor", "Chiller", "sensor", "hvac", "deg_C", None
+        ),
+        (
+            ["{fac}_CHLR{chlr}_CHW_RET_T", "{fac}_CHLR{chlr}_CHW_RET", "{fac}_CHLR{chlr}_RETURN_TEMP", "{fac}_CHLR{chlr}_CHW_RT"],
+            "Chilled_Water_Return_Temperature_Sensor", "Chiller", "sensor", "hvac", "deg_C", None
+        ),
+        (
+            ["{fac}_CHLR{chlr}_CHW_STPT", "{fac}_CHLR{chlr}_CHW_SP", "{fac}_CHLR{chlr}_SETPOINT", "{fac}_CHLR{chlr}_CHW_SETPT"],
+            "Chilled_Water_Supply_Temperature_Setpoint", "Chiller", "setpoint", "hvac", "deg_C", None
+        ),
+        (
+            ["{fac}_CHLR{chlr}_KW", "{fac}_CHLR{chlr}_POWER_KW", "{fac}_CHLR{chlr}_ELEC_KW", "{fac}_CHLR{chlr}_MTR_KW"],
+            "Electric_Power_Sensor", "Chiller", "meter", "electrical", "kW", None
+        ),
+        (
+            ["{fac}_BLDG_TOTAL_KW", "{fac}_MAIN_MTR_KW", "{fac}_BUILDING_POWER", "{fac}_GRID_KW"],
+            "Electric_Power_Sensor", "Building", "meter", "electrical", "kW", None
+        ),
+        (
+            ["{fac}_OAT", "{fac}_OUTDOOR_TEMP", "{fac}_AMB_TEMP", "{fac}_OA_T", "{fac}_WEATHER_TEMP"],
+            "Outside_Air_Temperature_Sensor", "Building", "sensor", "environment", "deg_C", None
+        ),
+        (
+            ["{fac}_SOLAR_GHI", "{fac}_SOLAR_IRRAD", "{fac}_GHI_SENS", "{fac}_SOL_IRRAD"],
+            "Solar_Radiance_Sensor", "Building", "sensor", "environment", "W/m2", None
+        ),
+        (
+            ["{fac}_{zone}_CZ_PARAM", "{fac}_{zone}_CAPACITANCE_AIR"],
+            "Thermal_Capacitance_Air_Parameter", "Variable_Air_Volume_Box", "parameter", "thermal_model", "kJ/K", "C_z"
+        ),
+        (
+            ["{fac}_{zone}_CM_PARAM", "{fac}_{zone}_CAPACITANCE_MASS"],
+            "Thermal_Capacitance_Mass_Parameter", "Variable_Air_Volume_Box", "parameter", "thermal_model", "kJ/K", "C_m"
+        ),
+        (
+            ["{fac}_{zone}_REXT_PARAM", "{fac}_{zone}_RESISTANCE_EXT"],
+            "Envelope_Thermal_Resistance_Parameter", "Variable_Air_Volume_Box", "parameter", "thermal_model", "K/kW", "R_ext"
+        ),
+        (
+            ["{fac}_{zone}_RM_PARAM", "{fac}_{zone}_RESISTANCE_MASS"],
+            "Mass_Thermal_Resistance_Parameter", "Variable_Air_Volume_Box", "parameter", "thermal_model", "K/kW", "R_m"
+        ),
+        (
+            ["{fac}_{zone}_AREA_SQM", "{fac}_{zone}_FLOOR_AREA"],
+            "Floor_Area_Parameter", "Variable_Air_Volume_Box", "parameter", "thermal_model", "m2", "floor_area_sqm"
+        ),
+        (
+            ["{fac}_{zone}_SOLAR_FRAC", "{fac}_{zone}_SOLAR_FACTOR"],
+            "Solar_Factor_Parameter", "Variable_Air_Volume_Box", "parameter", "thermal_model", "ratio", "solar_factor"
+        ),
+    ]
+
+    zones = ["zone_1", "zone_2", "zone_3", "zone_4", "zone_5"]
+    zone_aliases = {
+        "zone_1": ["Z01", "ZN1", "ZONE_1", "CORE", "Z1", "FL01_Z1", "ZN_CORE"],
+        "zone_2": ["Z02", "ZN2", "ZONE_2", "NORTH", "PERIM_N", "Z2", "FL01_Z2", "ZN_NORTH"],
+        "zone_3": ["Z03", "ZN3", "ZONE_3", "SOUTH", "PERIM_S", "Z3", "FL01_Z3", "ZN_SOUTH"],
+        "zone_4": ["Z04", "ZN4", "ZONE_4", "EAST", "PERIM_E", "Z4", "FL01_Z4", "ZN_EAST"],
+        "zone_5": ["Z05", "ZN5", "ZONE_5", "WEST", "PERIM_W", "Z5", "FL01_Z5", "ZN_WEST"],
+    }
 
     delimiters = ["_", "-", ".", "/", " "]
     case_styles = ["upper", "lower", "mixed", "camel"]
 
-    facilities = ["BLDG1", "HQ", "FACILITY_A", "TOWER_NORTH", "CAMPUS_ENG", "HOSPITAL_MAIN", "DATACENTER_WEST"]
-    zones = ["zone_1", "zone_2", "zone_3", "zone_4", "zone_5"]
-    zone_aliases = {
-        "zone_1": ["Z01", "ZN1", "ZONE_1", "CORE", "Z1", "FLOOR1_Z1"],
-        "zone_2": ["Z02", "ZN2", "ZONE_2", "NORTH", "PERIM_N", "Z2", "FLOOR1_Z2"],
-        "zone_3": ["Z03", "ZN3", "ZONE_3", "SOUTH", "PERIM_S", "Z3", "FLOOR1_Z3"],
-        "zone_4": ["Z04", "ZN4", "ZONE_4", "EAST", "PERIM_E", "Z4", "FLOOR1_Z4"],
-        "zone_5": ["Z05", "ZN5", "ZONE_5", "WEST", "PERIM_W", "Z5", "FLOOR1_Z5"],
-    }
+    def _generate_for_facilities(facility_list: List[str], num_points: int, split_name: str) -> List[dict]:
+        dataset = []
+        for _ in range(num_points):
+            arch = archetypes[rng.integers(0, len(archetypes))]
+            templates, b_class, eq_type, role, sub, unit, p_key = arch
 
-    point_archetypes = [
-        # (Pattern template, brick_class, equipment_type, point_role, subsystem, unit, param_key)
-        # Zone temperature sensors & setpoints
-        ("{facility}_{zone}_RAT", "Zone_Air_Temperature_Sensor", "Variable_Air_Volume_Box", "sensor", "hvac", "deg_C", None),
-        ("{facility}_{zone}_TEMP_SENS", "Zone_Air_Temperature_Sensor", "Variable_Air_Volume_Box", "sensor", "hvac", "deg_C", None),
-        ("{facility}_{zone}_ROOM_TEMP", "Zone_Air_Temperature_Sensor", "Variable_Air_Volume_Box", "sensor", "hvac", "deg_C", None),
-        ("{facility}_{zone}_TEMP_SP", "Zone_Air_Temperature_Setpoint", "Variable_Air_Volume_Box", "setpoint", "hvac", "deg_C", None),
-        ("{facility}_{zone}_STPT", "Zone_Air_Temperature_Setpoint", "Variable_Air_Volume_Box", "setpoint", "hvac", "deg_C", None),
-        ("{facility}_{zone}_AIR_TEMP_SP", "Zone_Air_Temperature_Setpoint", "Variable_Air_Volume_Box", "setpoint", "hvac", "deg_C", None),
-        ("{facility}_{zone}_OCC", "Occupancy_Sensor", "Variable_Air_Volume_Box", "sensor", "environment", "count", None),
-        ("{facility}_{zone}_OCCUPANCY_COUNT", "Occupancy_Sensor", "Variable_Air_Volume_Box", "sensor", "environment", "count", None),
-        ("{facility}_{zone}_CO2_PPM", "CO2_Level_Sensor", "Variable_Air_Volume_Box", "sensor", "environment", "ppm", None),
-        ("{facility}_{zone}_RH_SENS", "Relative_Humidity_Sensor", "Variable_Air_Volume_Box", "sensor", "environment", "%", None),
+            template = rng.choice(templates)
+            fac = rng.choice(facility_list)
+            z_idx = rng.choice(zones)
+            z_alias = rng.choice(zone_aliases[z_idx])
+            ahu_num = rng.integers(1, 5)
+            chlr_num = rng.integers(1, 4)
 
-        # VAV dampers and flows
-        ("{facility}_VAV_{zone}_DMPR_POS", "Damper_Position_Command", "Variable_Air_Volume_Box", "command", "hvac", "ratio", None),
-        ("{facility}_VAV_{zone}_DAMPER_CMD", "Damper_Position_Command", "Variable_Air_Volume_Box", "command", "hvac", "ratio", None),
-        ("{facility}_VAV_{zone}_AIR_FLOW", "Air_Flow_Sensor", "Variable_Air_Volume_Box", "sensor", "hvac", "m3/s", None),
-        ("{facility}_VAV_{zone}_DAT_SP", "Discharge_Air_Temperature_Setpoint", "Variable_Air_Volume_Box", "setpoint", "hvac", "deg_C", None),
-
-        # AHU points
-        ("{facility}_AHU{ahu_idx}_SAT", "Supply_Air_Temperature_Sensor", "Air_Handling_Unit", "sensor", "hvac", "deg_C", None),
-        ("{facility}_AHU{ahu_idx}_SUPPLY_TEMP", "Supply_Air_Temperature_Sensor", "Air_Handling_Unit", "sensor", "hvac", "deg_C", None),
-        ("{facility}_AHU{ahu_idx}_SAT_SP", "Supply_Air_Temperature_Setpoint", "Air_Handling_Unit", "setpoint", "hvac", "deg_C", None),
-        ("{facility}_AHU{ahu_idx}_FAN_PWR_KW", "Electric_Power_Sensor", "Air_Handling_Unit", "meter", "electrical", "kW", None),
-        ("{facility}_AHU{ahu_idx}_FAN_KW", "Electric_Power_Sensor", "Air_Handling_Unit", "meter", "electrical", "kW", None),
-        ("{facility}_AHU{ahu_idx}_FAN_STAT", "Fan_Status", "Air_Handling_Unit", "status", "hvac", "unknown", None),
-        ("{facility}_AHU{ahu_idx}_FLTR_DP", "Filter_Differential_Pressure_Sensor", "Air_Handling_Unit", "sensor", "hvac", "kPa", None),
-
-        # Chiller points
-        ("{facility}_CHLR{chlr_idx}_CHW_SUP_T", "Chilled_Water_Supply_Temperature_Sensor", "Chiller", "sensor", "hvac", "deg_C", None),
-        ("{facility}_CHLR{chlr_idx}_CHW_RET_T", "Chilled_Water_Return_Temperature_Sensor", "Chiller", "sensor", "hvac", "deg_C", None),
-        ("{facility}_CHLR{chlr_idx}_CHW_STPT", "Chilled_Water_Supply_Temperature_Setpoint", "Chiller", "setpoint", "hvac", "deg_C", None),
-        ("{facility}_CHLR{chlr_idx}_SETPOINT", "Chilled_Water_Supply_Temperature_Setpoint", "Chiller", "setpoint", "hvac", "deg_C", None),
-        ("{facility}_CHLR{chlr_idx}_ELEC_KW", "Electric_Power_Sensor", "Chiller", "meter", "electrical", "kW", None),
-        ("{facility}_CHLR{chlr_idx}_POWER_KW", "Electric_Power_Sensor", "Chiller", "meter", "electrical", "kW", None),
-
-        # Building Level & Environmental
-        ("{facility}_BLDG_TOTAL_PWR_KW", "Electric_Power_Sensor", "Building", "meter", "electrical", "kW", None),
-        ("{facility}_MAIN_MTR_KW", "Electric_Power_Sensor", "Building", "meter", "electrical", "kW", None),
-        ("{facility}_OAT", "Outside_Air_Temperature_Sensor", "Building", "sensor", "environment", "deg_C", None),
-        ("{facility}_OUTDOOR_TEMP_SENS", "Outside_Air_Temperature_Sensor", "Building", "sensor", "environment", "deg_C", None),
-        ("{facility}_SOLAR_GHI_SENS", "Solar_Radiance_Sensor", "Building", "sensor", "environment", "W/m2", None),
-        ("{facility}_SOLAR_IRRAD", "Solar_Radiance_Sensor", "Building", "sensor", "environment", "W/m2", None),
-
-        # 2R2C Model Thermal Parameters
-        ("{facility}_{zone}_CZ_PARAM", "Thermal_Capacitance_Air_Parameter", "Variable_Air_Volume_Box", "parameter", "thermal_model", "kJ/K", "C_z"),
-        ("{facility}_{zone}_CM_PARAM", "Thermal_Capacitance_Mass_Parameter", "Variable_Air_Volume_Box", "parameter", "thermal_model", "kJ/K", "C_m"),
-        ("{facility}_{zone}_REXT_PARAM", "Envelope_Thermal_Resistance_Parameter", "Variable_Air_Volume_Box", "parameter", "thermal_model", "K/kW", "R_ext"),
-        ("{facility}_{zone}_RM_PARAM", "Mass_Thermal_Resistance_Parameter", "Variable_Air_Volume_Box", "parameter", "thermal_model", "K/kW", "R_m"),
-        ("{facility}_{zone}_AREA_SQM", "Floor_Area_Parameter", "Variable_Air_Volume_Box", "parameter", "thermal_model", "m2", "floor_area_sqm"),
-        ("{facility}_{zone}_SOLAR_FRAC", "Solar_Factor_Parameter", "Variable_Air_Volume_Box", "parameter", "thermal_model", "ratio", "solar_factor"),
-    ]
-
-    for i in range(num_samples):
-        arch = point_archetypes[rng.integers(0, len(point_archetypes))]
-        template, b_class, eq_type, role, sub, unit, p_key = arch
-
-        fac = rng.choice(facilities)
-        z_idx = rng.choice(zones)
-        z_alias = rng.choice(zone_aliases[z_idx]) if z_idx in zone_aliases else "Z01"
-        ahu_num = rng.integers(1, 4)
-        chlr_num = rng.integers(1, 3)
-
-        raw_tag = template.format(
-            facility=fac,
-            zone=z_alias,
-            ahu_idx=ahu_num,
-            chlr_idx=chlr_num
-        )
-
-        delim = rng.choice(delimiters)
-        if delim != "_":
-            raw_tag = raw_tag.replace("_", delim)
-
-        style = rng.choice(case_styles)
-        if style == "lower":
-            raw_tag = raw_tag.lower()
-        elif style == "camel":
-            parts = raw_tag.split(delim if delim != "_" else "_")
-            raw_tag = "".join(p.capitalize() for p in parts)
-        elif style == "mixed" and rng.random() > 0.5:
-            raw_tag = raw_tag.title()
-
-        eq_id = f"{eq_type}_{ahu_num}" if "AHU" in eq_type else (
-            f"Chiller_{chlr_num}" if "Chiller" in eq_type else (
-                f"VAV_{z_idx.upper()}" if "VAV" in eq_type else "Building_Main"
+            tag = template.format(
+                fac=fac,
+                zone=z_alias,
+                ahu=ahu_num,
+                chlr=chlr_num
             )
-        )
 
-        assigned_zone = z_idx if ("RAT" in template or "VAV" in template or "PARAM" in template or "zone" in template or "OCC" in template) else "unassigned"
+            # Delimiter variation
+            delim = rng.choice(delimiters)
+            if delim != "_":
+                tag = tag.replace("_", delim)
 
-        records.append({
-            "raw_tag": raw_tag,
-            "canonical_id": raw_tag,
-            "brick_class": b_class,
-            "equipment_type": eq_type,
-            "equipment_id": eq_id,
-            "point_role": role,
-            "subsystem": sub,
-            "zone_id": assigned_zone,
-            "unit": unit,
-            "param_key": p_key or "none",
-            "description": f"Standard {b_class} point for {eq_id} in {assigned_zone}"
-        })
+            # Casing variation
+            style = rng.choice(case_styles)
+            if style == "lower":
+                tag = tag.lower()
+            elif style == "camel":
+                parts = tag.split(delim if delim != "_" else "_")
+                tag = "".join(p.capitalize() for p in parts)
+            elif style == "mixed" and rng.random() > 0.5:
+                tag = tag.title()
 
-    # Include explicit Inter-zone adjacency parameter tags
-    for z1 in range(1, 6):
-        for z2 in range(1, 6):
-            if z1 != z2:
-                tag = f"BLDG1_Z0{z1}_Z0{z2}_RADJ_PARAM"
-                records.append({
-                    "raw_tag": tag,
-                    "canonical_id": tag,
-                    "brick_class": "Interzone_Thermal_Resistance_Parameter",
-                    "equipment_type": "Variable_Air_Volume_Box",
-                    "equipment_id": f"VAV_ZONE_{z1}",
-                    "point_role": "parameter",
-                    "subsystem": "thermal_model",
-                    "zone_id": f"zone_{z1}",
-                    "unit": "K/kW",
-                    "param_key": "R_adj",
-                    "description": f"Inter-zone thermal resistance between zone_{z1} and zone_{z2}"
-                })
+            # Optional Noise / Typo Injection (5% chance in Train, 15% in Test OOD to test robustness)
+            noise_rate = 0.15 if split_name == "test_ood" else 0.05
+            if rng.random() < noise_rate and len(tag) > 6:
+                idx = rng.integers(1, len(tag) - 1)
+                # Random char swap or duplication
+                if rng.random() > 0.5:
+                    tag = tag[:idx] + tag[idx+1] + tag[idx] + tag[idx+2:]
+                else:
+                    tag = tag[:idx] + tag[idx] + tag[idx:]
 
-    return records
+            eq_id = f"{eq_type}_{ahu_num}" if "AHU" in eq_type else (
+                f"Chiller_{chlr_num}" if "Chiller" in eq_type else (
+                    f"VAV_{z_idx.upper()}" if "VAV" in eq_type else "Building_Main"
+                )
+            )
+
+            assigned_zone = z_idx if ("RAT" in template or "VAV" in template or "PARAM" in template or "zone" in template or "OCC" in template or "ZN" in template) else "unassigned"
+
+            dataset.append({
+                "raw_tag": tag,
+                "canonical_id": tag,
+                "brick_class": b_class,
+                "equipment_type": eq_type,
+                "equipment_id": eq_id,
+                "point_role": role,
+                "subsystem": sub,
+                "zone_id": assigned_zone,
+                "unit": unit,
+                "param_key": p_key or "none",
+                "split": split_name,
+                "facility": fac,
+                "description": f"Standard {b_class} point for {eq_id} in {assigned_zone}"
+            })
+
+        # Inter-zone adjacency parameters
+        for z1 in range(1, 6):
+            for z2 in range(1, 6):
+                if z1 != z2:
+                    fac = rng.choice(facility_list)
+                    tag = f"{fac}_Z0{z1}_Z0{z2}_RADJ_PARAM"
+                    dataset.append({
+                        "raw_tag": tag,
+                        "canonical_id": tag,
+                        "brick_class": "Interzone_Thermal_Resistance_Parameter",
+                        "equipment_type": "Variable_Air_Volume_Box",
+                        "equipment_id": f"VAV_ZONE_{z1}",
+                        "point_role": "parameter",
+                        "subsystem": "thermal_model",
+                        "zone_id": f"zone_{z1}",
+                        "unit": "K/kW",
+                        "param_key": "R_adj",
+                        "split": split_name,
+                        "facility": fac,
+                        "description": f"Inter-zone thermal resistance between zone_{z1} and zone_{z2}"
+                    })
+
+        return dataset
+
+    train_data = _generate_for_facilities(train_facilities, num_points=4500, split_name="train")
+    val_data = _generate_for_facilities(val_facilities, num_points=800, split_name="val")
+    test_ood_data = _generate_for_facilities(test_ood_facilities, num_points=1000, split_name="test_ood")
+
+    return train_data, val_data, test_ood_data
+
+
+def generate_slm_tag_corpus(num_samples: int = 1000, seed: int = 42) -> List[dict]:
+    train_d, val_d, test_d = generate_slm_tag_corpus_leak_free(seed=seed)
+    combined = train_d + val_d + test_d
+    return combined[:num_samples]
 
 
 def generate_grid_weather_thermal_timeseries(num_days: int = 365, seed: int = 42) -> pd.DataFrame:
@@ -231,8 +329,7 @@ def generate_grid_weather_thermal_timeseries(num_days: int = 365, seed: int = 42
     rel_humidity = np.clip(60.0 - 25.0 * np.sin(2.0 * np.pi * (hour_of_day - 8.0) / 24.0) + rng.normal(0, 4.0, total_steps), 15.0, 95.0)
 
     # Dynamic LMP Electricity Price ($/kWh)
-    # Baseline + Duck Curve solar midday drop + Evening peak spike ($0.80 - $2.50/kWh)
-    base_lmp = 0.12 + 0.04 * (seasonal_temp_offset > 5.0)  # Higher summer base
+    base_lmp = 0.12 + 0.04 * (seasonal_temp_offset > 5.0)
     solar_curtailment_drop = np.where((hour_of_day >= 10.0) & (hour_of_day <= 15.0), -0.06 * (solar_ghi / 900.0), 0.0)
     evening_peak = np.where(
         (hour_of_day >= 17.0) & (hour_of_day <= 21.0),
@@ -240,11 +337,9 @@ def generate_grid_weather_thermal_timeseries(num_days: int = 365, seed: int = 42
         0.0
     )
 
-    # Extreme price spike events (heatwaves / grid congestion)
     spike_prob = np.where((hour_of_day >= 16.0) & (hour_of_day <= 20.0) & (ambient_temp > 33.0), 0.08, 0.005)
     random_spikes = (rng.random(total_steps) < spike_prob) * rng.uniform(0.60, 1.80, total_steps)
 
-    # Occasional negative pricing during high solar spring afternoons
     spring_negative = np.where(
         (day_of_year >= 60) & (day_of_year <= 130) & (hour_of_day >= 12.0) & (hour_of_day <= 14.0) & (rng.random(total_steps) < 0.15),
         -0.08,
@@ -253,7 +348,6 @@ def generate_grid_weather_thermal_timeseries(num_days: int = 365, seed: int = 42
 
     dynamic_lmp = np.maximum(-0.05, base_lmp + solar_curtailment_drop + evening_peak + random_spikes + spring_negative)
 
-    # Lookahead forward prices
     p_2h = np.zeros(total_steps)
     p_4h = np.zeros(total_steps)
     p_6h = np.zeros(total_steps)
@@ -262,10 +356,8 @@ def generate_grid_weather_thermal_timeseries(num_days: int = 365, seed: int = 42
         p_4h[t] = np.mean(dynamic_lmp[t : min(t + 48, total_steps)])
         p_6h[t] = np.mean(dynamic_lmp[t : min(t + 72, total_steps)])
 
-    # Demand Response (DR) event signals
     dr_active = np.where((dynamic_lmp > 0.65) | (random_spikes > 0.5), 1, 0)
 
-    # Occupancy profiles per zone (0 to 25 people)
     occ_curve = np.where(
         (is_weekend == 0) & (hour_of_day >= 7.5) & (hour_of_day <= 18.5),
         np.sin(np.pi * (hour_of_day - 7.5) / 11.0),
@@ -308,31 +400,33 @@ def generate_grid_weather_thermal_timeseries(num_days: int = 365, seed: int = 42
 def build_and_save_all_datasets():
     DATASET_DIR.mkdir(parents=True, exist_ok=True)
 
-    print("Generating SLM BMS point tag dataset...")
-    slm_data = generate_slm_tag_corpus(num_samples=6000, seed=42)
+    print("Generating Leak-Free Disjoint BMS Tag Datasets...")
+    train_data, val_data, test_ood_data = generate_slm_tag_corpus_leak_free(seed=42)
+    all_data = train_data + val_data + test_ood_data
 
-    # Save JSONL
-    with open(SLM_JSONL_PATH, "w", encoding="utf-8") as f:
-        for item in slm_data:
-            f.write(json.dumps(item) + "\n")
-    print(f"Saved {len(slm_data)} SLM tags to {SLM_JSONL_PATH}")
+    # Save disjoint split JSONLs
+    for p, d in [(SLM_TRAIN_PATH, train_data), (SLM_VAL_PATH, val_data), (SLM_TEST_OOD_PATH, test_ood_data), (SLM_JSONL_PATH, all_data)]:
+        with open(p, "w", encoding="utf-8") as f:
+            for item in d:
+                f.write(json.dumps(item) + "\n")
+        print(f" -> Saved {len(d)} items to {p.name}")
 
-    # Save CSV
-    keys = list(slm_data[0].keys())
+    # Save full CSV
+    keys = list(all_data[0].keys())
     with open(SLM_CSV_PATH, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=keys)
         writer.writeheader()
-        writer.writerows(slm_data)
-    print(f"Saved SLM CSV dataset to {SLM_CSV_PATH}")
+        writer.writerows(all_data)
+    print(f" -> Saved full CSV dataset to {SLM_CSV_PATH.name}")
 
     print("Generating 1-Year 5-minute Grid & Weather Thermal Timeseries dataset...")
     df_grid = generate_grid_weather_thermal_timeseries(num_days=365, seed=42)
     df_grid.to_csv(GRID_CSV_PATH, index=False)
-    print(f"Saved {len(df_grid)} steps to {GRID_CSV_PATH}")
+    print(f" -> Saved {len(df_grid)} steps to {GRID_CSV_PATH.name}")
 
     try:
         df_grid.to_parquet(GRID_PARQUET_PATH, index=False)
-        print(f"Saved Parquet dataset to {GRID_PARQUET_PATH}")
+        print(f" -> Saved Parquet dataset to {GRID_PARQUET_PATH.name}")
     except Exception:
         pass
 

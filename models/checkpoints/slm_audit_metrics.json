@@ -1,0 +1,149 @@
+{
+  "model_name": "AetherisBrickSLM (Multi-Task Transformer)",
+  "training_duration_seconds": 178.25042271614075,
+  "epochs": 12,
+  "parameters_count": 445376,
+  "in_distribution_val": {
+    "exact_match_acc": 0.874390243902439,
+    "class_acc": 0.9414634146341463,
+    "eq_acc": 0.9573170731707317,
+    "role_acc": 0.9914634146341463,
+    "sub_acc": 0.9768292682926829,
+    "zone_acc": 0.947560975609756,
+    "unit_acc": 0.9780487804878049,
+    "total_samples": 820
+  },
+  "out_of_distribution_test_zero_shot": {
+    "exact_match_acc": 0.7745098039215687,
+    "class_acc": 0.8745098039215686,
+    "eq_acc": 0.9333333333333333,
+    "role_acc": 0.961764705882353,
+    "sub_acc": 0.957843137254902,
+    "zone_acc": 0.8774509803921569,
+    "unit_acc": 0.9352941176470588,
+    "total_samples": 1020
+  },
+  "leak_free_guarantee": "Strict Disjoint Facilities & Domains across Train, Val, and OOD Test",
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 9.663194951876788,
+      "val_exact_acc": 0.18658536585365854,
+      "val_class_acc": 0.38414634146341464,
+      "val_role_acc": 0.6560975609756098,
+      "ood_exact_acc": 0.22745098039215686,
+      "ood_class_acc": 0.4588235294117647,
+      "ood_role_acc": 0.7549019607843137
+    },
+    {
+      "epoch": 2,
+      "train_loss": 5.070378723278852,
+      "val_exact_acc": 0.3878048780487805,
+      "val_class_acc": 0.6426829268292683,
+      "val_role_acc": 0.8914634146341464,
+      "ood_exact_acc": 0.4088235294117647,
+      "ood_class_acc": 0.7333333333333333,
+      "ood_role_acc": 0.8745098039215686
+    },
+    {
+      "epoch": 3,
+      "train_loss": 3.6849638576238926,
+      "val_exact_acc": 0.4865853658536585,
+      "val_class_acc": 0.774390243902439,
+      "val_role_acc": 0.9329268292682927,
+      "ood_exact_acc": 0.4803921568627451,
+      "ood_class_acc": 0.8274509803921568,
+      "ood_role_acc": 0.9362745098039216
+    },
+    {
+      "epoch": 4,
+      "train_loss": 3.172156558909886,
+      "val_exact_acc": 0.49878048780487805,
+      "val_class_acc": 0.8073170731707318,
+      "val_role_acc": 0.9073170731707317,
+      "ood_exact_acc": 0.46078431372549017,
+      "ood_class_acc": 0.7813725490196078,
+      "ood_role_acc": 0.9137254901960784
+    },
+    {
+      "epoch": 5,
+      "train_loss": 2.8974963241899516,
+      "val_exact_acc": 0.574390243902439,
+      "val_class_acc": 0.8390243902439024,
+      "val_role_acc": 0.9658536585365853,
+      "ood_exact_acc": 0.5529411764705883,
+      "ood_class_acc": 0.85,
+      "ood_role_acc": 0.9196078431372549
+    },
+    {
+      "epoch": 6,
+      "train_loss": 2.6738219899190985,
+      "val_exact_acc": 0.5853658536585366,
+      "val_class_acc": 0.823170731707317,
+      "val_role_acc": 0.9621951219512195,
+      "ood_exact_acc": 0.6411764705882353,
+      "ood_class_acc": 0.8784313725490196,
+      "ood_role_acc": 0.9264705882352942
+    },
+    {
+      "epoch": 7,
+      "train_loss": 2.4682368392675693,
+      "val_exact_acc": 0.7682926829268293,
+      "val_class_acc": 0.9207317073170732,
+      "val_role_acc": 0.9817073170731707,
+      "ood_exact_acc": 0.7529411764705882,
+      "ood_class_acc": 0.8803921568627451,
+      "ood_role_acc": 0.9647058823529412
+    },
+    {
+      "epoch": 8,
+      "train_loss": 2.235124903665462,
+      "val_exact_acc": 0.7780487804878049,
+      "val_class_acc": 0.8695121951219512,
+      "val_role_acc": 0.9817073170731707,
+      "ood_exact_acc": 0.7696078431372549,
+      "ood_class_acc": 0.8852941176470588,
+      "ood_role_acc": 0.9656862745098039
+    },
+    {
+      "epoch": 9,
+      "train_loss": 2.107346276162376,
+      "val_exact_acc": 0.8475609756097561,
+      "val_class_acc": 0.9231707317073171,
+      "val_role_acc": 0.9865853658536585,
+      "ood_exact_acc": 0.7627450980392156,
+      "ood_class_acc": 0.8696078431372549,
+      "ood_role_acc": 0.9568627450980393
+    },
+    {
+      "epoch": 10,
+      "train_loss": 2.0313356057019303,
+      "val_exact_acc": 0.8585365853658536,
+      "val_class_acc": 0.9365853658536586,
+      "val_role_acc": 0.9902439024390244,
+      "ood_exact_acc": 0.765686274509804,
+      "ood_class_acc": 0.8696078431372549,
+      "ood_role_acc": 0.9558823529411765
+    },
+    {
+      "epoch": 11,
+      "train_loss": 1.9962481747210865,
+      "val_exact_acc": 0.8536585365853658,
+      "val_class_acc": 0.9304878048780488,
+      "val_role_acc": 0.9878048780487805,
+      "ood_exact_acc": 0.7715686274509804,
+      "ood_class_acc": 0.8735294117647059,
+      "ood_role_acc": 0.961764705882353
+    },
+    {
+      "epoch": 12,
+      "train_loss": 1.97946298122406,
+      "val_exact_acc": 0.874390243902439,
+      "val_class_acc": 0.9414634146341463,
+      "val_role_acc": 0.9914634146341463,
+      "ood_exact_acc": 0.7745098039215687,
+      "ood_class_acc": 0.8745098039215686,
+      "ood_role_acc": 0.961764705882353
+    }
+  ]
+}
