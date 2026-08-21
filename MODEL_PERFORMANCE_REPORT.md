@@ -104,7 +104,7 @@ To ensure genuine generalization to novel real-world commercial buildings, the d
 | Evaluation Metric | Baseline Rule-Based Controller | Vectorized Safe-RL PPO Agent | Improvement / Delta |
 | :--- | :---: | :---: | :---: |
 | **Electricity Cost (30 Days)** | `$4,362.52` | **`$3,812.29`** | **-12.61% ($550.23 saved)** |
-| **Cost in Indian Rupees (₹)** | `₹3,62,089` | **`$3,16,420`** | **-₹45,669 saved / month** |
+| **Cost in Indian Rupees (₹)** | `₹3,62,089` | **`₹3,16,420`** | **-₹45,669 saved / month** |
 | **Annual Estimated Cost Savings** | `$0` | **`$6,680.00 / year`** | **12.6% - 24.8% under CAISO spikes** |
 | **Energy Consumption (30 Days)** | `15,938.99 kWh` | **`15,117.89 kWh`** | **-821.10 kWh consumed** |
 | **Peak Electrical Demand** | `43.32 kW` | **`42.47 kW`** | **-0.85 kW peak shaving** |
