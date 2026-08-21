@@ -23,7 +23,7 @@ def test_dashboard_html_endpoints(client):
     assert "text/html" in res_root.headers.get("content-type", "")
     assert "AETHERIS-Zero" in res_root.text
     assert "three-canvas-container" in res_root.text
-    assert "Live Input & Scenario Studio" in res_root.text
+    assert "CUSTOM INJECTION STUDIO" in res_root.text
 
     # 2. Test /dashboard alias
     res_dash = client.get("/dashboard")
