@@ -3,163 +3,228 @@
 <head>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <meta name="description" content="AETHERIS-Zero: Executive 3D Digital Twin & Autonomous BMS Supervisory Mission Control"/>
-  <title>AETHERIS-Zero // BMS Supervisory Intelligence Layer</title>
+  <meta name="description" content="AETHERIS-Zero: Autonomous Smart Building Supervisory Layer & 3D Digital Twin"/>
+  <title>AETHERIS-Zero // 3D Digital Twin & Mission Control</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>"/>
   
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet"/>
   
-  <!-- Three.js & Chart.js -->
+  <!-- Three.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
   <style>
     :root {
-      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       --font-mono: 'JetBrains Mono', monospace;
 
-      /* Dark Theme */
-      --bg-base: #0f1012;
-      --bg-surface: #17181c;
-      --bg-elevated: #202227;
-      --bg-well: #0a0b0d;
+      /* Dark Theme (Default) */
+      --bg-base: #08090c;
+      --bg-card: rgba(15, 17, 23, 0.85);
+      --bg-elevated: #151821;
+      --bg-well: #0c0d12;
       
-      --border-outer: #2c2e35;
-      --border-inner: #1e2025;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-active: rgba(56, 189, 248, 0.4);
+      --border-card: rgba(255, 255, 255, 0.06);
 
-      --text-main: #f0f2f5;
-      --text-muted: #9ba1ad;
-      --text-dim: #5c6270;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
 
-      --shadow-bevel-raised: 
-        0 2px 0 0 rgba(255, 255, 255, 0.07) inset,
-        0 -2px 0 0 rgba(0, 0, 0, 0.6) inset,
-        0 8px 24px rgba(0, 0, 0, 0.45);
+      --accent-cyan: #38bdf8;
+      --accent-green: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
 
-      --shadow-well-inset: 
-        0 2px 4px 0 rgba(0, 0, 0, 0.8) inset,
-        0 -1px 0 0 rgba(255, 255, 255, 0.04) inset;
-
-      --shadow-btn-raised: 
-        0 1px 0 0 rgba(255, 255, 255, 0.12) inset,
-        0 -2px 0 0 rgba(0, 0, 0, 0.5) inset,
-        0 4px 8px rgba(0, 0, 0, 0.35);
-
-      --led-green: #22c55e;
-      --led-amber: #f59e0b;
-      --led-red: #ef4444;
-      --led-blue: #38bdf8;
+      --card-shadow: 
+        0 1px 1px rgba(0, 0, 0, 0.2),
+        0 8px 24px -4px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
     }
 
     html.light {
-      --bg-base: #e6e8ec;
-      --bg-surface: #f0f2f5;
-      --bg-elevated: #ffffff;
-      --bg-well: #dcdfe4;
+      --bg-base: #f8fafc;
+      --bg-card: rgba(255, 255, 255, 0.95);
+      --bg-elevated: #f1f5f9;
+      --bg-well: #e2e8f0;
       
-      --border-outer: #c0c4cc;
-      --border-inner: #d0d4dc;
+      --border-subtle: rgba(0, 0, 0, 0.08);
+      --border-active: rgba(2, 132, 199, 0.5);
+      --border-card: rgba(0, 0, 0, 0.06);
 
-      --text-main: #111317;
-      --text-muted: #555b68;
-      --text-dim: #8890a0;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --text-dim: #94a3b8;
 
-      --shadow-bevel-raised: 
-        0 2px 0 0 rgba(255, 255, 255, 0.9) inset,
-        0 -2px 0 0 rgba(0, 0, 0, 0.1) inset,
-        0 8px 20px rgba(0, 0, 0, 0.08);
-
-      --shadow-well-inset: 
-        0 2px 4px 0 rgba(0, 0, 0, 0.15) inset,
-        0 -1px 0 0 rgba(255, 255, 255, 0.8) inset;
-
-      --shadow-btn-raised: 
-        0 1px 0 0 rgba(255, 255, 255, 0.9) inset,
-        0 -2px 0 0 rgba(0, 0, 0, 0.15) inset,
-        0 4px 8px rgba(0, 0, 0, 0.08);
+      --card-shadow: 
+        0 1px 3px rgba(0, 0, 0, 0.05),
+        0 10px 25px -5px rgba(0, 0, 0, 0.04),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; transition: background 0.2s, color 0.2s, border 0.2s; }
-    body { font-family: var(--font-sans); background-color: var(--bg-base); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; }
-
-    .skeuo-card { background: var(--bg-surface); border: 1px solid var(--border-outer); border-radius: 12px; box-shadow: var(--shadow-bevel-raised); }
-    .skeuo-well { background: var(--bg-well); border: 1px solid var(--border-inner); border-radius: 8px; box-shadow: var(--shadow-well-inset); }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     
-    .skeuo-btn {
-      background: var(--bg-elevated); color: var(--text-main); border: 1px solid var(--border-outer);
-      border-radius: 8px; box-shadow: var(--shadow-btn-raised); padding: 8px 16px; font-size: 11px; font-weight: 700;
-      font-family: var(--font-sans); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; user-select: none;
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
-    .skeuo-btn:hover { filter: brightness(1.08); }
-    .skeuo-btn:active { transform: translateY(1px); }
-    .skeuo-btn-primary { background: #1e293b; color: #ffffff; border-color: #334155; }
-    .skeuo-btn-danger { background: #450a0a; color: #fca5a5; border-color: #7f1d1d; }
 
-    .led-lamp { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
-    .led-green { background: var(--led-green); box-shadow: 0 0 10px rgba(34, 197, 94, 0.6); }
-    .led-amber { background: var(--led-amber); box-shadow: 0 0 10px rgba(245, 158, 11, 0.6); }
-    .led-red { background: var(--led-red); box-shadow: 0 0 10px rgba(239, 68, 68, 0.6); }
-    .led-blue { background: var(--led-blue); box-shadow: 0 0 10px rgba(56, 189, 248, 0.6); }
+    /* Glassmorphic Clean Card */
+    .pro-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-card);
+      border-radius: 14px;
+      box-shadow: var(--card-shadow);
+      position: relative;
+    }
 
-    .font-mono { font-family: var(--font-mono); }
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    .pro-well {
+      background: var(--bg-well);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+    }
+
+    /* Interactive Buttons */
+    .pro-btn {
+      background: var(--bg-elevated);
+      color: var(--text-main);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 7px 14px;
+      font-size: 11.5px;
+      font-weight: 600;
+      font-family: var(--font-sans);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      user-select: none;
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+    .pro-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+    }
+    .pro-btn:active { transform: translateY(1px); }
+
+    .pro-btn-primary {
+      background: #0284c7;
+      color: #ffffff;
+      border-color: #38bdf8;
+      box-shadow: 0 0 16px rgba(56, 189, 248, 0.25);
+    }
+    .pro-btn-primary:hover { background: #0369a1; border-color: #7dd3fc; }
+
+    /* Navigation Pills */
+    .nav-pill {
+      color: var(--text-muted);
+      padding: 6px 12px;
+      border-radius: 7px;
+      font-size: 11.5px;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+    .nav-pill:hover { color: var(--text-main); background: rgba(255, 255, 255, 0.05); }
+    .nav-pill.active {
+      color: var(--text-main);
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+    }
+
+    /* Live Pulse LED */
+    .pulse-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .pulse-green { background: var(--accent-green); box-shadow: 0 0 8px rgba(16, 185, 129, 0.7); }
+    .pulse-amber { background: var(--accent-amber); box-shadow: 0 0 8px rgba(245, 158, 11, 0.7); }
+    .pulse-cyan { background: var(--accent-cyan); box-shadow: 0 0 8px rgba(56, 189, 248, 0.7); }
+
+    .font-mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+    
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
     ::-webkit-scrollbar-track { background: var(--bg-well); }
-    ::-webkit-scrollbar-thumb { background: var(--border-outer); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.12); border-radius: 3px; }
   </style>
 </head>
 <body>
 
-  <!-- HEADER / NAVIGATION -->
-  <header style="background: var(--bg-surface); border-bottom: 1px solid var(--border-outer); position: sticky; top: 0; z-index: 100;">
-    <div style="max-width: 1680px; margin: 0 auto; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+  <!-- =========================================================================
+       GLOBAL TOPBAR / NAVIGATION
+       ========================================================================= -->
+  <header style="background: var(--bg-card); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border-card); position: sticky; top: 0; z-index: 100;">
+    <div style="max-width: 1680px; margin: 0 auto; padding: 10px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
       
-      <!-- Brand & Product Title -->
+      <!-- Brand Title & Tag -->
       <div style="display: flex; align-items: center; gap: 12px;">
-        <div class="skeuo-well" style="width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; font-size: 20px;">
+        <div class="pro-well" style="width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; font-size: 16px; border-radius: 8px;">
           ⚡
         </div>
         <div>
           <div style="display: flex; align-items: center; gap: 8px;">
-            <h1 style="font-size: 17px; font-weight: 800; letter-spacing: -0.4px;">AETHERIS-Zero</h1>
-            <span class="skeuo-well font-mono" style="font-size: 10px; font-weight: 700; padding: 2px 6px; color: var(--text-dim);">ENTERPRISE BMS LAYER</span>
+            <span style="font-size: 15px; font-weight: 800; letter-spacing: -0.3px;">AETHERIS<span style="color: var(--accent-cyan);">·Zero</span></span>
+            <span class="pro-well font-mono" style="font-size: 9.5px; font-weight: 700; padding: 2px 6px; color: var(--accent-cyan);">v2.0-PROD</span>
           </div>
-          <p style="font-size: 11px; color: var(--text-muted); font-weight: 500;">Autonomous Physics-Informed Safe-RL Supervisory Intelligence</p>
+          <span style="font-size: 11px; color: var(--text-muted); font-weight: 500;">BMS Supervisory Intelligence & Transactive Digital Twin</span>
         </div>
       </div>
 
-      <!-- Header Controls -->
-      <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+      <!-- Navigation Tabs -->
+      <nav style="display: flex; align-items: center; gap: 4px; background: var(--bg-well); padding: 3px; border-radius: 9px; border: 1px solid var(--border-subtle);">
+        <a href="/overview" class="nav-pill">
+          <span>📊</span> Overview & ROI
+        </a>
+        <a href="/dashboard" class="nav-pill active">
+          <span>🏢</span> 3D Digital Twin
+        </a>
+        <a href="/simulator" class="nav-pill">
+          <span>🎛️</span> Scenario Lab
+        </a>
+        <a href="/docs" target="_blank" class="nav-pill">
+          <span>📖</span> API Docs
+        </a>
+      </nav>
+
+      <!-- Right Action Deck -->
+      <div style="display: flex; align-items: center; gap: 10px;">
         
-        <!-- Live Status Indicators -->
-        <div class="skeuo-well" style="padding: 6px 14px; display: flex; align-items: center; gap: 14px; font-size: 11px; font-family: var(--font-mono);">
-          <div style="display: flex; align-items: center; gap: 6px;">
-            <span class="led-lamp led-green"></span> BMS: <strong>ONLINE</strong>
+        <!-- Live System Status Badge -->
+        <div class="pro-well font-mono" style="padding: 5px 12px; font-size: 11px; display: flex; align-items: center; gap: 12px;">
+          <div style="display: flex; align-items: center; gap: 5px;">
+            <span class="pulse-dot pulse-green"></span> BMS: <strong>ONLINE</strong>
           </div>
-          <div style="display: flex; align-items: center; gap: 6px;">
-            <span class="led-lamp led-green"></span> SHIELD: <strong>100% ARMED</strong>
-          </div>
-          <div style="display: flex; align-items: center; gap: 6px;">
-            <span class="led-lamp led-blue"></span> SLM: <strong>READY</strong>
+          <div style="display: flex; align-items: center; gap: 5px;">
+            <span class="pulse-dot pulse-cyan"></span> SHIELD: <strong>ARMED</strong>
           </div>
         </div>
 
-        <!-- Navigation Links -->
-        <a href="/overview" class="skeuo-btn">
-          📊 <strong>PRODUCT ROI</strong>
-        </a>
-        <a href="/simulator" class="skeuo-btn">
-          🎛️ <strong>SIMULATOR POD</strong>
-        </a>
-
-        <!-- Mode Toggle (RL vs Baseline Only - No Shadow) -->
-        <button id="btn-mode-toggle" class="skeuo-btn skeuo-btn-primary" onclick="toggleControlMode()">
+        <!-- Mode Toggle Pill (RL vs Baseline Only - No Shadow) -->
+        <button id="btn-mode-toggle" class="pro-btn pro-btn-primary" onclick="toggleControlMode()">
           <span>⚙️</span> <span id="txt-mode-name">MODE: RL ARBITRAGE</span>
         </button>
-        
+
         <!-- Theme Toggle -->
-        <button class="skeuo-btn" onclick="toggleTheme()">
+        <button class="pro-btn" style="padding: 7px 10px;" onclick="toggleTheme()">
           <span id="theme-icon">☀️</span>
         </button>
 
@@ -168,17 +233,22 @@
     </div>
   </header>
 
-  <!-- MAIN DASHBOARD CONTENT -->
-  <main style="max-width: 1680px; margin: 20px auto; padding: 0 24px 60px 24px; width: 100%; flex: 1;">
+  <!-- =========================================================================
+       MAIN WORKSPACE
+       ========================================================================= -->
+  <main style="max-width: 1680px; margin: 20px auto; padding: 0 24px 60px 24px; width: 100%; flex: 1; display: flex; flex-direction: column; gap: 20px;">
     
-    <!-- Top Row: Real-time Executive KPIs -->
-    <section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 20px;">
+    <!-- Top Row: Executive High-Impact KPI Cards -->
+    <section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;">
       
       <!-- KPI 1: Energy Arbitrage Savings -->
-      <div class="skeuo-card" style="padding: 16px 20px;">
-        <div style="font-size: 11px; font-weight: 700; color: var(--text-dim); text-transform: uppercase;">Energy Arbitrage Savings</div>
+      <div class="pro-card" style="padding: 18px 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 11px; font-weight: 700; color: var(--text-dim); text-transform: uppercase;">Energy Arbitrage Savings</span>
+          <span class="pulse-dot pulse-green"></span>
+        </div>
         <div style="display: flex; align-items: baseline; justify-content: space-between; margin-top: 6px;">
-          <span id="kpi-savings-pct" class="font-mono" style="font-size: 30px; font-weight: 800; color: var(--led-green);">22.4%</span>
+          <span id="kpi-savings-pct" class="font-mono" style="font-size: 32px; font-weight: 800; color: var(--accent-green);">24.8%</span>
           <span id="kpi-savings-val" class="font-mono" style="font-size: 13px; color: var(--text-muted);">$84.20 / day</span>
         </div>
         <div style="font-size: 11px; color: var(--text-dim); margin-top: 6px; font-family: var(--font-mono);">
@@ -187,61 +257,79 @@
       </div>
 
       <!-- KPI 2: Dynamic Wholesale LMP Rate -->
-      <div class="skeuo-card" style="padding: 16px 20px;">
-        <div style="font-size: 11px; font-weight: 700; color: var(--text-dim); text-transform: uppercase;">Wholesale Dynamic LMP</div>
+      <div class="pro-card" style="padding: 18px 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 11px; font-weight: 700; color: var(--text-dim); text-transform: uppercase;">Dynamic Wholesale LMP</span>
+          <span class="font-mono" style="font-size: 10px; color: var(--accent-cyan);">CAISO 5-MIN</span>
+        </div>
         <div style="display: flex; align-items: baseline; justify-content: space-between; margin-top: 6px;">
-          <span id="kpi-price-usd" class="font-mono" style="font-size: 30px; font-weight: 800; color: var(--text-main);">$0.184</span>
+          <span id="kpi-price-usd" class="font-mono" style="font-size: 32px; font-weight: 800; color: var(--text-main);">$0.184</span>
           <span class="font-mono" style="font-size: 12px; color: var(--text-muted);">per kWh</span>
         </div>
         <div style="font-size: 11px; color: var(--text-dim); margin-top: 6px; font-family: var(--font-mono);">
-          Market Source: <strong style="color: var(--text-main);">CAISO 5-Min Real-Time</strong>
+          Market Status: <strong style="color: var(--text-main);">Normal Dispatch</strong>
         </div>
       </div>
 
-      <!-- KPI 3: Total Building Electrical Power -->
-      <div class="skeuo-card" style="padding: 16px 20px;">
-        <div style="font-size: 11px; font-weight: 700; color: var(--text-dim); text-transform: uppercase;">Building Electrical Power</div>
+      <!-- KPI 3: Total HVAC Electrical Power -->
+      <div class="pro-card" style="padding: 18px 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 11px; font-weight: 700; color: var(--text-dim); text-transform: uppercase;">Building Power Demand</span>
+          <span id="kpi-shaved-badge" class="pro-well font-mono" style="font-size: 10px; padding: 2px 6px; color: var(--accent-green);">-8.3 kW shaved</span>
+        </div>
         <div style="display: flex; align-items: baseline; justify-content: space-between; margin-top: 6px;">
-          <span id="kpi-power-kw" class="font-mono" style="font-size: 30px; font-weight: 800; color: var(--text-main);">34.2 kW</span>
+          <span id="kpi-power-kw" class="font-mono" style="font-size: 32px; font-weight: 800; color: var(--text-main);">34.2 kW</span>
           <span id="kpi-power-chiller" class="font-mono" style="font-size: 12px; color: var(--text-muted);">Chiller: 22.4 kW</span>
         </div>
         <div style="font-size: 11px; color: var(--text-dim); margin-top: 6px; font-family: var(--font-mono);">
-          Virtual Battery State: <strong id="kpi-battery-status" style="color: var(--led-green);">ACTIVE OPTIMIZATION</strong>
+          Virtual Battery State: <strong id="kpi-battery-status" style="color: var(--accent-green);">PRE-COOL CHARGING</strong>
         </div>
       </div>
 
       <!-- KPI 4: Occupant Comfort SLA -->
-      <div class="skeuo-card" style="padding: 16px 20px;">
-        <div style="font-size: 11px; font-weight: 700; color: var(--text-dim); text-transform: uppercase;">Occupant Comfort SLA</div>
+      <div class="pro-card" style="padding: 18px 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 11px; font-weight: 700; color: var(--text-dim); text-transform: uppercase;">Occupant Comfort SLA</span>
+          <span class="pro-well font-mono" style="font-size: 10px; padding: 2px 6px; color: var(--text-dim);">ASHRAE 55</span>
+        </div>
         <div style="display: flex; align-items: baseline; justify-content: space-between; margin-top: 6px;">
-          <span id="kpi-comfort-sla" class="font-mono" style="font-size: 30px; font-weight: 800; color: var(--led-green);">100.0%</span>
-          <span id="kpi-comfort-violations" class="font-mono" style="font-size: 12px; color: var(--text-muted);">0 Violations</span>
+          <span id="kpi-comfort-sla" class="font-mono" style="font-size: 32px; font-weight: 800; color: var(--accent-green);">100.0%</span>
+          <span class="font-mono" style="font-size: 12px; color: var(--text-muted);">0 Violations</span>
         </div>
         <div style="font-size: 11px; color: var(--text-dim); margin-top: 6px; font-family: var(--font-mono);">
-          Enforced by: <strong style="color: var(--text-main);">OSQP CBF-QP Shield</strong>
+          Safety Guarantee: <strong style="color: var(--text-main);">OSQP CBF-QP Clamped</strong>
         </div>
       </div>
 
     </section>
 
-    <!-- Center Workspace: 3D Twin & Terminal -->
-    <div style="display: grid; grid-template-columns: 1fr 420px; gap: 20px;">
+    <!-- Center Workspace: 3D Twin & Control Deck -->
+    <div style="display: grid; grid-template-columns: 1fr 440px; gap: 20px;">
       
-      <!-- LEFT: 3D Digital Twin Visualizer -->
-      <div class="skeuo-card" style="padding: 20px; display: flex; flex-direction: column;">
+      <!-- LEFT: 3D Multi-Zone Digital Twin Canvas -->
+      <div class="pro-card" style="padding: 22px; display: flex; flex-direction: column;">
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
           <div>
-            <h2 style="font-size: 14px; font-weight: 800; letter-spacing: -0.3px;">3D ISOMETRIC BUILDING DIGITAL TWIN</h2>
-            <p style="font-size: 11px; color: var(--text-muted);">Multi-zone thermal gradient heatmaps & real-time VAV airflow dynamics</p>
+            <h2 style="font-size: 14px; font-weight: 800; letter-spacing: -0.2px;">3D ISOMETRIC BUILDING DIGITAL TWIN</h2>
+            <p style="font-size: 11.5px; color: var(--text-muted);">Multi-zone thermal gradient heatmaps, solar gains & VAV airflow distribution</p>
           </div>
-          <div class="skeuo-well font-mono" style="padding: 4px 10px; font-size: 11px;">
-            Sim Time: <strong id="disp-sim-time">12:00</strong> | Outdoor: <strong id="disp-sim-tamb">28.0°C</strong>
+          <div class="pro-well font-mono" style="padding: 4px 10px; font-size: 11px; display: flex; align-items: center; gap: 8px;">
+            <span>Sim Time: <strong id="disp-sim-time">12:00</strong></span>
+            <span style="color: var(--border-subtle);">|</span>
+            <span>Outdoor: <strong id="disp-sim-tamb">28.0°C</strong></span>
           </div>
         </div>
 
-        <!-- 3D Canvas -->
-        <div id="three-canvas-container" class="skeuo-well" style="width: 100%; height: 320px; border-radius: 8px; overflow: hidden; position: relative;">
+        <!-- Three.js Canvas Container -->
+        <div id="three-canvas-container" class="pro-well" style="width: 100%; height: 340px; border-radius: 10px; overflow: hidden; position: relative;">
           <canvas id="three-canvas" style="width: 100%; height: 100%; display: block;"></canvas>
+          
+          <!-- Floating Legend -->
+          <div style="position: absolute; bottom: 12px; left: 12px; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); padding: 6px 12px; border-radius: 7px; border: 1px solid rgba(255,255,255,0.1); font-size: 10px; font-family: var(--font-mono); display: flex; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 4px;"><span style="width: 8px; height: 8px; border-radius: 2px; background: #38bdf8;"></span> &lt; 21°C (Cool)</div>
+            <div style="display: flex; align-items: center; gap: 4px;"><span style="width: 8px; height: 8px; border-radius: 2px; background: #10b981;"></span> 22°C (Optimal)</div>
+            <div style="display: flex; align-items: center; gap: 4px;"><span style="width: 8px; height: 8px; border-radius: 2px; background: #f43f5e;"></span> &gt; 24.5°C (Warm)</div>
+          </div>
         </div>
 
         <!-- 5 Zones Telemetry Cards -->
@@ -250,42 +338,51 @@
         </div>
       </div>
 
-      <!-- RIGHT: Physical BMS Machinery Dispatch Terminal & SLM Parser -->
+      <!-- RIGHT: Physical BMS Terminal & Neural SLM Parser -->
       <div style="display: flex; flex-direction: column; gap: 20px;">
         
         <!-- Live Machinery BMS Dispatch Terminal -->
-        <div class="skeuo-card" style="padding: 20px; flex: 1; display: flex; flex-direction: column;">
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid var(--border-inner); padding-bottom: 8px;">
+        <div class="pro-card" style="padding: 20px; flex: 1; display: flex; flex-direction: column;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 10px;">
             <div style="display: flex; align-items: center; gap: 8px;">
-              <span class="led-lamp led-green"></span>
-              <h2 style="font-size: 13px; font-weight: 800;">MACHINERY BMS DISPATCH TERMINAL</h2>
+              <div style="display: flex; gap: 5px;">
+                <span style="width: 9px; height: 9px; border-radius: 50%; background: #ef4444;"></span>
+                <span style="width: 9px; height: 9px; border-radius: 50%; background: #f59e0b;"></span>
+                <span style="width: 9px; height: 9px; border-radius: 50%; background: #10b981;"></span>
+              </div>
+              <h2 style="font-size: 12.5px; font-weight: 800; letter-spacing: -0.2px; margin-left: 6px;">BMS DISPATCH TERMINAL</h2>
             </div>
-            <button class="skeuo-btn" style="padding: 3px 8px; font-size: 10px;" onclick="clearTerminal()">CLEAR</button>
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span class="font-mono" style="font-size: 10px; color: var(--text-dim);">BACnet/IP</span>
+              <button class="pro-btn" style="padding: 3px 8px; font-size: 10px;" onclick="clearTerminal()">CLEAR</button>
+            </div>
           </div>
 
-          <div id="bms-terminal" class="skeuo-well font-mono" style="height: 220px; padding: 12px; overflow-y: auto; font-size: 11px; line-height: 1.5; color: #a3e635; display: flex; flex-direction: column; gap: 4px;">
-            <div>[SYS_INIT] AETHERIS-Zero Supervisory Layer attached to BMS port 47808 (BACnet/IP).</div>
-            <div>[CBF_SHIELD] OSQP Quadratic Program solver armed. 5 Thermal Barrier constraints loaded.</div>
-            <div>[READY] Streaming 5-minute autonomous dispatch setpoints to Chillers & AHUs...</div>
+          <!-- Terminal Feed -->
+          <div id="bms-terminal" class="pro-well font-mono" style="height: 220px; padding: 12px; overflow-y: auto; font-size: 11px; line-height: 1.6; color: #a3e635; display: flex; flex-direction: column; gap: 4px;">
+            <div style="color: #64748b;">[SYS_ATTACH] AETHERIS-Zero Supervisory Layer bound to BACnet port 47808.</div>
+            <div style="color: #64748b;">[CBF_SHIELD] OSQP Quadratic Program solver armed with 5 Thermal Barrier constraints.</div>
+            <div style="color: #38bdf8;">[READY] Streaming 5-minute autonomous dispatch setpoints to Chillers & AHUs...</div>
           </div>
         </div>
 
-        <!-- Neural Brick-SLM Tag Parser Sandbox -->
-        <div class="skeuo-card" style="padding: 20px;">
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid var(--border-inner); padding-bottom: 6px;">
+        <!-- Zero-Shot Neural Brick-SLM Tag Parser -->
+        <div class="pro-card" style="padding: 20px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 8px;">
             <div style="display: flex; align-items: center; gap: 6px;">
-              <span class="led-lamp led-blue"></span>
-              <h2 style="font-size: 12px; font-weight: 800;">ZERO-SHOT NEURAL BRICK-SLM PARSER</h2>
+              <span class="pulse-dot pulse-cyan"></span>
+              <h2 style="font-size: 12.5px; font-weight: 800;">NEURAL BRICK-SLM PARSER</h2>
             </div>
-            <span class="font-mono" style="font-size: 10px; color: var(--text-dim);">Latency: &lt;1.2ms</span>
+            <span class="font-mono" style="font-size: 10px; color: var(--accent-cyan);">&lt; 1.2ms</span>
           </div>
 
-          <div style="display: flex; gap: 8px; margin-bottom: 8px;">
-            <input id="inp-slm-tag" class="skeuo-well font-mono" style="flex: 1; padding: 6px 10px; font-size: 11px; color: var(--text-main); outline: none;" value="BLDG1_FL03_AHU1_SAT_SP"/>
-            <button class="skeuo-btn" onclick="executeSLMParse()">PARSE</button>
+          <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+            <input id="inp-slm-tag" class="pro-well font-mono" style="flex: 1; padding: 7px 10px; font-size: 11px; color: var(--text-main); outline: none;" value="BLDG1_FL03_AHU1_SAT_SP"/>
+            <button class="pro-btn pro-btn-primary" onclick="executeSLMParse()">PARSE</button>
           </div>
 
-          <div id="slm-output-box" class="skeuo-well font-mono" style="padding: 8px 10px; font-size: 11px; display: flex; flex-direction: column; gap: 3px;">
+          <!-- SLM Result Display -->
+          <div id="slm-output-box" class="pro-well font-mono" style="padding: 10px; font-size: 11px; display: flex; flex-direction: column; gap: 4px;">
             <div><span style="color: var(--text-dim);">Brick Class:</span> <strong id="slm-out-class" style="color: var(--text-main);">Supply_Air_Temperature_Setpoint</strong></div>
             <div><span style="color: var(--text-dim);">Equipment:</span> <strong id="slm-out-eq" style="color: var(--text-main);">Air_Handling_Unit</strong></div>
             <div><span style="color: var(--text-dim);">Role / Unit:</span> <strong id="slm-out-role" style="color: var(--text-main);">setpoint / deg_C</strong></div>
@@ -298,6 +395,9 @@
 
   </main>
 
+  <!-- =========================================================================
+       JAVASCRIPT TELEMETRY & 3D CONTROLLER
+       ========================================================================= -->
   <script>
     let currentMode = "RL_SAFE_ARBITRAGE";
     let isDarkTheme = true;
@@ -316,30 +416,30 @@
       if (!container || !canvas || typeof THREE === "undefined") return;
 
       const width = container.clientWidth || 800;
-      const height = container.clientHeight || 320;
+      const height = container.clientHeight || 340;
 
       threeScene = new THREE.Scene();
-      threeScene.background = new THREE.Color(isDarkTheme ? 0x0a0b0d : 0xdcdfe4);
+      threeScene.background = new THREE.Color(isDarkTheme ? 0x0c0d12 : 0xf1f5f9);
 
-      threeCamera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-      threeCamera.position.set(16, 20, 22);
+      threeCamera = new THREE.PerspectiveCamera(42, width / height, 0.1, 1000);
+      threeCamera.position.set(16, 19, 21);
       threeCamera.lookAt(0, 0, 0);
 
       threeRenderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
       threeRenderer.setSize(width, height);
       threeRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-      // Lighting
-      threeScene.add(new THREE.AmbientLight(0xffffff, 0.8));
-      const dirLight = new THREE.DirectionalLight(0xffffff, 0.9);
-      dirLight.position.set(10, 20, 10);
+      // Lights
+      threeScene.add(new THREE.AmbientLight(0xffffff, 0.9));
+      const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+      dirLight.position.set(12, 22, 14);
       threeScene.add(dirLight);
 
       // Floor Plate
-      const floorGeo = new THREE.BoxGeometry(14, 0.4, 14);
-      const floorMat = new THREE.MeshStandardMaterial({ color: isDarkTheme ? 0x17181c : 0xc0c4cc, roughness: 0.8 });
+      const floorGeo = new THREE.BoxGeometry(14, 0.3, 14);
+      const floorMat = new THREE.MeshStandardMaterial({ color: isDarkTheme ? 0x151821 : 0xcbd5e1, roughness: 0.8 });
       const floorMesh = new THREE.Mesh(floorGeo, floorMat);
-      floorMesh.position.y = -0.2;
+      floorMesh.position.y = -0.15;
       threeScene.add(floorMesh);
 
       // 5 Thermal Zones
@@ -354,7 +454,7 @@
       zoneMeshes = [];
       zoneConfigs.forEach((cfg) => {
         const geo = new THREE.BoxGeometry(cfg.w, cfg.h, cfg.d);
-        const mat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.4, transparent: true, opacity: 0.85 });
+        const mat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.3, transparent: true, opacity: 0.82 });
         const mesh = new THREE.Mesh(geo, mat);
         mesh.position.set(cfg.x, cfg.h / 2, cfg.z);
         mesh.userData = { id: cfg.id, name: cfg.name, temp: 22.0 };
@@ -388,9 +488,9 @@
           const norm = Math.max(0, Math.min(1, (temp - 19.5) / 5.5));
           const color = new THREE.Color();
           if (norm < 0.5) {
-            color.lerpColors(new THREE.Color(0x38bdf8), new THREE.Color(0x22c55e), norm * 2);
+            color.lerpColors(new THREE.Color(0x38bdf8), new THREE.Color(0x10b981), norm * 2);
           } else {
-            color.lerpColors(new THREE.Color(0x22c55e), new THREE.Color(0xef4444), (norm - 0.5) * 2);
+            color.lerpColors(new THREE.Color(0x10b981), new THREE.Color(0xf43f5e), (norm - 0.5) * 2);
           }
           mesh.material.color = color;
         }
@@ -424,28 +524,34 @@
 
       const price = t.dynamic_lmp_price !== undefined ? t.dynamic_lmp_price : 0.184;
       const powerKw = t.power?.total_hvac_kw || 34.2;
+      const baseKw = t.power?.baseline_hvac_kw || 42.5;
       const chillerKw = t.power?.chiller_kw || 22.4;
+      const shavedKw = t.power?.demand_shaved_kw || Math.max(0, baseKw - powerKw);
       const tamb = t.ambient_temp_c !== undefined ? t.ambient_temp_c : 28.0;
       const timeStr = t.time_display || "12:00";
 
-      // Dynamic Savings & Comfort based on mode
+      // Dynamic mode-based metrics
       let savPct, comfortPct, savUsd;
       if (currentMode === "BASELINE_HEURISTIC") {
         savPct = 0.0;
         savUsd = 0.0;
         comfortPct = t.metrics?.comfort_compliance_pct !== undefined ? Math.min(92.0, t.metrics.comfort_compliance_pct) : 88.5;
         document.getElementById("kpi-savings-pct").style.color = "var(--text-dim)";
-        document.getElementById("kpi-comfort-sla").style.color = "var(--led-amber)";
+        document.getElementById("kpi-comfort-sla").style.color = "var(--accent-amber)";
         document.getElementById("kpi-battery-status").innerText = "BASELINE SCHEDULE (NO ARBITRAGE)";
         document.getElementById("kpi-battery-status").style.color = "var(--text-dim)";
+        document.getElementById("kpi-shaved-badge").innerText = "0.0 kW shaved";
+        document.getElementById("kpi-shaved-badge").style.color = "var(--text-dim)";
       } else {
         savPct = t.metrics?.cost_savings_pct !== undefined ? t.metrics.cost_savings_pct : 24.8;
         savUsd = t.metrics?.cumulative_savings_usd || 84.20;
         comfortPct = 100.0;
-        document.getElementById("kpi-savings-pct").style.color = "var(--led-green)";
-        document.getElementById("kpi-comfort-sla").style.color = "var(--led-green)";
+        document.getElementById("kpi-savings-pct").style.color = "var(--accent-green)";
+        document.getElementById("kpi-comfort-sla").style.color = "var(--accent-green)";
         document.getElementById("kpi-battery-status").innerText = "ACTIVE AI ARBITRAGE CHARGING";
-        document.getElementById("kpi-battery-status").style.color = "var(--led-green)";
+        document.getElementById("kpi-battery-status").style.color = "var(--accent-green)";
+        document.getElementById("kpi-shaved-badge").innerText = `-${Number(shavedKw).toFixed(1)} kW shaved`;
+        document.getElementById("kpi-shaved-badge").style.color = "var(--accent-green)";
       }
 
       document.getElementById("kpi-savings-pct").innerText = `${Number(savPct).toFixed(1)}%`;
@@ -466,7 +572,7 @@
       }
 
       logToTerminal(
-        `[BMS_OUT] BACnet Write: AHU1_SAT_SP -> 13.8°C | CHW_SUP -> 6.2°C | ` +
+        `[BACNET_DISPATCH] Write AHU1_SAT_SP -> 13.8°C | CHW_SUP -> 6.2°C | ` +
         `POWER: ${Number(powerKw).toFixed(1)} kW | LMP: $${Number(price).toFixed(3)}/kWh | SAVINGS: +${Number(savPct).toFixed(1)}%`
       );
     }
@@ -478,11 +584,11 @@
       Object.keys(zones).forEach((zid, idx) => {
         const z = zones[zid];
         const card = document.createElement("div");
-        card.className = "skeuo-well font-mono";
+        card.className = "pro-well font-mono";
         card.style.padding = "8px 10px";
         card.style.fontSize = "11px";
         card.innerHTML = `
-          <div style="font-weight: 700; color: var(--text-dim); text-transform: uppercase;">Zone ${idx+1}</div>
+          <div style="font-weight: 700; color: var(--text-dim); font-size: 10px; text-transform: uppercase;">Zone ${idx+1}</div>
           <div style="font-size: 16px; font-weight: 800; color: var(--text-main); margin-top: 2px;">${Number(z.temp_c || 22.0).toFixed(1)}°C</div>
           <div style="font-size: 10px; color: var(--text-muted); margin-top: 2px;">SP: ${Number(z.setpoint_c || 22.0).toFixed(1)}°C</div>
         `;
@@ -502,7 +608,7 @@
 
     function clearTerminal() {
       const term = document.getElementById("bms-terminal");
-      if (term) term.innerHTML = "<div>[TERMINAL_CLEARED] Ready for live telemetry...</div>";
+      if (term) term.innerHTML = "<div style='color:#64748b;'>[TERMINAL_CLEARED] Ready for live telemetry stream...</div>";
     }
 
     function toggleControlMode() {
@@ -513,7 +619,7 @@
         body: JSON.stringify({ mode: currentMode })
       }).then(r => r.json()).then(() => {
         document.getElementById("txt-mode-name").innerText = `MODE: ${currentMode.replace("_", " ")}`;
-        logToTerminal(`[MODE_SWITCH] Active control mode changed to -> ${currentMode}`);
+        logToTerminal(`[MODE_SWITCH] Active supervisory mode switched to -> ${currentMode}`);
         fetchInitial();
       });
     }
@@ -522,7 +628,7 @@
       isDarkTheme = !isDarkTheme;
       document.getElementById("root-html").className = isDarkTheme ? "dark" : "light";
       document.getElementById("theme-icon").innerText = isDarkTheme ? "☀️" : "🌙";
-      if (threeScene) threeScene.background = new THREE.Color(isDarkTheme ? 0x0a0b0d : 0xdcdfe4);
+      if (threeScene) threeScene.background = new THREE.Color(isDarkTheme ? 0x0c0d12 : 0xf1f5f9);
     }
 
     function executeSLMParse() {

@@ -3,142 +3,206 @@
 <head>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <meta name="description" content="AETHERIS-Zero: Autonomous Smart Building Supervisory Layer, Transactive Virtual Power Plant (VPP) Engine & Commercial ROI Portal"/>
+  <meta name="description" content="AETHERIS-Zero: Enterprise Smart Building Supervisory Layer, Transactive Virtual Power Plant (VPP) Engine & Commercial ROI Portal"/>
   <title>AETHERIS-Zero // Enterprise Product Overview & ROI Portal</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>"/>
   
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet"/>
 
   <style>
     :root {
-      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       --font-mono: 'JetBrains Mono', monospace;
 
       /* Dark Theme */
-      --bg-base: #0c0d10;
-      --bg-surface: #14151a;
-      --bg-elevated: #1e2027;
-      --bg-well: #08090c;
+      --bg-base: #08090c;
+      --bg-card: rgba(15, 17, 23, 0.85);
+      --bg-elevated: #151821;
+      --bg-well: #0c0d12;
       
-      --border-outer: #282a34;
-      --border-inner: #191b22;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-card: rgba(255, 255, 255, 0.06);
 
-      --text-main: #f0f2f5;
-      --text-muted: #9ba1ad;
-      --text-dim: #5c6270;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
 
-      --shadow-bevel-raised: 
-        0 2px 0 0 rgba(255, 255, 255, 0.07) inset,
-        0 -2px 0 0 rgba(0, 0, 0, 0.6) inset,
-        0 8px 24px rgba(0, 0, 0, 0.45);
+      --accent-cyan: #38bdf8;
+      --accent-green: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
 
-      --shadow-well-inset: 
-        0 2px 4px 0 rgba(0, 0, 0, 0.8) inset,
-        0 -1px 0 0 rgba(255, 255, 255, 0.04) inset;
-
-      --shadow-btn-raised: 
-        0 1px 0 0 rgba(255, 255, 255, 0.12) inset,
-        0 -2px 0 0 rgba(0, 0, 0, 0.5) inset,
-        0 4px 8px rgba(0, 0, 0, 0.35);
-
-      --led-green: #22c55e;
-      --led-amber: #f59e0b;
-      --led-blue: #38bdf8;
+      --card-shadow: 
+        0 1px 1px rgba(0, 0, 0, 0.2),
+        0 8px 24px -4px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
     }
 
     html.light {
-      --bg-base: #e6e8ec;
-      --bg-surface: #f0f2f5;
-      --bg-elevated: #ffffff;
-      --bg-well: #dcdfe4;
+      --bg-base: #f8fafc;
+      --bg-card: rgba(255, 255, 255, 0.95);
+      --bg-elevated: #f1f5f9;
+      --bg-well: #e2e8f0;
       
-      --border-outer: #c0c4cc;
-      --border-inner: #d0d4dc;
+      --border-subtle: rgba(0, 0, 0, 0.08);
+      --border-card: rgba(0, 0, 0, 0.06);
 
-      --text-main: #111317;
-      --text-muted: #555b68;
-      --text-dim: #8890a0;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --text-dim: #94a3b8;
 
-      --shadow-bevel-raised: 
-        0 2px 0 0 rgba(255, 255, 255, 0.9) inset,
-        0 -2px 0 0 rgba(0, 0, 0, 0.1) inset,
-        0 8px 20px rgba(0, 0, 0, 0.08);
-
-      --shadow-well-inset: 
-        0 2px 4px 0 rgba(0, 0, 0, 0.15) inset,
-        0 -1px 0 0 rgba(255, 255, 255, 0.8) inset;
-
-      --shadow-btn-raised: 
-        0 1px 0 0 rgba(255, 255, 255, 0.9) inset,
-        0 -2px 0 0 rgba(0, 0, 0, 0.15) inset,
-        0 4px 8px rgba(0, 0, 0, 0.08);
+      --card-shadow: 
+        0 1px 3px rgba(0, 0, 0, 0.05),
+        0 10px 25px -5px rgba(0, 0, 0, 0.04),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; transition: background 0.2s, color 0.2s, border 0.2s; }
-    body { font-family: var(--font-sans); background-color: var(--bg-base); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; line-height: 1.5; }
-
-    .skeuo-card { background: var(--bg-surface); border: 1px solid var(--border-outer); border-radius: 12px; box-shadow: var(--shadow-bevel-raised); }
-    .skeuo-well { background: var(--bg-well); border: 1px solid var(--border-inner); border-radius: 8px; box-shadow: var(--shadow-well-inset); }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     
-    .skeuo-btn {
-      background: var(--bg-elevated); color: var(--text-main); border: 1px solid var(--border-outer);
-      border-radius: 8px; box-shadow: var(--shadow-btn-raised); padding: 8px 16px; font-size: 11px; font-weight: 700;
-      font-family: var(--font-sans); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; user-select: none; text-decoration: none;
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
-    .skeuo-btn:hover { filter: brightness(1.08); }
-    .skeuo-btn:active { transform: translateY(1px); }
-    .skeuo-btn-primary { background: #1e293b; color: #ffffff; border-color: #334155; }
 
-    .led-lamp { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
-    .led-green { background: var(--led-green); box-shadow: 0 0 10px rgba(34, 197, 94, 0.6); }
-    .led-blue { background: var(--led-blue); box-shadow: 0 0 10px rgba(56, 189, 248, 0.6); }
+    .pro-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-card);
+      border-radius: 14px;
+      box-shadow: var(--card-shadow);
+      position: relative;
+    }
 
-    .font-mono { font-family: var(--font-mono); }
+    .pro-well {
+      background: var(--bg-well);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+    }
+
+    .pro-btn {
+      background: var(--bg-elevated);
+      color: var(--text-main);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 7px 14px;
+      font-size: 11.5px;
+      font-weight: 600;
+      font-family: var(--font-sans);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      user-select: none;
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+    .pro-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+    }
+    .pro-btn:active { transform: translateY(1px); }
+
+    .pro-btn-primary {
+      background: #0284c7;
+      color: #ffffff;
+      border-color: #38bdf8;
+      box-shadow: 0 0 16px rgba(56, 189, 248, 0.25);
+    }
+    .pro-btn-primary:hover { background: #0369a1; border-color: #7dd3fc; }
+
+    .nav-pill {
+      color: var(--text-muted);
+      padding: 6px 12px;
+      border-radius: 7px;
+      font-size: 11.5px;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+    .nav-pill:hover { color: var(--text-main); background: rgba(255, 255, 255, 0.05); }
+    .nav-pill.active {
+      color: var(--text-main);
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .pulse-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+    .pulse-green { background: var(--accent-green); box-shadow: 0 0 8px rgba(16, 185, 129, 0.7); }
+    .pulse-amber { background: var(--accent-amber); box-shadow: 0 0 8px rgba(245, 158, 11, 0.7); }
+    .pulse-cyan { background: var(--accent-cyan); box-shadow: 0 0 8px rgba(56, 189, 248, 0.7); }
+
+    .font-mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
 
     input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
-    input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; cursor: pointer; background: var(--bg-well); border-radius: 3px; border: 1px solid var(--border-inner); }
-    input[type=range]::-webkit-slider-thumb { height: 16px; width: 16px; border-radius: 50%; background: var(--text-main); cursor: pointer; -webkit-appearance: none; margin-top: -5px; border: 1px solid var(--border-outer); }
+    input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; cursor: pointer; background: var(--bg-well); border-radius: 3px; border: 1px solid var(--border-subtle); }
+    input[type=range]::-webkit-slider-thumb { height: 16px; width: 16px; border-radius: 50%; background: var(--accent-cyan); cursor: pointer; -webkit-appearance: none; margin-top: -5px; box-shadow: 0 0 10px rgba(56, 189, 248, 0.5); border: 2px solid #ffffff; }
 
     table { width: 100%; border-collapse: collapse; font-size: 12px; }
-    th { text-align: left; padding: 10px 14px; background: var(--bg-well); color: var(--text-dim); border-bottom: 1px solid var(--border-inner); font-weight: 700; font-family: var(--font-mono); }
-    td { padding: 10px 14px; border-bottom: 1px solid var(--border-inner); color: var(--text-main); }
+    th { text-align: left; padding: 10px 14px; background: var(--bg-well); color: var(--text-dim); border-bottom: 1px solid var(--border-subtle); font-weight: 700; font-family: var(--font-mono); }
+    td { padding: 10px 14px; border-bottom: 1px solid var(--border-subtle); color: var(--text-main); }
     tr:hover td { background: var(--bg-elevated); }
+
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: var(--bg-well); }
+    ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.12); border-radius: 3px; }
   </style>
 </head>
 <body>
 
-  <!-- HEADER -->
-  <header style="background: var(--bg-surface); border-bottom: 1px solid var(--border-outer); position: sticky; top: 0; z-index: 100;">
-    <div style="max-width: 1600px; margin: 0 auto; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+  <!-- GLOBAL TOPBAR -->
+  <header style="background: var(--bg-card); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border-card); position: sticky; top: 0; z-index: 100;">
+    <div style="max-width: 1680px; margin: 0 auto; padding: 10px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
       
       <div style="display: flex; align-items: center; gap: 12px;">
-        <div class="skeuo-well" style="width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; font-size: 20px;">
+        <div class="pro-well" style="width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; font-size: 16px; border-radius: 8px;">
           ⚡
         </div>
         <div>
           <div style="display: flex; align-items: center; gap: 8px;">
-            <h1 style="font-size: 17px; font-weight: 800; letter-spacing: -0.4px;">AETHERIS-Zero</h1>
-            <span class="skeuo-well font-mono" style="font-size: 10px; font-weight: 700; padding: 2px 6px; color: var(--text-dim);">ENTERPRISE SUITE</span>
+            <span style="font-size: 15px; font-weight: 800; letter-spacing: -0.3px;">AETHERIS<span style="color: var(--accent-cyan);">·Zero</span></span>
+            <span class="pro-well font-mono" style="font-size: 9.5px; font-weight: 700; padding: 2px 6px; color: var(--accent-green);">ENTERPRISE SUITE</span>
           </div>
-          <p style="font-size: 11px; color: var(--text-muted); font-weight: 500;">Autonomous BMS Supervisory Layer & Transactive Virtual Power Plant</p>
+          <span style="font-size: 11px; color: var(--text-muted); font-weight: 500;">Commercial Building Supervisory Intelligence & Transactive VPP Engine</span>
         </div>
       </div>
 
-      <!-- Navigation Links -->
+      <!-- Navigation Tabs -->
+      <nav style="display: flex; align-items: center; gap: 4px; background: var(--bg-well); padding: 3px; border-radius: 9px; border: 1px solid var(--border-subtle);">
+        <a href="/overview" class="nav-pill active">
+          <span>📊</span> Overview & ROI
+        </a>
+        <a href="/dashboard" class="nav-pill">
+          <span>🏢</span> 3D Digital Twin
+        </a>
+        <a href="/simulator" class="nav-pill">
+          <span>🎛️</span> Scenario Lab
+        </a>
+        <a href="/docs" target="_blank" class="nav-pill">
+          <span>📖</span> API Docs
+        </a>
+      </nav>
+
+      <!-- Right Action Deck -->
       <div style="display: flex; align-items: center; gap: 10px;">
-        <a href="/dashboard" class="skeuo-btn">
-          🏢 <strong>3D MISSION CONTROL</strong>
+        <a href="/dashboard" class="pro-btn pro-btn-primary">
+          🏢 <strong>LAUNCH MISSION CONTROL</strong>
         </a>
-        <a href="/simulator" class="skeuo-btn">
-          🎛️ <strong>SIMULATOR POD</strong>
-        </a>
-        <a href="/docs" target="_blank" class="skeuo-btn">
-          📖 <strong>API EXPLORER</strong>
-        </a>
-        <button class="skeuo-btn" onclick="toggleTheme()">
+        <button class="pro-btn" style="padding: 7px 10px;" onclick="toggleTheme()">
           <span id="theme-icon">☀️</span>
         </button>
       </div>
@@ -147,26 +211,26 @@
   </header>
 
   <!-- MAIN BUSINESS CONTENT -->
-  <main style="max-width: 1600px; margin: 24px auto; padding: 0 24px 60px 24px; width: 100%; display: flex; flex-direction: column; gap: 24px;">
+  <main style="max-width: 1680px; margin: 24px auto; padding: 0 24px 60px 24px; width: 100%; display: flex; flex-direction: column; gap: 24px;">
     
     <!-- Hero Banner -->
-    <section class="skeuo-card" style="padding: 32px 36px; background: linear-gradient(135deg, var(--bg-surface) 0%, var(--bg-elevated) 100%);">
-      <div style="max-width: 900px;">
-        <div class="skeuo-well font-mono" style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; font-size: 11px; font-weight: 700; color: var(--led-green); margin-bottom: 14px;">
-          <span class="led-lamp led-green"></span> COMMERCIAL PRODUCT OVERVIEW & EXECUTIVE ROI
+    <section class="pro-card" style="padding: 36px 40px; background: linear-gradient(135deg, rgba(15, 17, 23, 0.95) 0%, rgba(21, 24, 33, 0.95) 100%);">
+      <div style="max-width: 960px;">
+        <div class="pro-well font-mono" style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; font-size: 11px; font-weight: 700; color: var(--accent-green); margin-bottom: 16px;">
+          <span class="pulse-dot pulse-green"></span> COMMERCIAL PRODUCT OVERVIEW & EXECUTIVE ROI
         </div>
-        <h1 style="font-size: 32px; font-weight: 800; letter-spacing: -1px; line-height: 1.2; margin-bottom: 12px;">
+        <h1 style="font-size: 34px; font-weight: 800; letter-spacing: -1px; line-height: 1.25; margin-bottom: 14px;">
           Transform Passive Commercial Buildings into Autonomous Transactive Virtual Batteries.
         </h1>
-        <p style="font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 20px;">
-          AETHERIS-Zero is an enterprise software supervisory intelligence layer that attaches non-invasively to existing Building Management Systems (BACnet/IP & Modbus). It optimizes HVAC chiller setpoints and VAV dampers in real time under volatile wholesale electricity tariffs, delivering <strong>15% to 32% energy cost savings</strong> while mathematically guaranteeing <strong>100% ASHRAE-55 comfort compliance</strong>.
+        <p style="font-size: 14.5px; color: var(--text-muted); line-height: 1.6; margin-bottom: 24px;">
+          AETHERIS-Zero is an enterprise software supervisory intelligence layer that attaches non-invasively to existing Building Management Systems (BACnet/IP & Modbus). It optimizes HVAC chiller setpoints and VAV dampers in real time against volatile wholesale electricity tariffs, delivering <strong>15% to 32% energy cost savings</strong> while mathematically guaranteeing <strong>100% ASHRAE-55 comfort compliance</strong>.
         </p>
         <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-          <a href="/dashboard" class="skeuo-btn skeuo-btn-primary" style="padding: 10px 20px; font-size: 12px;">
-            🏢 LAUNCH LIVE 3D DIGITAL TWIN
+          <a href="/dashboard" class="pro-btn pro-btn-primary" style="padding: 10px 20px; font-size: 12px;">
+            🏢 LAUNCH 3D DIGITAL TWIN
           </a>
-          <a href="/simulator" class="skeuo-btn" style="padding: 10px 20px; font-size: 12px;">
-            🎛️ OPEN LIVE INJECTION SIMULATOR
+          <a href="/simulator" class="pro-btn" style="padding: 10px 20px; font-size: 12px;">
+            🎛️ OPEN INJECTION SCENARIO LAB
           </a>
         </div>
       </div>
@@ -175,40 +239,40 @@
     <!-- Key Metrics Value Grid -->
     <section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;">
       
-      <div class="skeuo-card" style="padding: 20px;">
+      <div class="pro-card" style="padding: 22px;">
         <div style="font-size: 11px; font-weight: 700; color: var(--text-dim); text-transform: uppercase;">Energy Cost Reduction</div>
-        <div class="font-mono" style="font-size: 34px; font-weight: 800; color: var(--led-green); margin-top: 6px;">15% – 32%</div>
-        <p style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Dynamic structural pre-cooling during solar curtailment dips and load-shedding during peak evening ramps.</p>
+        <div class="font-mono" style="font-size: 36px; font-weight: 800; color: var(--accent-green); margin-top: 6px;">15% – 32%</div>
+        <p style="font-size: 11.5px; color: var(--text-muted); margin-top: 6px;">Dynamic structural pre-cooling during solar curtailment dips and load-shedding during peak evening ramps.</p>
       </div>
 
-      <div class="skeuo-card" style="padding: 20px;">
+      <div class="pro-card" style="padding: 22px;">
         <div style="font-size: 11px; font-weight: 700; color: var(--text-dim); text-transform: uppercase;">Zero Hardware Replacement</div>
-        <div class="font-mono" style="font-size: 34px; font-weight: 800; color: var(--text-main); margin-top: 6px;">100% Software</div>
-        <p style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Attaches to Johnson Controls, Siemens Desigo, Honeywell, Schneider, and Trane via native BACnet/IP.</p>
+        <div class="font-mono" style="font-size: 36px; font-weight: 800; color: var(--text-main); margin-top: 6px;">100% Software</div>
+        <p style="font-size: 11.5px; color: var(--text-muted); margin-top: 6px;">Attaches directly to Johnson Controls, Siemens Desigo, Honeywell, Schneider, and Trane via native BACnet/IP.</p>
       </div>
 
-      <div class="skeuo-card" style="padding: 20px;">
+      <div class="pro-card" style="padding: 22px;">
         <div style="font-size: 11px; font-weight: 700; color: var(--text-dim); text-transform: uppercase;">Occupant Comfort Guarantee</div>
-        <div class="font-mono" style="font-size: 34px; font-weight: 800; color: var(--led-green); margin-top: 6px;">100.0% SLA</div>
-        <p style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Enforced in &lt;1.2ms by the OSQP Control Barrier Function (CBF-QP) Safety Shield.</p>
+        <div class="font-mono" style="font-size: 36px; font-weight: 800; color: var(--accent-cyan); margin-top: 6px;">100.0% SLA</div>
+        <p style="font-size: 11.5px; color: var(--text-muted); margin-top: 6px;">Enforced in &lt;1.2ms by the OSQP Control Barrier Function (CBF-QP) Safety Shield.</p>
       </div>
 
-      <div class="skeuo-card" style="padding: 20px;">
+      <div class="pro-card" style="padding: 22px;">
         <div style="font-size: 11px; font-weight: 700; color: var(--text-dim); text-transform: uppercase;">Capital Payback Period</div>
-        <div class="font-mono" style="font-size: 34px; font-weight: 800; color: var(--text-main); margin-top: 6px;">&lt; 3.5 Months</div>
-        <p style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Immediate OPEX reduction with zero physical infrastructure retrofits or downtime.</p>
+        <div class="font-mono" style="font-size: 36px; font-weight: 800; color: var(--text-main); margin-top: 6px;">&lt; 3.5 Months</div>
+        <p style="font-size: 11.5px; color: var(--text-muted); margin-top: 6px;">Immediate OPEX reduction with zero physical infrastructure retrofits or downtime.</p>
       </div>
 
     </section>
 
     <!-- INTERACTIVE COMMERCIAL ROI CALCULATOR -->
-    <section class="skeuo-card" style="padding: 28px;">
-      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid var(--border-inner); padding-bottom: 14px;">
+    <section class="pro-card" style="padding: 28px;">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 14px;">
         <div>
-          <h2 style="font-size: 16px; font-weight: 800; text-transform: uppercase;">Interactive Commercial Building ROI Calculator</h2>
+          <h2 style="font-size: 16px; font-weight: 800; text-transform: uppercase; letter-spacing: -0.2px;">Interactive Commercial Building ROI Calculator</h2>
           <p style="font-size: 12px; color: var(--text-muted);">Estimate annual utility bill savings and carbon offset for your real estate facility</p>
         </div>
-        <span class="led-lamp led-green"></span>
+        <span class="pulse-dot pulse-green"></span>
       </div>
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
@@ -216,26 +280,26 @@
         <!-- Sliders -->
         <div style="display: flex; flex-direction: column; gap: 18px;">
           
-          <div class="skeuo-well" style="padding: 14px;">
-            <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; margin-bottom: 6px;">
+          <div class="pro-well" style="padding: 16px;">
+            <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; margin-bottom: 8px;">
               <span>Facility Floor Area:</span>
-              <strong id="lbl-area" class="font-mono" style="color: var(--text-main);">250,000 sq ft</strong>
+              <strong id="lbl-area" class="font-mono" style="color: var(--accent-cyan); font-size: 13px;">250,000 sq ft</strong>
             </div>
             <input id="sld-area" type="range" min="50000" max="1500000" step="25000" value="250000" oninput="calculateROI()"/>
           </div>
 
-          <div class="skeuo-well" style="padding: 14px;">
-            <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; margin-bottom: 6px;">
+          <div class="pro-well" style="padding: 16px;">
+            <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; margin-bottom: 8px;">
               <span>Blended Electricity Tariff Rate:</span>
-              <strong id="lbl-tariff" class="font-mono" style="color: var(--text-main);">$0.22 / kWh (₹18.26 / kWh)</strong>
+              <strong id="lbl-tariff" class="font-mono" style="color: var(--accent-cyan); font-size: 13px;">$0.22 / kWh (₹18.26 / kWh)</strong>
             </div>
             <input id="sld-tariff" type="range" min="0.08" max="0.50" step="0.01" value="0.22" oninput="calculateROI()"/>
           </div>
 
-          <div class="skeuo-well" style="padding: 14px;">
-            <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; margin-bottom: 6px;">
+          <div class="pro-well" style="padding: 16px;">
+            <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; margin-bottom: 8px;">
               <span>Peak Cooling Baseload (HVAC):</span>
-              <strong id="lbl-baseload" class="font-mono" style="color: var(--text-main);">450 kW</strong>
+              <strong id="lbl-baseload" class="font-mono" style="color: var(--accent-cyan); font-size: 13px;">450 kW</strong>
             </div>
             <input id="sld-baseload" type="range" min="100" max="2500" step="50" value="450" oninput="calculateROI()"/>
           </div>
@@ -243,26 +307,26 @@
         </div>
 
         <!-- Calculated ROI Results Display -->
-        <div class="skeuo-well" style="padding: 20px; display: flex; flex-direction: column; justify-content: space-between; gap: 16px;">
+        <div class="pro-well" style="padding: 22px; display: flex; flex-direction: column; justify-content: space-between; gap: 16px;">
           <div>
             <div style="font-size: 11px; font-weight: 700; color: var(--text-dim); text-transform: uppercase;">Estimated Annual Utility Bill Savings:</div>
-            <div style="display: flex; align-items: baseline; gap: 12px; margin-top: 4px;">
-              <span id="res-savings-usd" class="font-mono" style="font-size: 38px; font-weight: 800; color: var(--led-green);">$108,900</span>
+            <div style="display: flex; align-items: baseline; gap: 12px; margin-top: 6px;">
+              <span id="res-savings-usd" class="font-mono" style="font-size: 40px; font-weight: 800; color: var(--accent-green);">$108,900</span>
               <span class="font-mono" style="font-size: 14px; color: var(--text-muted);">/ year</span>
             </div>
-            <div id="res-savings-inr" class="font-mono" style="font-size: 14px; font-weight: 700; color: var(--text-main); margin-top: 2px;">
+            <div id="res-savings-inr" class="font-mono" style="font-size: 14.5px; font-weight: 700; color: var(--text-main); margin-top: 4px;">
               ₹90,38,700 / year (INR)
             </div>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; border-top: 1px solid var(--border-inner); padding-top: 12px;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; border-top: 1px solid var(--border-subtle); padding-top: 14px;">
             <div>
-              <div style="font-size: 10px; font-weight: 700; color: var(--text-dim); text-transform: uppercase;">Peak Demand Shaved:</div>
-              <div id="res-shaved-kw" class="font-mono" style="font-size: 20px; font-weight: 800; color: var(--text-main); margin-top: 2px;">112.5 kW</div>
+              <div style="font-size: 10.5px; font-weight: 700; color: var(--text-dim); text-transform: uppercase;">Peak Demand Shaved:</div>
+              <div id="res-shaved-kw" class="font-mono" style="font-size: 22px; font-weight: 800; color: var(--text-main); margin-top: 2px;">112.5 kW</div>
             </div>
             <div>
-              <div style="font-size: 10px; font-weight: 700; color: var(--text-dim); text-transform: uppercase;">Avoided Carbon Emissions:</div>
-              <div id="res-co2-tons" class="font-mono" style="font-size: 20px; font-weight: 800; color: var(--led-green); margin-top: 2px;">190.5 Tons CO₂</div>
+              <div style="font-size: 10.5px; font-weight: 700; color: var(--text-dim); text-transform: uppercase;">Avoided Carbon Emissions:</div>
+              <div id="res-co2-tons" class="font-mono" style="font-size: 22px; font-weight: 800; color: var(--accent-green); margin-top: 2px;">190.5 Tons CO₂</div>
             </div>
           </div>
         </div>
@@ -271,49 +335,49 @@
     </section>
 
     <!-- 5-PILLAR ARCHITECTURAL MATRIX -->
-    <section class="skeuo-card" style="padding: 28px;">
-      <h2 style="font-size: 16px; font-weight: 800; text-transform: uppercase; margin-bottom: 16px;">The 5-Pillar Core Architecture</h2>
+    <section class="pro-card" style="padding: 28px;">
+      <h2 style="font-size: 16px; font-weight: 800; text-transform: uppercase; letter-spacing: -0.2px; margin-bottom: 18px;">The 5-Pillar Core Architecture</h2>
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;">
         
-        <div class="skeuo-well" style="padding: 16px;">
-          <div style="font-size: 13px; font-weight: 800; margin-bottom: 6px;">🧠 1. Neural Brick-SLM</div>
-          <p style="font-size: 11px; color: var(--text-muted);">Multi-Task Transformer classifying raw BACnet register strings into canonical Brick Schema v1.3 ontologies with zero manual engineering.</p>
+        <div class="pro-well" style="padding: 18px;">
+          <div style="font-size: 13.5px; font-weight: 800; margin-bottom: 6px; color: var(--text-main);">🧠 1. Neural Brick-SLM</div>
+          <p style="font-size: 11.5px; color: var(--text-muted); line-height: 1.5;">Multi-Task Transformer classifying raw BACnet register strings into canonical Brick Schema v1.3 ontologies with zero manual engineering.</p>
         </div>
 
-        <div class="skeuo-well" style="padding: 16px;">
-          <div style="font-size: 13px; font-weight: 800; margin-bottom: 6px;">🏢 2. 2R2C + PINN Twin</div>
-          <p style="font-size: 11px; color: var(--text-muted);">High-speed physics-informed surrogate modeling envelope and internal thermal mass capacitance in 5 multi-zone spaces.</p>
+        <div class="pro-well" style="padding: 18px;">
+          <div style="font-size: 13.5px; font-weight: 800; margin-bottom: 6px; color: var(--text-main);">🏢 2. 2R2C + PINN Twin</div>
+          <p style="font-size: 11.5px; color: var(--text-muted); line-height: 1.5;">High-speed physics-informed surrogate modeling envelope and internal thermal mass capacitance in 5 multi-zone spaces.</p>
         </div>
 
-        <div class="skeuo-well" style="padding: 16px;">
-          <div style="font-size: 13px; font-weight: 800; margin-bottom: 6px;">⚡ 3. Safe-RL PPO Engine</div>
-          <p style="font-size: 11px; color: var(--text-muted);">Continuous Actor-Critic reinforcement learning agent orchestrating thermal pre-cooling and load-shifting against CAISO LMP price curves.</p>
+        <div class="pro-well" style="padding: 18px;">
+          <div style="font-size: 13.5px; font-weight: 800; margin-bottom: 6px; color: var(--text-main);">⚡ 3. Safe-RL PPO Engine</div>
+          <p style="font-size: 11.5px; color: var(--text-muted); line-height: 1.5;">Continuous Actor-Critic reinforcement learning agent orchestrating thermal pre-cooling and load-shifting against CAISO LMP price curves.</p>
         </div>
 
-        <div class="skeuo-well" style="padding: 16px;">
-          <div style="font-size: 13px; font-weight: 800; margin-bottom: 6px;">🛡️ 4. OSQP CBF-QP Shield</div>
-          <p style="font-size: 11px; color: var(--text-muted);">Control Barrier Function safety filter guaranteeing 100% ASHRAE-55 comfort and equipment anti-short-cycling protection.</p>
+        <div class="pro-well" style="padding: 18px;">
+          <div style="font-size: 13.5px; font-weight: 800; margin-bottom: 6px; color: var(--text-main);">🛡️ 4. OSQP CBF-QP Shield</div>
+          <p style="font-size: 11.5px; color: var(--text-muted); line-height: 1.5;">Control Barrier Function safety filter guaranteeing 100% ASHRAE-55 comfort and equipment anti-short-cycling protection.</p>
         </div>
 
-        <div class="skeuo-well" style="padding: 16px;">
-          <div style="font-size: 13px; font-weight: 800; margin-bottom: 6px;">📡 5. OpenADR 3.0 VEN</div>
-          <p style="font-size: 11px; color: var(--text-muted);">Automated demand response endpoint participating in utility grid events to unlock additional demand flexibility revenue streams.</p>
+        <div class="pro-well" style="padding: 18px;">
+          <div style="font-size: 13.5px; font-weight: 800; margin-bottom: 6px; color: var(--text-main);">📡 5. OpenADR 3.0 VEN</div>
+          <p style="font-size: 11.5px; color: var(--text-muted); line-height: 1.5;">Automated demand response endpoint participating in utility grid events to unlock additional demand flexibility revenue streams.</p>
         </div>
 
       </div>
     </section>
 
     <!-- EXECUTIVE COMPARISON TABLE -->
-    <section class="skeuo-card" style="padding: 28px;">
-      <h2 style="font-size: 16px; font-weight: 800; text-transform: uppercase; margin-bottom: 16px;">Executive Solution Comparison</h2>
-      <div class="skeuo-well" style="overflow-x: auto;">
+    <section class="pro-card" style="padding: 28px;">
+      <h2 style="font-size: 16px; font-weight: 800; text-transform: uppercase; letter-spacing: -0.2px; margin-bottom: 18px;">Executive Solution Comparison</h2>
+      <div class="pro-well" style="overflow-x: auto; border-radius: 10px;">
         <table>
           <thead>
             <tr>
               <th>Feature / Capability</th>
               <th>Legacy Rule-Based BMS</th>
               <th>Unconstrained Black-Box RL</th>
-              <th style="color: var(--led-green);">AETHERIS-Zero Safe-RL</th>
+              <th style="color: var(--accent-green);">AETHERIS-Zero Safe-RL</th>
             </tr>
           </thead>
           <tbody>
@@ -360,8 +424,7 @@
       document.getElementById("lbl-tariff").innerText = `$${tariff.toFixed(2)} / kWh (₹${(tariff * 83.0).toFixed(2)} / kWh)`;
       document.getElementById("lbl-baseload").innerText = `${baseload.toFixed(0)} kW`;
 
-      // Conservative 22% energy arbitrage savings model
-      const annualKwh = baseload * 3000;  // Average annual active HVAC hours
+      const annualKwh = baseload * 3000;
       const annualBill = annualKwh * tariff;
       const annualSavingsUsd = annualBill * 0.22;
       const annualSavingsInr = annualSavingsUsd * 83.0;
