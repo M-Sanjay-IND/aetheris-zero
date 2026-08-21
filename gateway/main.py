@@ -287,6 +287,7 @@ app.add_middleware(
 
 @app.get("/", response_class=HTMLResponse)
 @app.get("/dashboard", response_class=HTMLResponse)
+@app.get("/simulator", response_class=HTMLResponse)
 def get_dashboard_html():
     """Serve the interactive AETHERIS-Zero Digital Twin Mission Control Dashboard."""
     if DASHBOARD_HTML_PATH.exists():
