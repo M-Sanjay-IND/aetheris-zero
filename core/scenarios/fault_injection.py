@@ -35,11 +35,20 @@ def run_arbitrage_scenario(
     power_baseline = [h["power_baseline_kw"] for h in history]
     demand_shaved = [h["demand_shaved_kw"] for h in history]
 
+    # Coincident peak demand window (critical high-tariff & DR window: 14:00 - 17:30 or price >= $0.80)
+    on_peak_indices = [i for i, p in enumerate(prices) if p >= 0.80 or (14.0 <= timestamps[i] <= 17.5)]
+    if on_peak_indices:
+        peak_b_kw = max([power_baseline[i] for i in on_peak_indices])
+        peak_a_kw = max([power_aetheris[i] for i in on_peak_indices])
+    else:
+        peak_b_kw = max(power_baseline) if power_baseline else 0.0
+        peak_a_kw = max(power_aetheris) if power_aetheris else 0.0
+
     metrics = generate_comparative_metrics(
         baseline_cost=summary["cumulative_cost_baseline_usd"],
         aetheris_cost=summary["cumulative_cost_actual_usd"],
-        peak_baseline_kw=max(power_baseline) if power_baseline else 0.0,
-        peak_aetheris_kw=max(power_aetheris) if power_aetheris else 0.0,
+        peak_baseline_kw=peak_b_kw,
+        peak_aetheris_kw=peak_a_kw,
         energy_saved_kwh=summary["energy_saved_kwh"],
         total_interventions=summary["total_safety_interventions"]
     )

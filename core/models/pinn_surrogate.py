@@ -1,4 +1,6 @@
 import time
+from pathlib import Path
+from typing import Union, Optional, List, Dict, Any
 import numpy as np
 import torch
 import torch.nn as nn
@@ -139,3 +141,26 @@ class PINNSurrogate(nn.Module):
 
         elapsed_ms = (time.perf_counter() - start_time) * 1000.0
         return predicted_trajectory
+
+    def save_checkpoint(self, save_path: str | Path):
+        path = Path(save_path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        torch.save({
+            "in_dim": self.in_dim,
+            "out_dim": self.out_dim,
+            "lambda_phys": self.lambda_phys,
+            "state_dict": self.state_dict(),
+        }, path)
+
+    @classmethod
+    def load_checkpoint(cls, checkpoint_path: str | Path, device: str = "cpu") -> "PINNSurrogate":
+        data = torch.load(checkpoint_path, map_location=device, weights_only=False)
+        model = cls(
+            in_dim=data.get("in_dim", 17),
+            out_dim=data.get("out_dim", 5),
+            lambda_phys=data.get("lambda_phys", 0.2),
+        )
+        model.load_state_dict(data["state_dict"])
+        model.to(device)
+        model.eval()
+        return model
